@@ -1,9 +1,9 @@
 2004-12-21  Andreas Büsching  <crunchy@tzi.de>
 
+	* notifier/version.py (extension): set version to 0.3.2
+
 	* notifier/nf_generic.py (step): fixed typo; exception is not
 	called KeyboardExit but KeyboardInterrupt
-
-	* notifier/version.py (extension): set version to 0.3.2
 
 	* notifier/nf_generic.py (step): if a raised exception in any
 	callback is of type KeyboardInterruppt or SystemExit it is passed

@@ -173,7 +173,7 @@ def step( sleep = True, external = True ):
                     try:
                         if not __sockets[ condition ][ sock ]( sock ):
                             removeSocket( sock, condition )
-                    except ( KeyboardExit, SystemExit ), e:
+                    except ( KeyboardInterrupt, SystemExit ), e:
                         raise e
                     except:
                         log.exception( 'error in socket callback' )
