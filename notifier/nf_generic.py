@@ -76,7 +76,8 @@ def step():
     # handle __sockets
     r, w, e = select( __sockets.keys(), [], [], timeout )
     for sock in r:
-        if sock.fileno() >= 0: __sockets[sock]( sock )
+        if ( type( sock ) == int and sock != -1 ) or sock.fileno() != -1:
+            __sockets[sock]( sock )
 
 def loop():
     """Execute main loop forver."""
