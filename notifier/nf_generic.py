@@ -7,7 +7,6 @@ __sockets = {}
 __timers = []
 __timer_id = 0
 
-
 def addSocket( socket, method ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket.
@@ -40,22 +39,6 @@ def removeTimer( id ):
     for i in range( 0, len( __timers ) ):
 	if __timers[ i ][ 2 ][ 1 ] == id:
             del __timers[ i ]
-    
-# def removeTimerByMethod( method ):
-#     """Removes _all_ functioncalls to the method given as argument from the
-#     scheduler."""
-#     remove = []
-#     for i in range( 0, len(__timers) ):
-# 	if __timers[i][2] == method:
-# 	    remove.append( i )
-#     remove.reverse()
-#     for i in remove: del __timers[i]
-
-def loop():
-    """Execute main loop forver."""
-    print 'notifier loop with', id( __sockets )
-    while 1:
-	step()
 
 def step():
     # IDEA: Add parameter to specify max timeamount to spend in mainloop
@@ -88,4 +71,9 @@ def step():
     # handle __sockets
     r, w, e = select( __sockets.keys(), [], [], timeout )
     for sock in r: __sockets[sock]( sock )
+
+def loop():
+    """Execute main loop forver."""
+    while 1:
+	step()
 

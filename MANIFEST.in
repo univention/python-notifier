@@ -1,0 +1,3 @@
+include test-generic.py test-gtk.py test-qt.py test-wx.py
+include COPYING AUTHORS
+
