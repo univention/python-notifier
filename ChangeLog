@@ -1,4 +1,15 @@
+2004-10-19  Andreas Büsching  <crunchy@tzi.de>
+
+	* setup.py: set version to 0.2.0
+
+2004-10-18  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/qt/notifier.py (removeSocket): adapt notifier to new
+	unit for timers (milliseconds); that's what Qt uses normally.
+
 2004-10-12  Andreas Büsching  <crunchy@tzi.de>
+
+	* setup.py: set version to 0.2.0rc3
 
 	* notifier/generic/notifier.py (step): fixed a stupid bug causing
 	pyNotifier to crash if sleep is False

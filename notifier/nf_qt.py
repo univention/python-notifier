@@ -48,12 +48,13 @@ def removeSocket( socket ):
 	del qt_socketIDs[ socket ]
 
 def addTimer( interval, method, data = None ):
-    """The first argument specifies an interval in seconds, the second argument
-    a function. This is function is called after interval seconds. If it
-    returns true it's called again after interval seconds, otherwise it is
-    removed from the scheduler. The third (optional) argument is a parameter
-    given to the called function."""
-    return Timer( interval * 1000, method, data )
+    """The first argument specifies an interval in milliseconds, the
+    second argument a function. This is function is called after
+    interval milliseconds. If it returns true it's called again after
+    interval milliseconds, otherwise it is removed from the
+    scheduler. The third (optional) argument is a parameter given to
+    the called function."""
+    return Timer( interval, method, data )
 
 def removeTimer( id ):
     """Removes _all_ functioncalls to the method given as argument from the
