@@ -1,6 +1,17 @@
+2005-03-09  Andreas Büsching  <crunchy@tzi.de>
+
+        * notifier/version.py: set version to 0.3.4
+
+        * notifier/nf_generic.py (step, millisecs, addDispatcher,
+        removeDispatcher): add more documentation
+
 2005-03-03  Andreas Büsching  <crunchy@tzi.de>
 
-	* notifier/version.py: set version to 0.3.3
+        * notifier/nf_generic.py (step): fixed bug in timeout calculation for
+        select command; may cause select to sleep to long; thanx to Sönke
+        Schwardt <schwardt@users.sourceforge.net>
+
+        * notifier/version.py: set version to 0.3.3
 
 2005-01-24  Andreas Büsching  <crunchy@tzi.de>
 

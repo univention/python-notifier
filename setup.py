@@ -3,9 +3,10 @@
 
 """A generic notifier/event scheduler abstraction
 
-pyNotifier provides an implementation of a notifier/event
-scheduler and is capable of wrapping other notifier implementations of
-GTK+, Qt and wxWindows."""
+pyNotifier provides an implementation of a notifier/event scheduler and is
+capable of wrapping other notifier implementations of GTK+, Qt and wxWindows.
+This enables library developers to write code that may be used in applications
+with """
 
 from distutils.core import setup
 
