@@ -1,5 +1,15 @@
 2004-11-04  Andreas Büsching  <crunchy@tzi.de>
 
+	* notifier/version.py: set version to 0.3.0
+
+	* notifier/nf_generic.py (step): if there are no timers and no
+	external dispatchers set the default sleep timer to MIN_TIMER
+
+	* notifier/__init__.py: import version to make version information
+	available by a simple import of notifier
+	(init): import IO_IN and IO_OUT from selected notifier
+	implementation to be accessible via notifier.IO_IN and notifier.IO_OUT
+
 	* notifier/version.py: set version to 0.3.0pre3
 
 	* setup.py: make use of version.py

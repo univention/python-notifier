@@ -106,7 +106,7 @@ def step( sleep = True, external = True ):
                 nextCall = interval + timestamp - millisecs()
                 if nextCall > 0: timeout = nextCall
                 else: timeout = 0
-        if timeout == None: timeout = 0
+        if timeout == None: timeout = MIN_TIMER
         if __min_timer and __min_timer < timeout: timeout = __min_timer
 
     r, w, e = select( __sockets[ IO_IN ].keys(), __sockets[ IO_OUT ].keys(),

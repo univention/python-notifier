@@ -1,5 +1,7 @@
 """Simple mainloop that watches _sockets and _timers."""
 
+from version import *
+
 from select import select
 from time import time
 
@@ -21,6 +23,10 @@ QT      = 1
 GTK     = 2
 WX      = 3
 
+# socket conditions
+IO_IN = None
+IO_OUT = None
+
 def init( type = GENERIC ):
     global addTimer
     global addSocket
@@ -29,7 +35,8 @@ def init( type = GENERIC ):
     global removeSocket
     global removeDispatcher
     global loop, step
-
+    global IO_IN, IO_OUT
+    
     if type == GENERIC:
         import nf_generic
         addSocket = nf_generic.addSocket
@@ -40,6 +47,8 @@ def init( type = GENERIC ):
         removeDispatcher = nf_generic.removeDispatcher
         loop = nf_generic.loop
         step = nf_generic.step
+        IO_OUT = nf_generic.IO_OUT
+        IO_IN = nf_generic.IO_IN
     elif type == QT:
         import nf_qt
         addSocket = nf_qt.addSocket
@@ -56,6 +65,8 @@ def init( type = GENERIC ):
         removeTimer = nf_gtk.removeTimer
         loop = nf_gtk.loop
         step = nf_gtk.step
+        IO_OUT = nf_gtk.IO_OUT
+        IO_IN = nf_gtk.IO_IN
     elif type == WX:
         import nf_wx
         addSocket = nf_wx.addSocket
