@@ -21,7 +21,6 @@ QT      = 1
 GTK     = 2
 WX      = 3
 
-import traceback
 def init( type = GENERIC ):
     global addTimer
     global addSocket

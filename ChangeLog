@@ -1,3 +1,8 @@
+2004-10-24  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/__init__.py (WX): remove unnecessary import of
+	traceback
+
 2004-10-22  Andreas Büsching  <crunchy@tzi.de>
 
 	* setup.py: set version to 0.2.1
