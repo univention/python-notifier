@@ -15,7 +15,7 @@ classifiers = """\
 Development Status :: 5 - Production/Stable
 Environment :: Console
 Environment :: X11 Applications :: GTK
-Environment :: X11 Applications :: Qt
+    Environment :: X11 Applications :: Qt
 Intended Audience :: Developers
 License :: OSI Approved :: GNU General Public License (GPL)
 Programming Language :: Python
@@ -31,7 +31,8 @@ setup( name	= 'pyNotifier',
        long_description = '\n'.join( doclines[ 2 : ] ),
        author	= 'Andreas Büsching',
        author_email = 'crunchy@tzi.de',
-       url	= 'http://www.mbus.org//',
+       url	= 'http://www.mbus.org/',
+       download_url = 'ftp://ftp.mbus.org/tzi/dmn/mbus/python/',
        platforms = [ 'any', ],
        classifiers = filter( None, classifiers.split( '\n' ) ),
        packages = [ 'notifier', ],

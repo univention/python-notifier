@@ -1,6 +1,14 @@
-2005-01-20  Andreas Büsching  <crunchy@tzi.de>
+2005-03-03  Andreas Büsching  <crunchy@tzi.de>
 
 	* notifier/version.py: set version to 0.3.3
+
+2005-01-24  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/version.py: set version to 0.3.3pre1
+
+	* notifier/log.py: removed changes from 2005-01-20
+
+2005-01-20  Andreas Büsching  <crunchy@tzi.de>
 
 	* notifier/*.py: add license text if missing and updated copyright
 	for 2005
@@ -47,7 +55,7 @@
 	* notifier/nf_wx.py (Notifier.OnTimer): if any timer callback
 	raises an exception it is removed; removed unused class
 	DeadTimerException
-	(addDispatcher): 
+	(addDispatcher):
 
 	* notifier/__init__.py (init): map notifier constants IO_* to
 	implementation specific values.
@@ -73,7 +81,7 @@
 	IO_WRITE to match C constances; add IO_EXCEPT to complete interface
 	(__sockets): add key IO_EXCEPT to the map.
 	(step): handle except map returned by select
-	(DeadTimerException): remove class 
+	(DeadTimerException): remove class
 
 2004-11-04  Andreas Büsching  <crunchy@tzi.de>
 
