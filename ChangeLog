@@ -1,5 +1,7 @@
 2004-12-21  Andreas Büsching  <crunchy@tzi.de>
 
+	* notifier/version.py (extension): set version to 0.3.2pre1
+
 	* notifier/nf_generic.py (step): use logging facility
 
 	* notifier/log.py: logging facility
