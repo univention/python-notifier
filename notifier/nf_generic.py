@@ -2,18 +2,19 @@
 
 from copy import copy
 from select import select
+import os
 import time
 
 import socket
 import popen2
 
-PROCESS_MIN_TIMER = 100
+MIN_TIMER = 100
 
 __sockets = {}
-__processes = {}
-__min_timer = None
+__dispatchers = []
 __timers = {}
 __timer_id = 0
+__min_timer = None
 
 def millisecs():
     return int( time.time() * 1000 )
@@ -28,7 +29,8 @@ def addSocket( sock, method ):
 def removeSocket( socket ):
     """Removes the given socket from scheduler."""
     global __sockets
-    del __sockets[ socket ]
+    if __sockets.has_key( socket ):
+        del __sockets[ socket ]
 
 def addTimer( interval, method ):
     """The first argument specifies an interval in milliseconds, the second
@@ -51,29 +53,28 @@ def addTimer( interval, method ):
 
 def removeTimer( id ):
     """remove the timer identifed by the unique ID"""
-    if __timers.has_key( id ): del __timers[ i ]
+    if __timers.has_key( id ):
+        del __timers[ id ]
 
-def addProcess( proc, method ):
-    """ watches child processes. The first argument proc
-    should be a process id or a popen2.Popen3 object """
-    global __processes, __min_timer
-    __processes[ proc ] = method
-    __min_timer = PROCESS_MIN_TIMER
-
-def removeProcess( proc ):
-    """bla"""
-    global __processes, __min_timer
-    del __processes[ proc ]
-    if not __processess:
-        __min_timer = None
+def addDispatcher( method ):
+    global __dispatchers
+    global __min_timer
+    __dispatchers.append( method )
+    __min_timer = MIN_TIMER
     
-def step( sleep = True ):
+def removeDispatcher( method ):
+    global __dispatchers
+    if method in __dispatchers:
+        __dispatcher.remove( method )
+
+def step( sleep = True, external = True ):
     # IDEA: Add parameter to specify max timeamount to spend in mainloop
     """Do one step forward in the main loop."""
     # handle timers
     trash_can = []
-    for i in copy( __timers ):
-        interval, timestamp, callback = __timers[ i ]
+    _copy = __timers.copy()
+    for i in _copy:
+        interval, timestamp, callback = _copy[ i ]
 	if interval + timestamp <= millisecs():
 	    retval = None
 	    try:
@@ -86,7 +87,8 @@ def step( sleep = True ):
 
     # remove functions that returned false from scheduler
     trash_can.reverse()
-    for r in trash_can: del __timers[ r ]
+    for r in trash_can:
+        if __timers.has_key( r ): del __timers[ r ]
     
     # get minInterval for max timeout
     timeout = None
@@ -102,30 +104,23 @@ def step( sleep = True ):
         if __min_timer and __min_timer < timeout: timeout = __min_timer
 
     # handle __sockets
-    r, w, e = select( __sockets.keys(), [], [], timeout )
+    try:
+        r, w, e = select( __sockets.keys(), [], [], timeout / 1000.0 )
+    except TypeError, e:
+        print 'select failed:', e
+        print __sockets
+
     for sock in r:
         if ( isinstance( sock, socket.socket ) and sock.fileno() != -1 ) or \
                ( isinstance( sock, file ) and sock.fileno() != -1 ) or \
-               sock.fileno() != -1:
+               ( isinstance( sock, int ) and sock != -1 ):
             if __sockets.has_key( sock ):
                 __sockets[ sock ]( sock )
-            
-    # check for dead child processes
-    __remove_proc = []
-    for p in copy( __processes ):
-        if isinstance( p, popen2.Popen3 ):
-            status = os.waitpid( p.pid, os.WNOHANG )
-        else:
-            status = os.waitpid( p.pid, os.WNOHANG )
-        if status == -1:
-            print "error retrieving process information from %d" % p
-        elif os.WIFEXITED( status ) or os.WIFSIGNALED( status ) or \
-                 os.WCOREDUMP( status ):
-            __processes[ p ]( p )
-            __remove_proc.append( p )
 
-    # remove dead processes
-    for p in __remove_proc: del __processes[ p ]
+    # handle external dispatchers
+    if external:
+        for disp in copy( __dispatchers ):
+            disp()
         
 def loop():
     """Execute main loop forver."""

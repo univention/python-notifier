@@ -9,8 +9,8 @@ removeSocket = None
 addTimer = None
 removeTimer = None
 
-addProcess = None
-removeProcess = None
+addDispatcher = None
+removeDispatcher = None
 
 loop = None
 step = None
@@ -24,8 +24,10 @@ WX      = 3
 def init( type = GENERIC ):
     global addTimer
     global addSocket
+    global addDispatcher
     global removeTimer
     global removeSocket
+    global removeDispatcher
     global loop, step
     if type == GENERIC:
         import generic.notifier
@@ -33,8 +35,8 @@ def init( type = GENERIC ):
         removeSocket = generic.notifier.removeSocket
         addTimer = generic.notifier.addTimer
         removeTimer = generic.notifier.removeTimer
-        addProcess = generic.notifier.addProcess
-        removeProcess = generic.notifier.removeProcess
+        addDispatcher = generic.notifier.addDispatcher
+        removeDispatcher = generic.notifier.removeDispatcher
         loop = generic.notifier.loop
         step = generic.notifier.step
     elif type == QT:

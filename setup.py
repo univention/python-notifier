@@ -4,7 +4,7 @@
 from distutils.core import setup
 
 setup( name	= 'pyNotifier',
-       version	= '0.1.2rc3',
+       version	= '0.2.0rc1',
        license  = 'GPL',       
        description = 'a generic notifier, which can be used with a lot a different widget sets',       
        author	= 'Andreas Büsching',
