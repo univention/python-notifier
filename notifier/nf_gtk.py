@@ -5,30 +5,39 @@ import gtk
 
 import popen2
 
-gtk_socketIDs = {} # map of Sockets/Methods -> gtk_input_handler_id
+IO_IN = gobject.IO_IN
+IO_OUT = gobject.IO_OUT
 
-def addSocket( socket, method ):
+# map of Sockets/Methods -> gtk_input_handler_id
+_gtk_socketIDs = {}
+_gtk_socketIDs[ IO_IN ] = {}
+_gtk_socketIDs[ IO_OUT ] = {}
+
+def addSocket( socket, method, condition = IO_IN ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket."""
-    global gtk_socketIDs
-    source = gobject.io_add_watch( socket, gobject.IO_IN,
-                                   __socketCallback, method )
-    gtk_socketIDs[ socket ] = source
+    global _gtk_socketIDs
+    source = gobject.io_add_watch( socket, condition,
+                                   _socketCallback, method )
+    _gtk_socketIDs[ condition ][ socket ] = source
 
-def __socketCallback( source, condition, method ):
-    global gtk_socketIDs
-    if gtk_socketIDs.has_key( source ):
-        return method( source )
+def _socketCallback( source, condition, method ):
+    global _gtk_socketIDs
+    if _gtk_socketIDs[ condition ].has_key( source ):
+        ret = method( source )
+        if not ret:
+            del _gtk_socketIDs[ condition ][ source ]
+        return ret
 
     print 'socket not found'
     return False
 
-def removeSocket( socket ):
+def removeSocket( socket, condition = IO_IN ):
     """Removes the given socket from scheduler."""
-    global gtk_socketIDs
-    if gtk_socketIDs.has_key( socket ):
-	gobject.source_remove( gtk_socketIDs[ socket ] )
-	del gtk_socketIDs[ socket ]
+    global _gtk_socketIDs
+    if _gtk_socketIDs[ condition ].has_key( socket ):
+	gobject.source_remove( _gtk_socketIDs[ condition ][ socket ] )
+	del _gtk_socketIDs[ condition ][ socket ]
 
 def addTimer( interval, method ):
     """The first argument specifies an interval in milliseconds, the

@@ -4,7 +4,7 @@
 #from time import time
 import qt
 
-qt_socketIDs = {} # map of Sockets/Methods -> qt.QSocketNotifier
+__qt_socketIDs = {} # map of Sockets/Methods -> qt.QSocketNotifier
 
 class Socket( qt.QSocketNotifier ):
     def __init__( self, socket, method ):
@@ -15,7 +15,10 @@ class Socket( qt.QSocketNotifier ):
         qt.QObject.connect( self, qt.SIGNAL('activated(int)'), self.slotRead )
         
     def slotRead( self ):
+        global __qt_socketIDs
         self.method( self.socket )
+	self.setEnabled( 0 )
+	del __qt_socketIDs[ socket ]
 
 class Timer( qt.QTimer ):
     def __init__( self, ms, method, args ):
@@ -37,15 +40,15 @@ class Timer( qt.QTimer ):
 def addSocket( socket, method ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket."""
-    global qt_socketIDs
-    qt_socketIDs[ socket ] = Socket( socket, method )
+    global __qt_socketIDs
+    __qt_socketIDs[ socket ] = Socket( socket, method )
 
 def removeSocket( socket ):
     """Removes the given socket from scheduler."""
-    global qt_socketIDs
-    if qt_socketIDs.has_key( socket ):
-	qt_socketIDs[ socket ].setEnabled( 0 )
-	del qt_socketIDs[ socket ]
+    global __qt_socketIDs
+    if __qt_socketIDs.has_key( socket ):
+	__qt_socketIDs[ socket ].setEnabled( 0 )
+	del __qt_socketIDs[ socket ]
 
 def addTimer( interval, method, data = None ):
     """The first argument specifies an interval in milliseconds, the

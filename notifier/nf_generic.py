@@ -120,7 +120,9 @@ def step( sleep = True, external = True ):
                    ( isinstance( sock, file ) and sock.fileno() != -1 ) or \
                    ( isinstance( sock, int ) and sock != -1 ):
                 if __sockets[ condition ].has_key( sock ):
-                    __sockets[ condition ][ sock ]( sock )
+                    if not __sockets[ condition ][ sock ]( sock ):
+                        del __sockets[ condition ][ sock ]
+                        
 
     # handle external dispatchers
     if external:
