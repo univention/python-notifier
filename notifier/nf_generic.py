@@ -101,14 +101,15 @@ def step( sleep = True, external = True ):
                 nextCall = interval + timestamp - millisecs()
                 if nextCall > 0: timeout = nextCall
                 else: timeout = 0
+        if timeout == None: timeout = 0
         if __min_timer and __min_timer < timeout: timeout = __min_timer
 
     # handle __sockets
-    try:
+#    try:
         r, w, e = select( __sockets.keys(), [], [], timeout / 1000.0 )
-    except TypeError, e:
-        print 'select failed:', e
-        print __sockets
+#     except TypeError, e:
+#         print 'select failed:', e
+#         print __sockets
 
     for sock in r:
         if ( isinstance( sock, socket.socket ) and sock.fileno() != -1 ) or \

@@ -1,3 +1,9 @@
+2004-10-08  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/generic/notifier.py (step): if there are no timers
+	registered and __min_timer is None the timeout for select must be
+	initialised to 0
+
 2004-10-06  Andreas Büsching  <crunchy@tzi.de>
 
 	* setup.py: set version to 0.2.0rc1
