@@ -5,15 +5,16 @@ import gtk
 
 import popen2
 
-IO_IN = gobject.IO_IN
-IO_OUT = gobject.IO_OUT
+IO_READ = gobject.IO_IN
+IO_WRITE = gobject.IO_OUT
+IO_EXCEPT = gobject.IO_ERR
 
 # map of Sockets/Methods -> gtk_input_handler_id
 _gtk_socketIDs = {}
-_gtk_socketIDs[ IO_IN ] = {}
-_gtk_socketIDs[ IO_OUT ] = {}
+_gtk_socketIDs[ IO_READ ] = {}
+_gtk_socketIDs[ IO_WRITE ] = {}
 
-def addSocket( socket, method, condition = IO_IN ):
+def addSocket( socket, method, condition = IO_READ ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket."""
     global _gtk_socketIDs
@@ -32,7 +33,7 @@ def _socketCallback( source, condition, method ):
     print 'socket not found'
     return False
 
-def removeSocket( socket, condition = IO_IN ):
+def removeSocket( socket, condition = IO_READ ):
     """Removes the given socket from scheduler."""
     global _gtk_socketIDs
     if _gtk_socketIDs[ condition ].has_key( socket ):
@@ -60,7 +61,3 @@ def loop():
     """Execute main loop forver."""
     while 1:
         step()
-        
-
-class DeadTimerException:
-    def __init__( self ): pass

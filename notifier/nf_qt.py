@@ -72,6 +72,3 @@ def loop():
 
 def step():
     raise Error, "stepping not supported in qt-Mode"
-
-class DeadTimerException:
-    def __init__( self ): pass

@@ -24,8 +24,9 @@ GTK     = 2
 WX      = 3
 
 # socket conditions
-IO_IN = None
-IO_OUT = None
+IO_READ = None
+IO_WRITE = None
+IO_EXCEPT = None
 
 def init( type = GENERIC ):
     global addTimer
@@ -35,7 +36,7 @@ def init( type = GENERIC ):
     global removeSocket
     global removeDispatcher
     global loop, step
-    global IO_IN, IO_OUT
+    global IO_READ, IO_WRITE, IO_EXCEPT
     
     if type == GENERIC:
         import nf_generic
@@ -47,8 +48,6 @@ def init( type = GENERIC ):
         removeDispatcher = nf_generic.removeDispatcher
         loop = nf_generic.loop
         step = nf_generic.step
-        IO_OUT = nf_generic.IO_OUT
-        IO_IN = nf_generic.IO_IN
     elif type == QT:
         import nf_qt
         addSocket = nf_qt.addSocket
@@ -65,8 +64,6 @@ def init( type = GENERIC ):
         removeTimer = nf_gtk.removeTimer
         loop = nf_gtk.loop
         step = nf_gtk.step
-        IO_OUT = nf_gtk.IO_OUT
-        IO_IN = nf_gtk.IO_IN
     elif type == WX:
         import nf_wx
         addSocket = nf_wx.addSocket
@@ -77,7 +74,10 @@ def init( type = GENERIC ):
         step = nf_wx.step
     else:
         raise Exception( 'unknown notifier type' )
-        
+
+    IO_READ = nf_generic.IO_READ
+    IO_WRITE = nf_generic.IO_WRITE
+    IO_EXCEPT = nf_generic.IO_EXCEPT
 
 class Callback:
     def __init__( self, function, *args ):

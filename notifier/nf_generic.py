@@ -1,4 +1,4 @@
-"""Simple mainloop that watches _sockets and __timers."""
+"""Simple mainloop that watches sockets and timers."""
 
 from copy import copy
 from select import select
@@ -8,14 +8,16 @@ import time
 import socket
 import popen2
 
-IO_IN = 1
-IO_OUT = 2
+IO_READ = 1
+IO_WRITE = 2
+IO_EXCEPT = 4
 
 MIN_TIMER = 100
 
 __sockets = {}
-__sockets[ IO_IN ] = {}
-__sockets[ IO_OUT ] = {}
+__sockets[ IO_READ ] = {}
+__sockets[ IO_WRITE ] = {}
+__sockets[ IO_EXCEPT ] = {}
 __dispatchers = []
 __timers = {}
 __timer_id = 0
@@ -24,18 +26,18 @@ __min_timer = None
 def millisecs():
     return int( time.time() * 1000 )
 
-def addSocket( sock, method, condition = IO_IN ):
+def addSocket( id, method, condition = IO_READ ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket.
     The callback function gets the socket back as only argument."""
     global __sockets
-    __sockets[ condition ][ sock ] = method
+    __sockets[ condition ][ id ] = method
 
-def removeSocket( socket, condition = IO_IN ):
+def removeSocket( id, condition = IO_READ ):
     """Removes the given socket from scheduler."""
     global __sockets
-    if __sockets[ condition ].has_key( socket ):
-        del __sockets[ condition ][ socket ]
+    if __sockets[ condition ].has_key( id ):
+        del __sockets[ condition ][ id ]
 
 def addTimer( interval, method ):
     """The first argument specifies an interval in milliseconds, the second
@@ -87,7 +89,7 @@ def step( sleep = True, external = True ):
 		    trash_can.append( i )
 		else:
 		    __timers[ i ] = ( interval, millisecs(), callback )
-	    except DeadTimerException:
+	    except:
                 trash_can.append( i )
 
     # remove functions that returned false from scheduler
@@ -109,10 +111,10 @@ def step( sleep = True, external = True ):
         if timeout == None: timeout = MIN_TIMER
         if __min_timer and __min_timer < timeout: timeout = __min_timer
 
-    r, w, e = select( __sockets[ IO_IN ].keys(), __sockets[ IO_OUT ].keys(),
-                      [], timeout / 1000.0 )
+    r, w, e = select( __sockets[ IO_READ ].keys(), __sockets[ IO_WRITE ].keys(),
+                      __sockets[ IO_EXCEPT ].keys(), timeout / 1000.0 )
 
-    for sl in ( ( r, IO_IN ), ( w, IO_OUT ) ):
+    for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
         sockets, condition = sl
         for sock in sockets:
             if ( isinstance( sock, socket.socket ) and \
@@ -121,8 +123,7 @@ def step( sleep = True, external = True ):
                    ( isinstance( sock, int ) and sock != -1 ):
                 if __sockets[ condition ].has_key( sock ):
                     if not __sockets[ condition ][ sock ]( sock ):
-                        del __sockets[ condition ][ sock ]
-                        
+                        removeSocket( sock, condition )
 
     # handle external dispatchers
     if external:
@@ -133,6 +134,3 @@ def loop():
     """Execute main loop forver."""
     while 1:
 	step()
-
-class DeadTimerException:
-    def __init__( self ): pass

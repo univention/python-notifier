@@ -1,15 +1,15 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 #
-# version.py
+# logger.py
 # 
-# Author: Andreas Büsching <crunchy@tzi.de>
+# Author: Andreas Buesching  <crunchy@tzi.de>
 # 
-# version information
+# logger
 # 
 # $Id$
 # 
-# Copyright (C) 2004 Andreas Büsching <crunchy@tzi.de>
+# Copyright (C) 2004 Andreas B�sching <crunchy@tzi.de>
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,12 +25,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-major_number    = 0
-minor_number    = 3
-revision_number = 1
-extension       = ''
+import os
 
-VERSION = "%d.%d.%d%s" % ( major_number, minor_number,
-                           revision_number, extension )
+import notifier
 
+def tail_minus_f( logfile ):
+    new_size = os.stat( logfile.name )[ 6 ]
+    if new_size > logfile.tell():
+        buffer = logfile.read( 65536 )
+        if buffer: print buffer,
 
+    return True
+
+if __name__ == '__main__':
+    notifier.init()
+    log = open( '/var/log/messages', 'rb' )
+    log.seek( os.stat( '/var/log/messages' )[ 6 ] - 1 )
+    notifier.addTimer( 100, notifier.Callback( tail_minus_f, log ) )
+    notifier.addSocket( 45, None )
+    notifier.loop()

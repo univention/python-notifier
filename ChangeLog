@@ -1,3 +1,33 @@
+2004-12-20  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/version.py: set version to 0.3.1
+
+	* notifier/__init__.py (init): map notifier constants IO_* to
+	implementation specific values.
+
+	* __init__.py, notifier/nf_qt.py, notifier/nf_gtk.py,
+	notifier/nf_wx.py: removed unused class DeadTimerException
+
+	* notifier/nf_generic.py (step): use removeSocket to delete a
+	socket if callback return False, as it checks if the socket does
+	still exist.
+	(step): if a timer callback raises any exception it will be
+	removed.
+
+	* notifier/examples: sub-directory contains a set of examples
+	demonstrating the usage of pyNotifier
+
+	* README: add documentation (the formatting is used by
+	the MoinMoin Wiki).
+
+2004-12-19  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/nf_generic.py: renamed IO_IN to IO_READ and IO_OUT to
+	IO_WRITE to match C constances; add IO_EXCEPT to complete interface
+	(__sockets): add key IO_EXCEPT to the map.
+	(step): handle except map returned by select
+	(DeadTimerException): remove class 
+
 2004-11-04  Andreas Büsching  <crunchy@tzi.de>
 
 	* notifier/version.py: set version to 0.3.0
