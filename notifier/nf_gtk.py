@@ -54,6 +54,9 @@ def removeTimer( id ):
     scheduler."""
     gobject.source_remove( id )
 
+addDispatcher = None
+removeDispatcher = None
+
 def step():
     gtk.main_iteration_do()
 

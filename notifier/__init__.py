@@ -39,45 +39,27 @@ def init( type = GENERIC ):
     global IO_READ, IO_WRITE, IO_EXCEPT
     
     if type == GENERIC:
-        import nf_generic
-        addSocket = nf_generic.addSocket
-        removeSocket = nf_generic.removeSocket
-        addTimer = nf_generic.addTimer
-        removeTimer = nf_generic.removeTimer
-        addDispatcher = nf_generic.addDispatcher
-        removeDispatcher = nf_generic.removeDispatcher
-        loop = nf_generic.loop
-        step = nf_generic.step
+        import nf_generic as nf_impl
     elif type == QT:
-        import nf_qt
-        addSocket = nf_qt.addSocket
-        removeSocket = nf_qt.removeSocket
-        addTimer = nf_qt.addTimer
-        removeTimer = nf_qt.removeTimer
-        loop = nf_qt.loop
-        step = nf_qt.step
+        import nf_qt as nf_impl
     elif type == GTK:
-        import nf_gtk
-        addSocket = nf_gtk.addSocket
-        removeSocket = nf_gtk.removeSocket
-        addTimer = nf_gtk.addTimer
-        removeTimer = nf_gtk.removeTimer
-        loop = nf_gtk.loop
-        step = nf_gtk.step
+        import nf_gtk as nf_impl
     elif type == WX:
-        import nf_wx
-        addSocket = nf_wx.addSocket
-        removeSocket = nf_wx.removeSocket
-        addTimer = nf_wx.addTimer
-        removeTimer = nf_wx.removeTimer
-        loop = nf_wx.loop
-        step = nf_wx.step
+        import nf_wx as nf_impl
     else:
         raise Exception( 'unknown notifier type' )
-
-    IO_READ = nf_generic.IO_READ
-    IO_WRITE = nf_generic.IO_WRITE
-    IO_EXCEPT = nf_generic.IO_EXCEPT
+        
+    addSocket = nf_impl.addSocket
+    removeSocket = nf_impl.removeSocket
+    addTimer = nf_impl.addTimer
+    removeTimer = nf_impl.removeTimer
+    addDispatcher = nf_impl.addDispatcher
+    removeDispatcher = nf_impl.removeDispatcher
+    loop = nf_impl.loop
+    step = nf_impl.step
+    IO_READ = nf_impl.IO_READ
+    IO_WRITE = nf_impl.IO_WRITE
+    IO_EXCEPT = nf_impl.IO_EXCEPT
 
 class Callback:
     def __init__( self, function, *args ):
@@ -95,7 +77,3 @@ class Callback:
 
     def __nonzero__( self ):
         return bool( self._function )
-
-
-class DeadTimerException( Exception ):
-    def __init__( self ): pass

@@ -3,13 +3,13 @@
 #
 # logger.py
 # 
-# Author: Andreas Buesching  <crunchy@tzi.de>
+# Author: Andreas Büsching <crunchy@tzi.de>
 # 
 # logger
 # 
 # $Id$
 # 
-# Copyright (C) 2004 Andreas B�sching <crunchy@tzi.de>
+# Copyright (C) 2004 Andreas Büsching <crunchy@tzi.de>
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ def tail_minus_f( logfile ):
 if __name__ == '__main__':
     notifier.init()
     log = open( '/var/log/messages', 'rb' )
-    log.seek( os.stat( '/var/log/messages' )[ 6 ] - 1 )
+    log.seek( os.stat( '/var/log/messages' )[ 6 ] )
     notifier.addTimer( 100, notifier.Callback( tail_minus_f, log ) )
-    notifier.addSocket( 45, None )
     notifier.loop()

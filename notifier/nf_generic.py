@@ -2,6 +2,7 @@
 
 from copy import copy
 from select import select
+from select import error as select_error
 import os
 import time
 
@@ -111,8 +112,21 @@ def step( sleep = True, external = True ):
         if timeout == None: timeout = MIN_TIMER
         if __min_timer and __min_timer < timeout: timeout = __min_timer
 
-    r, w, e = select( __sockets[ IO_READ ].keys(), __sockets[ IO_WRITE ].keys(),
-                      __sockets[ IO_EXCEPT ].keys(), timeout / 1000.0 )
+    r = w = e = ()
+    try:
+        r, w, e = select( __sockets[ IO_READ ].keys(),
+                          __sockets[ IO_WRITE ].keys(),
+                          __sockets[ IO_EXCEPT ].keys(), timeout / 1000.0 )
+    except ValueError, select_error:
+        for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
+            print cond, __sockets[ cond ].keys()
+            for s in __sockets[ cond ].keys():
+                try:
+                    if isinstance( s, ( socket.socket, file ) ) and \
+                           s.closed or os.fdopen( s ).closed():
+                        del __sockets[ cond ][ s ]
+                except OSError:
+                    del __sockets[ cond ][ s ]
 
     for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
         sockets, condition = sl

@@ -2,6 +2,18 @@
 
 	* notifier/version.py: set version to 0.3.1
 
+	* notifier/nf_generic.py (step): if select raises an exception the
+	socket dicts are searched for a invalid socket/file object that
+	will be removed
+
+	* notifier/nf_qt.py, notifier/nf_gtk.py, notifier/nf_wx.py: add
+	symbols addDispatcher and removeDispatcher pointing to None
+
+	* notifier/nf_wx.py (Notifier.OnTimer): if any timer callback
+	raises an exception it is removed; removed unused class
+	DeadTimerException
+	(addDispatcher): 
+
 	* notifier/__init__.py (init): map notifier constants IO_* to
 	implementation specific values.
 

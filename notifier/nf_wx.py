@@ -114,7 +114,8 @@ class Notifier( wxEvtHandler ):
 			remove.append( i )
 		    else: self.timers[i] = ( self.timers[i][0], time.time(), \
 			    self.timers[i][2], self.timers[i][3] )
-		except DeadTimerException: remove.append( i )
+		except:
+                    remove.append( i )
 		delta = self.timers[i][0]
 	    if mindelta > delta: mindelta = delta
 	remove.reverse()
@@ -139,5 +140,5 @@ removeTimer	=  notifier_instance.removeTimer
 step		=  notifier_instance.step
 loop		=  notifier_instance.loop
 
-class DeadTimerException:
-    def __init__( self ): pass
+addDispatcher = None
+removeDispatcher = None

@@ -66,6 +66,9 @@ def removeTimer( id ):
         id.stop()
         del id
 
+addDispatcher = None
+removeDispatcher = None
+
 def loop():
     """Execute main loop forever."""
     raise Error, "Not supported with Qt notifier. Use the run method of your QApplication object"
