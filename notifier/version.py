@@ -9,7 +9,7 @@
 # 
 # $Id$
 # 
-# Copyright (C) 2004 Andreas Büsching <crunchy@tzi.de>
+# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@tzi.de>
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

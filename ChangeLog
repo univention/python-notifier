@@ -2,6 +2,9 @@
 
 	* notifier/version.py: set version to 0.3.3
 
+	* notifier/*.py: add license text if missing and updated copyright
+	for 2005
+
 	* notifier/log.py: create a logger instance (copy'n'paste from
 	freevo)
 	(debug): new symbol for debug output
