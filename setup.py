@@ -1,13 +1,15 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from distutils.core import setup
 
 setup( name	= 'pyNotifier',
-       version	= '0.1.2',
+       version	= '0.1.2rc3',
        license  = 'GPL',       
        description = 'a generic notifier, which can be used with a lot a different widget sets',       
-       author	= 'Andreas Büsching',
+       author	= 'Andreas BÃ¼sching',
        author_email = 'crunchy@tzi.de',
-       url	= '',
-       packages = [ 'notifier', 'notifier.gtk', 'notifier.qt', 'notifier.wx' ],
+       url	= 'http://www.crunchy-home.de/download/',
+       packages = [ 'notifier', 'notifier.generic', 'notifier.gtk',
+                    'notifier.qt', 'notifier.wx' ],
      )

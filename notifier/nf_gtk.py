@@ -4,6 +4,8 @@ import gtk
 
 import popen2
 
+PROCESS_MIN_TIMER = 100
+
 gtk_socketIDs = {} # map of Sockets/Methods -> gtk_input_handler_id
 __processes = {}
 
@@ -20,14 +22,14 @@ def removeSocket( socket ):
 	gtk.input_remove( gtk_socketIDs[socket] )
 	del gtk_socketIDs[socket]
 
-def addTimer( interval, method, data = None ):
-    """The first argument specifies an interval in seconds, the second argument
-    a function. This is function is called after interval seconds. If it
-    returns true it's called again after interval seconds, otherwise it is
-    removed from the scheduler. The third (optional) argument is a parameter
-    given to the called function."""
-    return gtk.timeout_add( interval * 1000, \
-                            timerCallback, ( method, data ) )
+def addTimer( interval, method ):
+    """The first argument specifies an interval in milliseconds, the
+    second argument a function. This is function is called after
+    interval seconds. If it returns true it's called again after
+    interval seconds, otherwise it is removed from the scheduler. The
+    third (optional) argument is a parameter given to the called
+    function."""
+    return gtk.timeout_add( interval * 1000, method )
 
 def removeTimer( id ):
     """Removes _all_ functioncalls to the method given as argument from the
@@ -48,15 +50,8 @@ def removeProcess( proc ):
     if not __processess:
         __min_timer = None
     
-def timerCallback( data ):
-    method, data = data
-    retval = 0
-    try: retval = method( data )
-    except DeadTimerException: return 0
-    return retval
-
 def step():
-    gtk.main_iteration_do( block = gtk.FALSE )
+    gtk.main_iteration_do()
 
 def loop():
     """Execute main loop forver."""

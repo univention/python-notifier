@@ -9,6 +9,9 @@ removeSocket = None
 addTimer = None
 removeTimer = None
 
+addProcess = None
+removeProcess = None
+
 loop = None
 step = None
 
@@ -30,6 +33,8 @@ def init( type = GENERIC ):
         removeSocket = generic.notifier.removeSocket
         addTimer = generic.notifier.addTimer
         removeTimer = generic.notifier.removeTimer
+        addProcess = generic.notifier.addProcess
+        removeProcess = generic.notifier.removeProcess
         loop = generic.notifier.loop
         step = generic.notifier.step
     elif type == QT:
@@ -59,6 +64,22 @@ def init( type = GENERIC ):
     else:
         raise Exception( 'unknown notifier type' )
         
+
+class Callback:
+    def __init__( self, function, *args ):
+        self._function = function
+        self._args = args
+
+    def __call__( self, *args ):
+        tmp = list( self._args )
+        if args:
+            tmp.extend( args )
+        if tmp: return self._function( *tmp )
+        else: return self._function()
+
+    def __nonzero__( self ):
+        return bool( self._function )
+
 
 class DeadTimerException( Exception ):
     def __init__( self ): pass

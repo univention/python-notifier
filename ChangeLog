@@ -1,0 +1,7 @@
+2004-09-21  Andreas Büsching  <crunchy@tzi.de>
+
+	* test-generic.py, test-gtk.py:  adapt exmaple to new API and
+	changed timer units to milliseconds
+
+	* setup.py: set version to 0.1.2rc3
+

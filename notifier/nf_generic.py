@@ -1,7 +1,8 @@
 """Simple mainloop that watches _sockets and __timers."""
 
+from copy import copy
 from select import select
-from time import time
+import time
 
 import socket
 import popen2
@@ -11,9 +12,11 @@ PROCESS_MIN_TIMER = 100
 __sockets = {}
 __processes = {}
 __min_timer = None
-__timers = []
+__timers = {}
 __timer_id = 0
 
+def millisecs():
+    return int( time.time() * 1000 )
 
 def addSocket( sock, method ):
     """The first argument specifies a socket, the second argument has to be a
@@ -27,8 +30,8 @@ def removeSocket( socket ):
     global __sockets
     del __sockets[ socket ]
 
-def addTimer( interval, method, data = None ):
-    """The first argument specifies an interval in seconds, the second
+def addTimer( interval, method ):
+    """The first argument specifies an interval in milliseconds, the second
     argument a function. This is function is called after interval
     seconds. If it returns true it's called again after interval
     seconds, otherwise it is removed from the scheduler. The third
@@ -42,16 +45,13 @@ def addTimer( interval, method, data = None ):
     except OverflowError:
         __timer_id = 0
 
-    __timers.append( (interval, time(), ( method, __timer_id ), data) )
+    __timers[ __timer_id ] = ( interval, millisecs(), method )
 
     return __timer_id
 
 def removeTimer( id ):
     """remove the timer identifed by the unique ID"""
-    for i in range( 0, len( __timers ) ):
-	if __timers[ i ][ 2 ][ 1 ] == id:
-            del __timers[ i ]
-            break
+    if __timers.has_key( id ): del __timers[ i ]
 
 def addProcess( proc, method ):
     """ watches child processes. The first argument proc
@@ -67,36 +67,39 @@ def removeProcess( proc ):
     if not __processess:
         __min_timer = None
     
-def step():
+def step( sleep = True ):
     # IDEA: Add parameter to specify max timeamount to spend in mainloop
     """Do one step forward in the main loop."""
     # handle timers
-    remove = []
-    i = 0
-    while i < len( __timers ):
-	if __timers[i][0] + __timers[i][1] <= time():
+    trash_can = []
+    for i in copy( __timers ):
+        interval, timestamp, callback = __timers[ i ]
+	if interval + timestamp <= millisecs():
 	    retval = None
 	    try:
-		if not __timers[ i ][ 2 ][ 0 ]( __timers[ i ][ 3 ] ):
-		    remove.append( i )
+		if not callback():
+		    trash_can.append( i )
 		else:
-		    __timers[i] = \
-			( __timers[i][0], time(), __timers[i][2], \
-			       __timers[i][3] )
-	    except DeadTimerException: remove.append( i )
-        i += 1
+		    __timers[ i ] = ( interval, millisecs(), callback )
+	    except DeadTimerException:
+                trash_can.append( i )
+
     # remove functions that returned false from scheduler
-    remove.reverse()
-    for r in remove: del __timers[r]
+    trash_can.reverse()
+    for r in trash_can: del __timers[ r ]
     
     # get minInterval for max timeout
     timeout = None
-    for i in __timers:
-	if timeout == None or i[0] < timeout:
-	    nextCall = i[0] + i[1] - time()
-	    if nextCall > 0: timeout = nextCall
-	    else: timeout = 0
-    if __min_timer and __min_timer < timeout: timeout = __min_timer
+    if not sleep:
+        timeout = 0
+    else:
+        for t in __timers:
+            interval, timestamp, callback = __timers[ t ]
+            if timeout == None or interval < timeout:
+                nextCall = interval + timestamp - millisecs()
+                if nextCall > 0: timeout = nextCall
+                else: timeout = 0
+        if __min_timer and __min_timer < timeout: timeout = __min_timer
 
     # handle __sockets
     r, w, e = select( __sockets.keys(), [], [], timeout )
@@ -104,11 +107,12 @@ def step():
         if ( isinstance( sock, socket.socket ) and sock.fileno() != -1 ) or \
                ( isinstance( sock, file ) and sock.fileno() != -1 ) or \
                sock.fileno() != -1:
-            __sockets[sock]( sock )
+            if __sockets.has_key( sock ):
+                __sockets[ sock ]( sock )
             
     # check for dead child processes
     __remove_proc = []
-    for p in __processes.keys():
+    for p in copy( __processes ):
         if isinstance( p, popen2.Popen3 ):
             status = os.waitpid( p.pid, os.WNOHANG )
         else:
@@ -117,7 +121,7 @@ def step():
             print "error retrieving process information from %d" % p
         elif os.WIFEXITED( status ) or os.WIFSIGNALED( status ) or \
                  os.WCOREDUMP( status ):
-            __processes[ p ]( p ):
+            __processes[ p ]( p )
             __remove_proc.append( p )
 
     # remove dead processes
