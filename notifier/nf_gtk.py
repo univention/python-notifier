@@ -1,10 +1,11 @@
 """Simple mainloop that watches sockets and timers."""
 
-#from select import select
-#from time import time
 import gtk
 
+import popen2
+
 gtk_socketIDs = {} # map of Sockets/Methods -> gtk_input_handler_id
+__processes = {}
 
 def addSocket( socket, method ):
     """The first argument specifies a socket, the second argument has to be a
@@ -33,6 +34,20 @@ def removeTimer( id ):
     scheduler."""
     gtk.input_remove( id )
 
+def addProcess( proc, method ):
+    """ watches the dead child processes. The first argument proc
+    should be a process id or a popen2.Popen3 object """
+    global __processes, __min_timer
+    __processes[ proc ] = method
+    __min_timer = PROCESS_MIN_TIMER
+
+def removeProcess( proc ):
+    """bla"""
+    global __processes, __min_timer
+    del __processes[ proc ]
+    if not __processess:
+        __min_timer = None
+    
 def timerCallback( data ):
     method, data = data
     retval = 0
@@ -40,12 +55,30 @@ def timerCallback( data ):
     except DeadTimerException: return 0
     return retval
 
+def step():
+    gtk.main_iteration_do( block = gtk.FALSE )
+
 def loop():
     """Execute main loop forver."""
-    gtk.mainloop()
+    while 1:
+        step()
+        # check for dead child processes
+        __remove_proc = []
+        for p in __processes.keys():
+            if isinstance( p, popen2.Popen3 ):
+                status = os.waitpid( p.pid, os.WNOHANG )
+            else:
+                status = os.waitpid( p.pid, os.WNOHANG )
+            if status == -1:
+                print "error retrieving process information from %d" % p
+            elif os.WIFEXITED( status ) or os.WIFSIGNALED( status ) or \
+                     os.WCOREDUMP( status ):
+                __processes[ p ]( p )
+                __remove_proc.append( p )
 
-def step():
-    raise Error, "stepping not supported in wx-Mode"
+        # remove dead processes
+        for p in __remove_proc: del __processes[ p ]
+        
 
 class DeadTimerException:
     def __init__( self ): pass

@@ -3,16 +3,24 @@
 from select import select
 from time import time
 
+import socket
+import popen2
+
+PROCESS_MIN_TIMER = 100
+
 __sockets = {}
+__processes = {}
+__min_timer = None
 __timers = []
 __timer_id = 0
 
-def addSocket( socket, method ):
+
+def addSocket( sock, method ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket.
     The callback function gets the socket back as only argument."""
     global __sockets
-    __sockets[ socket ] = method
+    __sockets[ sock ] = method
 
 def removeSocket( socket ):
     """Removes the given socket from scheduler."""
@@ -45,6 +53,20 @@ def removeTimer( id ):
             del __timers[ i ]
             break
 
+def addProcess( proc, method ):
+    """ watches child processes. The first argument proc
+    should be a process id or a popen2.Popen3 object """
+    global __processes, __min_timer
+    __processes[ proc ] = method
+    __min_timer = PROCESS_MIN_TIMER
+
+def removeProcess( proc ):
+    """bla"""
+    global __processes, __min_timer
+    del __processes[ proc ]
+    if not __processess:
+        __min_timer = None
+    
 def step():
     # IDEA: Add parameter to specify max timeamount to spend in mainloop
     """Do one step forward in the main loop."""
@@ -66,6 +88,7 @@ def step():
     # remove functions that returned false from scheduler
     remove.reverse()
     for r in remove: del __timers[r]
+    
     # get minInterval for max timeout
     timeout = None
     for i in __timers:
@@ -73,12 +96,33 @@ def step():
 	    nextCall = i[0] + i[1] - time()
 	    if nextCall > 0: timeout = nextCall
 	    else: timeout = 0
+    if __min_timer and __min_timer < timeout: timeout = __min_timer
+
     # handle __sockets
     r, w, e = select( __sockets.keys(), [], [], timeout )
     for sock in r:
-        if ( type( sock ) == int and sock != -1 ) or sock.fileno() != -1:
+        if ( isinstance( sock, socket.socket ) and sock.fileno() != -1 ) or \
+               ( isinstance( sock, file ) and sock.fileno() != -1 ) or \
+               sock.fileno() != -1:
             __sockets[sock]( sock )
+            
+    # check for dead child processes
+    __remove_proc = []
+    for p in __processes.keys():
+        if isinstance( p, popen2.Popen3 ):
+            status = os.waitpid( p.pid, os.WNOHANG )
+        else:
+            status = os.waitpid( p.pid, os.WNOHANG )
+        if status == -1:
+            print "error retrieving process information from %d" % p
+        elif os.WIFEXITED( status ) or os.WIFSIGNALED( status ) or \
+                 os.WCOREDUMP( status ):
+            __processes[ p ]( p ):
+            __remove_proc.append( p )
 
+    # remove dead processes
+    for p in __remove_proc: del __processes[ p ]
+        
 def loop():
     """Execute main loop forver."""
     while 1:
