@@ -17,7 +17,7 @@ def addSocket( socket, method ):
 def removeSocket( socket ):
     """Removes the given socket from scheduler."""
     global __sockets
-    __sockets.remove( socket )
+    del __sockets[ socket ]
 
 def addTimer( interval, method, data = None ):
     """The first argument specifies an interval in seconds, the second
@@ -28,8 +28,12 @@ def addTimer( interval, method, data = None ):
     function. This function returns an unique identifer which can be
     used to remove this timer"""
     global __timer_id
-    
-    __timer_id += 1
+
+    try:
+        __timer_id += 1
+    except OverflowError:
+        __timer_id = 0
+
     __timers.append( (interval, time(), ( method, __timer_id ), data) )
 
     return __timer_id
@@ -39,6 +43,7 @@ def removeTimer( id ):
     for i in range( 0, len( __timers ) ):
 	if __timers[ i ][ 2 ][ 1 ] == id:
             del __timers[ i ]
+            break
 
 def step():
     # IDEA: Add parameter to specify max timeamount to spend in mainloop
@@ -77,3 +82,5 @@ def loop():
     while 1:
 	step()
 
+class DeadTimerException:
+    def __init__( self ): pass

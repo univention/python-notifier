@@ -29,7 +29,7 @@ def init( type = GENERIC ):
         addSocket = generic.notifier.addSocket
         removeSocket = generic.notifier.removeSocket
         addTimer = generic.notifier.addTimer
-        removeTimer = generic.notifier.addTimer
+        removeTimer = generic.notifier.removeTimer
         loop = generic.notifier.loop
         step = generic.notifier.step
     elif type == QT:
