@@ -120,7 +120,7 @@ def step( sleep = True, external = True ):
 		    trash_can.append( i )
 		else:
 		    __timers[ i ] = ( interval, millisecs(), callback )
-            except ( KeyboardExit, SystemExit ), e:
+            except ( KeyboardInterrupt, SystemExit ), e:
                 raise e
 	    except:
                 log.exception( 'removed timer %d' % i )
