@@ -77,8 +77,11 @@ class Callback:
         tmp = list( self._args )
         if args:
             tmp.extend( args )
-        if tmp: return self._function( *tmp )
-        else: return self._function()
+        if tmp:
+            print 'args', *tmp
+            return self._function( *tmp )
+        else:
+            return self._function()
 
     def __nonzero__( self ):
         return bool( self._function )
