@@ -8,9 +8,14 @@ import time
 import socket
 import popen2
 
+IO_IN = 1
+IO_OUT = 2
+
 MIN_TIMER = 100
 
 __sockets = {}
+__sockets[ IO_IN ] = {}
+__sockets[ IO_OUT ] = {}
 __dispatchers = []
 __timers = {}
 __timer_id = 0
@@ -19,18 +24,18 @@ __min_timer = None
 def millisecs():
     return int( time.time() * 1000 )
 
-def addSocket( sock, method ):
+def addSocket( sock, method, condition = IO_IN ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket.
     The callback function gets the socket back as only argument."""
     global __sockets
-    __sockets[ sock ] = method
+    __sockets[ condition ][ sock ] = method
 
-def removeSocket( socket ):
+def removeSocket( socket, condition = IO_IN ):
     """Removes the given socket from scheduler."""
     global __sockets
-    if __sockets.has_key( socket ):
-        del __sockets[ socket ]
+    if __sockets[ condition ].has_key( socket ):
+        del __sockets[ condition ][ socket ]
 
 def addTimer( interval, method ):
     """The first argument specifies an interval in milliseconds, the second
@@ -104,14 +109,18 @@ def step( sleep = True, external = True ):
         if timeout == None: timeout = 0
         if __min_timer and __min_timer < timeout: timeout = __min_timer
 
-    r, w, e = select( __sockets.keys(), [], [], timeout / 1000.0 )
+    r, w, e = select( __sockets[ IO_IN ].keys(), __sockets[ IO_OUT ].keys(),
+                      [], timeout / 1000.0 )
 
-    for sock in r:
-        if ( isinstance( sock, socket.socket ) and sock.fileno() != -1 ) or \
-               ( isinstance( sock, file ) and sock.fileno() != -1 ) or \
-               ( isinstance( sock, int ) and sock != -1 ):
-            if __sockets.has_key( sock ):
-                __sockets[ sock ]( sock )
+    for sl in ( ( r, IO_IN ), ( w, IO_OUT ) ):
+        sockets, condition = sl
+        for sock in sockets:
+            if ( isinstance( sock, socket.socket ) and \
+                 sock.fileno() != -1 ) or \
+                   ( isinstance( sock, file ) and sock.fileno() != -1 ) or \
+                   ( isinstance( sock, int ) and sock != -1 ):
+                if __sockets[ condition ].has_key( sock ):
+                    __sockets[ condition ][ sock ]( sock )
 
     # handle external dispatchers
     if external:

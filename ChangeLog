@@ -1,3 +1,7 @@
+2004-11-03  Andreas Büsching  <crunchy@tzi.de>
+
+	* setup.py: set version to 0.3.0pre1
+
 2004-11-02  Andreas Büsching  <crunchy@tzi.de>
 
 	* notifier/: restructure package; notifier implementation are not
