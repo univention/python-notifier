@@ -1,3 +1,8 @@
+2004-11-02  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/: restructure package; notifier implementation are not
+	located in an own subdirectory anymore.
+
 2004-10-24  Andreas Büsching  <crunchy@tzi.de>
 
 	* notifier/__init__.py (WX): remove unnecessary import of

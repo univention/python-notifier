@@ -31,39 +31,39 @@ def init( type = GENERIC ):
     global loop, step
 
     if type == GENERIC:
-        import generic.notifier
-        addSocket = generic.notifier.addSocket
-        removeSocket = generic.notifier.removeSocket
-        addTimer = generic.notifier.addTimer
-        removeTimer = generic.notifier.removeTimer
-        addDispatcher = generic.notifier.addDispatcher
-        removeDispatcher = generic.notifier.removeDispatcher
-        loop = generic.notifier.loop
-        step = generic.notifier.step
+        import nf_generic
+        addSocket = nf_generic.addSocket
+        removeSocket = nf_generic.removeSocket
+        addTimer = nf_generic.addTimer
+        removeTimer = nf_generic.removeTimer
+        addDispatcher = nf_generic.addDispatcher
+        removeDispatcher = nf_generic.removeDispatcher
+        loop = nf_generic.loop
+        step = nf_generic.step
     elif type == QT:
-        import qt.notifier
-        addSocket = qt.notifier.addSocket
-        removeSocket = qt.notifier.removeSocket
-        addTimer = qt.notifier.addTimer
-        removeTimer = qt.notifier.removeTimer
-        loop = qt.notifier.loop
-        step = qt.notifier.step
+        import nf_qt
+        addSocket = nf_qt.addSocket
+        removeSocket = nf_qt.removeSocket
+        addTimer = nf_qt.addTimer
+        removeTimer = nf_qt.removeTimer
+        loop = nf_qt.loop
+        step = nf_qt.step
     elif type == GTK:
-        import gtk.notifier
-        addSocket = gtk.notifier.addSocket
-        removeSocket = gtk.notifier.removeSocket
-        addTimer = gtk.notifier.addTimer
-        removeTimer = gtk.notifier.removeTimer
-        loop = gtk.notifier.loop
-        step = gtk.notifier.step
+        import nf_gtk
+        addSocket = nf_gtk.addSocket
+        removeSocket = nf_gtk.removeSocket
+        addTimer = nf_gtk.addTimer
+        removeTimer = nf_gtk.removeTimer
+        loop = nf_gtk.loop
+        step = nf_gtk.step
     elif type == WX:
-        import wx.notifier
-        addSocket = wx.notifier.addSocket
-        removeSocket = wx.notifier.removeSocket
-        addTimer = wx.notifier.addTimer
-        removeTimer = wx.notifier.removeTimer
-        loop = wx.notifier.loop
-        step = wx.notifier.step
+        import nf_wx
+        addSocket = nf_wx.addSocket
+        removeSocket = nf_wx.removeSocket
+        addTimer = nf_wx.addTimer
+        removeTimer = nf_wx.removeTimer
+        loop = nf_wx.loop
+        step = nf_wx.step
     else:
         raise Exception( 'unknown notifier type' )
         
@@ -78,7 +78,6 @@ class Callback:
         if args:
             tmp.extend( args )
         if tmp:
-            print 'args', *tmp
             return self._function( *tmp )
         else:
             return self._function()
