@@ -75,7 +75,8 @@ def step():
 	    else: timeout = 0
     # handle __sockets
     r, w, e = select( __sockets.keys(), [], [], timeout )
-    for sock in r: __sockets[sock]( sock )
+    for sock in r:
+        if sock.fileno() >= 0: __sockets[sock]( sock )
 
 def loop():
     """Execute main loop forver."""
