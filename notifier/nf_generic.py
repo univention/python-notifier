@@ -120,8 +120,10 @@ def step( sleep = True, external = True ):
 		    trash_can.append( i )
 		else:
 		    __timers[ i ] = ( interval, millisecs(), callback )
+            except ( KeyboardExit, SystemExit ), e:
+                raise e
 	    except:
-                log.exception( 'removed timer %d' )
+                log.exception( 'removed timer %d' % i )
                 trash_can.append( i )
 
     # remove functions that returned false from scheduler
@@ -168,8 +170,13 @@ def step( sleep = True, external = True ):
                    ( isinstance( sock, file ) and sock.fileno() != -1 ) or \
                    ( isinstance( sock, int ) and sock != -1 ):
                 if __sockets[ condition ].has_key( sock ):
-                    if not __sockets[ condition ][ sock ]( sock ):
-                        removeSocket( sock, condition )
+                    try:
+                        if not __sockets[ condition ][ sock ]( sock ):
+                            removeSocket( sock, condition )
+                    except ( KeyboardExit, SystemExit ), e:
+                        raise e
+                    except:
+                        log.exception( 'error in socket callback' )
 
     # handle external dispatchers
     if external:
