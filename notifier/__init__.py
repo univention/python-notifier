@@ -27,7 +27,7 @@ def init( type = GENERIC ):
     if type == GENERIC:
         import generic.notifier
         addSocket = generic.notifier.addSocket
-        removeSocket = generic.notifier.addSocket
+        removeSocket = generic.notifier.removeSocket
         addTimer = generic.notifier.addTimer
         removeTimer = generic.notifier.addTimer
         loop = generic.notifier.loop
@@ -35,7 +35,7 @@ def init( type = GENERIC ):
     elif type == QT:
         import qt.notifier
         addSocket = qt.notifier.addSocket
-        removeSocket = qt.notifier.addSocket
+        removeSocket = qt.notifier.removeSocket
         addTimer = qt.notifier.addTimer
         removeTimer = qt.notifier.addTimer
         loop = qt.notifier.loop
@@ -43,7 +43,7 @@ def init( type = GENERIC ):
     elif type == GTK:
         import gtk.notifier
         addSocket = gtk.notifier.addSocket
-        removeSocket = gtk.notifier.addSocket
+        removeSocket = gtk.notifier.removeSocket
         addTimer = gtk.notifier.addTimer
         removeTimer = gtk.notifier.addTimer
         loop = gtk.notifier.loop
@@ -51,7 +51,7 @@ def init( type = GENERIC ):
     elif type == WX:
         import wx.notifier
         addSocket = wx.notifier.addSocket
-        removeSocket = wx.notifier.addSocket
+        removeSocket = wx.notifier.removeSocket
         addTimer = wx.notifier.addTimer
         removeTimer = wx.notifier.addTimer
         loop = wx.notifier.loop

@@ -13,13 +13,12 @@ def addSocket( socket, method ):
     function that is called whenever there is data ready in the socket.
     The callback function gets the socket back as only argument."""
     global __sockets
-    __sockets[socket] = method
+    __sockets[ socket ] = method
 
 def removeSocket( socket ):
     """Removes the given socket from scheduler."""
     global __sockets
-    
-    del __sockets[socket]
+    __sockets.remove( socket )
 
 def addTimer( interval, method, data = None ):
     """The first argument specifies an interval in seconds, the second
