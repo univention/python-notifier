@@ -104,12 +104,7 @@ def step( sleep = True, external = True ):
         if timeout == None: timeout = 0
         if __min_timer and __min_timer < timeout: timeout = __min_timer
 
-    # handle __sockets
-#    try:
-        r, w, e = select( __sockets.keys(), [], [], timeout / 1000.0 )
-#     except TypeError, e:
-#         print 'select failed:', e
-#         print __sockets
+    r, w, e = select( __sockets.keys(), [], [], timeout / 1000.0 )
 
     for sock in r:
         if ( isinstance( sock, socket.socket ) and sock.fileno() != -1 ) or \

@@ -1,3 +1,8 @@
+2004-10-12  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/generic/notifier.py (step): fixed a stupid bug causing
+	pyNotifier to crash if sleep is False
+
 2004-10-11  Andreas Büsching  <crunchy@tzi.de>
 
 	* setup.py: set version to 0.2.0rc2
