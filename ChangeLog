@@ -1,3 +1,13 @@
+2005-01-20  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/log.py: create a logger instance (copy'n'paste from
+	freevo)
+	(debug): new symbol for debug output
+
+	* setup.py: updated package description and added pyPI metadata.
+
+	* AUTHORS: add Kevin as first author of source and idea.
+
 2004-12-21  Andreas Büsching  <crunchy@tzi.de>
 
 	* notifier/version.py (extension): set version to 0.3.2

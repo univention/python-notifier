@@ -27,6 +27,21 @@
  
 import logging
 
+# create and setup the root logger object.
+# using logging.getLogger() gives the root logger, calling
+# logging.getLogger('foo') returns a new logger with the same default
+# settings.
+__root_logger = logging.getLogger()
+
+# set stdout logging
+# TODO: find a way to shut down that logger later when the user
+# wants to visible debug in the terminal
+__formatter = logging.Formatter( '%(levelname)s %(module)s' + \
+                                 '(%(lineno)s): %(message)s' )
+__handler = logging.StreamHandler()
+__handler.setFormatter( __formatter )
+__root_logger.addHandler( __handler )
+
 instance = logging.getLogger( 'notifier' )
 
 debug = instance.debug
