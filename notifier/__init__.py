@@ -21,6 +21,7 @@ QT      = 1
 GTK     = 2
 WX      = 3
 
+import traceback
 def init( type = GENERIC ):
     global addTimer
     global addSocket
@@ -29,6 +30,7 @@ def init( type = GENERIC ):
     global removeSocket
     global removeDispatcher
     global loop, step
+
     if type == GENERIC:
         import generic.notifier
         addSocket = generic.notifier.addSocket

@@ -1,3 +1,14 @@
+2004-10-22  Andreas Büsching  <crunchy@tzi.de>
+
+	* setup.py: set version to 0.2.1
+
+2004-10-21  Andreas Büsching  <crunchy@tzi.de>
+
+	* notifier/gtk/notifier.py (addTimer): adapt notifier to new unit
+	of timers (milliseconds); that's what gtk+ uses mormally
+	(addSocket, removeSocket, addTimer, removeTimer): replaced gtk I/O
+	and timer API with gobject API calls
+
 2004-10-19  Andreas Büsching  <crunchy@tzi.de>
 
 	* setup.py: set version to 0.2.0

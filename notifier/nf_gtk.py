@@ -1,26 +1,34 @@
 """Simple mainloop that watches sockets and timers."""
 
+import gobject
 import gtk
 
 import popen2
 
-PROCESS_MIN_TIMER = 100
-
 gtk_socketIDs = {} # map of Sockets/Methods -> gtk_input_handler_id
-__processes = {}
 
 def addSocket( socket, method ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket."""
     global gtk_socketIDs
-    gtk_socketIDs[socket] = gtk.input_add( socket, 1, method )
+    source = gobject.io_add_watch( socket, gobject.IO_IN,
+                                   __socketCallback, method )
+    gtk_socketIDs[ socket ] = source
+
+def __socketCallback( source, condition, method ):
+    global gtk_socketIDs
+    if gtk_socketIDs.has_key( source ):
+        return method( source )
+
+    print 'socket not found'
+    return False
 
 def removeSocket( socket ):
     """Removes the given socket from scheduler."""
     global gtk_socketIDs
     if gtk_socketIDs.has_key( socket ):
-	gtk.input_remove( gtk_socketIDs[socket] )
-	del gtk_socketIDs[socket]
+	gobject.source_remove( gtk_socketIDs[ socket ] )
+	del gtk_socketIDs[ socket ]
 
 def addTimer( interval, method ):
     """The first argument specifies an interval in milliseconds, the
@@ -29,27 +37,13 @@ def addTimer( interval, method ):
     interval seconds, otherwise it is removed from the scheduler. The
     third (optional) argument is a parameter given to the called
     function."""
-    return gtk.timeout_add( interval * 1000, method )
+    return gobject.timeout_add( interval, method )
 
 def removeTimer( id ):
     """Removes _all_ functioncalls to the method given as argument from the
     scheduler."""
-    gtk.input_remove( id )
+    gobject.source_remove( id )
 
-def addProcess( proc, method ):
-    """ watches the dead child processes. The first argument proc
-    should be a process id or a popen2.Popen3 object """
-    global __processes, __min_timer
-    __processes[ proc ] = method
-    __min_timer = PROCESS_MIN_TIMER
-
-def removeProcess( proc ):
-    """bla"""
-    global __processes, __min_timer
-    del __processes[ proc ]
-    if not __processess:
-        __min_timer = None
-    
 def step():
     gtk.main_iteration_do()
 
@@ -57,22 +51,6 @@ def loop():
     """Execute main loop forver."""
     while 1:
         step()
-        # check for dead child processes
-        __remove_proc = []
-        for p in __processes.keys():
-            if isinstance( p, popen2.Popen3 ):
-                status = os.waitpid( p.pid, os.WNOHANG )
-            else:
-                status = os.waitpid( p.pid, os.WNOHANG )
-            if status == -1:
-                print "error retrieving process information from %d" % p
-            elif os.WIFEXITED( status ) or os.WIFSIGNALED( status ) or \
-                     os.WCOREDUMP( status ):
-                __processes[ p ]( p )
-                __remove_proc.append( p )
-
-        # remove dead processes
-        for p in __remove_proc: del __processes[ p ]
         
 
 class DeadTimerException:
