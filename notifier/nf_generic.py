@@ -1,5 +1,33 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+#
+# nf_generic.py
+# 
+# Author: Andreas Büsching <crunchy@tzi.de>
+# 
+# generic notifier implementation
+# 
+# $Id$
+# 
+# Copyright (C) 2004 Andreas Büsching <crunchy@tzi.de>
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
 """Simple mainloop that watches sockets and timers."""
 
+# python core packages
 from copy import copy
 from select import select
 from select import error as select_error
@@ -7,7 +35,9 @@ import os
 import time
 
 import socket
-import popen2
+
+# internal packages
+import log
 
 IO_READ = 1
 IO_WRITE = 2
@@ -91,6 +121,7 @@ def step( sleep = True, external = True ):
 		else:
 		    __timers[ i ] = ( interval, millisecs(), callback )
 	    except:
+                log.exception( 'removed timer %d' )
                 trash_can.append( i )
 
     # remove functions that returned false from scheduler
@@ -118,6 +149,7 @@ def step( sleep = True, external = True ):
                           __sockets[ IO_WRITE ].keys(),
                           __sockets[ IO_EXCEPT ].keys(), timeout / 1000.0 )
     except ValueError, select_error:
+        log.exception( 'error in select' )
         for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
             print cond, __sockets[ cond ].keys()
             for s in __sockets[ cond ].keys():

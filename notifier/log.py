@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# version.py
+# log.py
 # 
 # Author: Andreas Büsching <crunchy@tzi.de>
 # 
-# version information
+# log - a logging facility for the generic notifier module
 # 
 # $Id$
 # 
@@ -24,13 +24,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ 
+import logging
 
-major_number    = 0
-minor_number    = 3
-revision_number = 2
-extension       = 'pre1'
+instance = logging.getLogger( 'notifier' )
 
-VERSION = "%d.%d.%d%s" % ( major_number, minor_number,
-                           revision_number, extension )
-
-
+debug = instance.debug
+info = instance.info
+warn = instance.warn
+error = instance.error
+critical = instance.critical
+exception = instance.exception
