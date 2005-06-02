@@ -167,17 +167,8 @@ def step( sleep = True, external = True ):
         r, w, e = select( __sockets[ IO_READ ].keys(),
                           __sockets[ IO_WRITE ].keys(),
                           __sockets[ IO_EXCEPT ].keys(), timeout / 1000.0 )
-    except ValueError, select_error:
+    except ( ValueError, select_error ):
         log.exception( 'error in select' )
-        for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
-            print cond, __sockets[ cond ].keys()
-            for s in __sockets[ cond ].keys():
-                try:
-                    if isinstance( s, ( socket.socket, file ) ) and \
-                           s.closed or os.fdopen( s ).closed():
-                        del __sockets[ cond ][ s ]
-                except OSError:
-                    del __sockets[ cond ][ s ]
 
     for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
         sockets, condition = sl

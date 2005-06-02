@@ -16,7 +16,7 @@ classifiers = """\
 Development Status :: 5 - Production/Stable
 Environment :: Console
 Environment :: X11 Applications :: GTK
-    Environment :: X11 Applications :: Qt
+Environment :: X11 Applications :: Qt
 Intended Audience :: Developers
 License :: OSI Approved :: GNU General Public License (GPL)
 Programming Language :: Python
