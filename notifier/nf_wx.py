@@ -32,6 +32,10 @@ import time
 from wxPython.wx import *
 import thread
 
+IO_READ = 1
+IO_WRITE = 2
+IO_EXCEPT = 4
+
 #------------------------------------------------------------------------------
 # Event to communicate with gui-thread (main-thread)
 
@@ -80,81 +84,96 @@ ID_Timer = wxNewId()
 
 class Notifier( wxEvtHandler ):
     def __init__( self ):
-	wxEvtHandler.__init__( self )
-	self.sockets = {}
-	self.timers = []
-	self.timeout = 5 # max seconds till new socket gets "selected"
-			 # decrease this value if you want to add/remove
-			 # sockets often
-	thread.start_new_thread( self.otherThreadLoop, () )
-	EVT_UDPSOCKETEVENT( self, self.OnSocket )
-	self.timer = wxTimer( self, ID_Timer )
-	EVT_TIMER( self, ID_Timer, self.OnTimer )
+        wxEvtHandler.__init__( self )
+        self.sockets = {}
+        self.timers = []
+        # max seconds till new socket gets "selected"
+        # decrease this value if you want to add/remove
+        # sockets often
+        self.timeout = 5 
+        thread.start_new_thread( self.otherThreadLoop, () )
+        self.app = wxPySimpleApp()
+        EVT_UDPSOCKETEVENT( self, self.OnSocket )
+        self.timer = wxTimer( self, ID_Timer )
+        EVT_TIMER( self, ID_Timer, self.OnTimer )
+
     def addSocket( self, socket, method ):
-	"""The first argument specifies a socket, the second argument has to be a
-	function that is called whenever there is data ready in the socket.
-	The callback function gets the socket back as only argument."""
-	self.sockets[socket] = method
+        """The first argument specifies a socket, the second argument
+        has to be a function that is called whenever there is data
+        ready in the socket.  The callback function gets the socket
+        back as only argument."""
+        self.sockets[socket] = method
+
     def removeSocket( self, socket ):
-	"""Remove given socket from scheduler"""
-	del self.sockets[socket]
+        """Remove given socket from scheduler"""
+        del self.sockets[socket]
+        
     def addTimer( self, interval, method, data = None ):
-	"""The first argument specifies an interval in seconds, the second argument
-	a function. This is function is called after interval seconds. If it
-	returns true it's called again after interval seconds, otherwise it is
-	removed from the scheduler. The third (optional) argument is a parameter
-	given to the called function."""
-	t = time.time()
-	self.timers.append( (interval, t, method, data) )
-	if len( self.timers ) == 1:
-	    self.timer.Start( (self.timers[0][0]+self.timers[0][1]-t)*1000 )
+        """The first argument specifies an interval in seconds, the
+        second argument a function. This is function is called after
+        interval seconds. If it returns true it's called again after
+        interval seconds, otherwise it is removed from the
+        scheduler. The third (optional) argument is a parameter given
+        to the called function."""
+        
+        t = time.time()
+        self.timers.append( (interval, t, method, data) )
+        if len( self.timers ) == 1:
+            self.timer.Start( (self.timers[0][0]+self.timers[0][1]-t) )
+
     def removeTimer( self, method ):
-	"""Removes _all_ functioncalls to the method given as argument from the
-	scheduler."""
-	remove = []
-	for i in range( 0, len(self.timers) ):
-	    if self.timers[i][2] == method:
-		remove.append( i )
-	remove.reverse()
-	for i in remove: del self.timers[i]
-    def otherThreadLoop( self ):
-	"""socketloop sits in its own thread and sends events to the main thread"""
-	while 1:
-	    if len( self.sockets.keys() ) != 0:
-		r,w,e = select( self.sockets.keys(), [], [], self.timeout )
-		for sock in r:
-		    evt = UDPSocketEvent( sock )
-		    wxPostEvent( self, evt )
-	    else: time.sleep( self.timeout )
+        """Removes _all_ functioncalls to the method given as argument
+        from the scheduler."""
+        remove = []
+        for i in range( 0, len( self.timers ) ):
+            if self.timers[ i ][ 2 ] == method:
+                remove.append( i )
+        remove.reverse()
+        for i in remove: del self.timers[ i ]
+
+    def otherThreadLoop( self ):        
+        """socketloop sits in its own thread and sends events to the
+        main thread"""
+        while 1:
+            if len( self.sockets.keys() ) != 0:
+                r,w,e = select( self.sockets.keys(), [], [], self.timeout )
+                for sock in r:
+                    evt = UDPSocketEvent( sock )
+                    wxPostEvent( self, evt )
+            else: time.sleep( self.timeout )
+
     def OnSocket( self, evt ):
-	"""this is where the udp-events are send to"""
-	self.sockets[evt.socket]( evt )
+        """this is where the udp-events are send to"""
+        self.sockets[evt.socket]( evt )
+
     def OnTimer( self, evt ):
-	"""gets called by wx-mainloop, mbus-timers are handled here"""
-	remove = []
-	mindelta = 86400 # one day
-	for i in range(0,len(self.timers)):
-	    delta = self.timers[i][1] + self.timers[i][0] - time.time()
-	    if delta < 0:
-		try:
-		    if not self.timers[i][2]( self.timers[i][3] ):
-			remove.append( i )
-		    else: self.timers[i] = ( self.timers[i][0], time.time(), \
-			    self.timers[i][2], self.timers[i][3] )
-		except:
+        """gets called by wx-mainloop, mbus-timers are handled here"""
+        remove = []
+        mindelta = 86400 * 1000 # one day
+        now = time.time() * 1000
+        for i in range(0,len(self.timers)):
+            delta = self.timers[i][1] + self.timers[i][0] - now
+            if delta < 0:
+                try:
+                    if not self.timers[i][2]( self.timers[i][3] ):
+                        remove.append( i )
+                    else: self.timers[i] = ( self.timers[i][0], now, \
+                            self.timers[i][2], self.timers[i][3] )
+                except:
                     remove.append( i )
-		delta = self.timers[i][0]
-	    if mindelta > delta: mindelta = delta
-	remove.reverse()
-	for r in remove: del self.timers[r]
-	if mindelta == 86400: self.timer.Stop()
-	else: self.timer.Start( mindelta * 1000 )
+                delta = self.timers[i][0]
+            if mindelta > delta: mindelta = delta
+        remove.reverse()
+        for r in remove: del self.timers[r]
+        if mindelta == 86400: self.timer.Stop()
+        else: self.timer.Start( mindelta )
+
     def loop( self ):
-	"""Execute main loop forver."""
-	app = wxPySimpleApp()
-	app.MainLoop()
+        """Execute main loop forver."""
+        self.app.MainLoop()
+
     def step( self ):
-	raise Error, "stepping not supported in wx-Mode"
+        raise Error, "stepping not supported in wx-Mode"
 
 # standard Notifier-Interface used by pyMbus 0.5.4 and above:
 
