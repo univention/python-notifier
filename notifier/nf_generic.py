@@ -31,7 +31,7 @@
 from copy import copy
 from select import select
 from select import error as select_error
-import os
+import os, sys
 import time
 
 import socket
@@ -169,6 +169,7 @@ def step( sleep = True, external = True ):
                           __sockets[ IO_EXCEPT ].keys(), timeout / 1000.0 )
     except ( ValueError, select_error ):
         log.exception( 'error in select' )
+	sys.exit( 1 )
 
     for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
         sockets, condition = sl
@@ -185,6 +186,7 @@ def step( sleep = True, external = True ):
                         raise e
                     except:
                         log.exception( 'error in socket callback' )
+			sys.exit( 1 )
 
     # handle external dispatchers
     if external:

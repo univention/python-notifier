@@ -1,3 +1,10 @@
+2005-06-16  Andreas Büsching  <crunchy@tzi.de>
+
+        * notifier/version.py: set version to 0.3.8
+
+	* notifier/nf_generic.py (step): when select or a socket callback fails
+	print exception and exit( 1 )
+
 2005-06-14  Andreas Büsching  <crunchy@tzi.de>
 
         * notifier/version.py: set version to 0.3.7
