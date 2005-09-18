@@ -54,7 +54,7 @@ __timers = {}
 __timer_id = 0
 __min_timer = None
 
-def millisecs():
+def __millisecs():
     """returns the current time in milliseconds"""
     return int( time.time() * 1000 )
 
@@ -87,7 +87,7 @@ def addTimer( interval, method ):
     except OverflowError:
         __timer_id = 0
 
-    __timers[ __timer_id ] = ( interval, millisecs(), method )
+    __timers[ __timer_id ] = ( interval, __millisecs(), method )
 
     return __timer_id
 
@@ -130,13 +130,19 @@ def step( sleep = True, external = True ):
     _copy = __timers.copy()
     for i in _copy:
         interval, timestamp, callback = _copy[ i ]
-	if interval + timestamp <= millisecs():
+	if interval + timestamp <= __millisecs():
 	    retval = None
+            # Update timestamp on timer before calling the callback to
+            # prevent infinite recursion in case the callback calls
+            # step().
+            __timers[ i ] = ( interval, __millisecs(), callback )
 	    try:
 		if not callback():
 		    trash_can.append( i )
 		else:
-		    __timers[ i ] = ( interval, millisecs(), callback )
+                    # Update timer's timestamp again to reflect callback
+                    # execution time.
+		    __timers[ i ] = ( interval, __millisecs(), callback )
             except ( KeyboardInterrupt, SystemExit ), e:
                 raise e
 	    except:
@@ -155,7 +161,7 @@ def step( sleep = True, external = True ):
     else:
         for t in __timers:
             interval, timestamp, callback = __timers[ t ]
-            nextCall = interval + timestamp - millisecs()
+            nextCall = interval + timestamp - __millisecs()
             if timeout == None or nextCall < timeout:
                 if nextCall > 0: timeout = nextCall
                 else: timeout = 0
@@ -174,12 +180,16 @@ def step( sleep = True, external = True ):
     for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
         sockets, condition = sl
         for sock in sockets:
+            print 'type', type( sock )
             if ( isinstance( sock, socket.socket ) and \
                  sock.fileno() != -1 ) or \
+                 ( isinstance( sock, socket._socketobject ) and \
+                   sock.fileno() != -1 ) or \
                    ( isinstance( sock, file ) and sock.fileno() != -1 ) or \
                    ( isinstance( sock, int ) and sock != -1 ):
                 if __sockets[ condition ].has_key( sock ):
                     try:
+                        print __sockets[ condition ][ sock ]
                         if not __sockets[ condition ][ sock ]( sock ):
                             removeSocket( sock, condition )
                     except ( KeyboardInterrupt, SystemExit ), e:

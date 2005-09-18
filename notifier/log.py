@@ -27,10 +27,8 @@
 
 import logging
 
-if not logging._handlers:
-    logging.getLogger().addHandler( logging.StreamHandler() )
-
 instance = logging.getLogger( 'notifier' )
+instance.addHandler(logging.StreamHandler(sys.stderr))
 
 debug = instance.debug
 info = instance.info
