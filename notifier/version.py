@@ -3,13 +3,13 @@
 #
 # version.py
 #
-# Author: Andreas Büsching <crunchy@tzi.de>
+# Author: Andreas Büsching <crunchy@bitkipper.net>
 #
 # version information
 #
 # $Id$
 #
-# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@tzi.de>
+# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

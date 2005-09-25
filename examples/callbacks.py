@@ -3,13 +3,13 @@
 #
 # callbacks.py
 #
-# Author: Andreas Büsching  <crunchy@tzi.de>
+# Author: Andreas Büsching  <crunchy@bitkipper.net>
 #
 # callbacks
 #
 # $Id: file.py,v 1.1 2004/09/20 12:39:43 crunchy Exp $
 #
-# Copyright (C) 2005 Andreas Büsching <crunchy@tzi.de>
+# Copyright (C) 2005 Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
