@@ -3,13 +3,13 @@
 #
 # nf_qt.py
 #
-# Author: Andreas Büsching <crunchy@tzi.de>
+# Author: Andreas Büsching <crunchy@bitkipper.net>
 #
 # QT notifier wrapper
 #
 # $Id$
 #
-# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@tzi.de>
+# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -63,20 +63,20 @@ class Timer( qt.QTimer ):
             self.stop()
             del self
 
-def addSocket( socket, method ):
+def socket_add( socket, method ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket."""
     global _qt_socketIDs
     _qt_socketIDs[ socket ] = Socket( socket, method )
 
-def removeSocket( socket ):
+def socket_remove( socket ):
     """Removes the given socket from scheduler."""
     global _qt_socketIDs
     if _qt_socketIDs.has_key( socket ):
 	_qt_socketIDs[ socket ].setEnabled( 0 )
 	del _qt_socketIDs[ socket ]
 
-def addTimer( interval, method, data = None ):
+def timer_add( interval, method, data = None ):
     """The first argument specifies an interval in milliseconds, the
     second argument a function. This is function is called after
     interval milliseconds. If it returns true it's called again after
@@ -85,15 +85,15 @@ def addTimer( interval, method, data = None ):
     the called function."""
     return Timer( interval, method, data )
 
-def removeTimer( id ):
+def timer_remove( id ):
     """Removes _all_ functioncalls to the method given as argument from the
     scheduler."""
     if isinstance( id, Timer ):
         id.stop()
         del id
 
-addDispatcher = None
-removeDispatcher = None
+dispatcher_add = None
+dispatcher_remove = None
 
 def loop():
     """Execute main loop forever."""

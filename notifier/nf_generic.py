@@ -58,21 +58,21 @@ def __millisecs():
     """returns the current time in milliseconds"""
     return int( time.time() * 1000 )
 
-def addSocket( id, method, condition = IO_READ ):
+def socket_add( id, method, condition = IO_READ ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket.
     The callback function gets the socket back as only argument."""
     global __sockets
     __sockets[ condition ][ id ] = method
 
-def removeSocket( id, condition = IO_READ ):
+def socket_remove( id, condition = IO_READ ):
     """Removes the given socket from scheduler. If no condition is specified the
     default is IO_READ."""
     global __sockets
     if __sockets[ condition ].has_key( id ):
         del __sockets[ condition ][ id ]
 
-def addTimer( interval, method ):
+def timer_add( interval, method ):
     """The first argument specifies an interval in milliseconds, the second
     argument a function. This is function is called after interval
     seconds. If it returns true it's called again after interval
@@ -91,12 +91,12 @@ def addTimer( interval, method ):
 
     return __timer_id
 
-def removeTimer( id ):
+def timer_remove( id ):
     """Removes the timer identifed by the unique ID from the main loop."""
     if __timers.has_key( id ):
         del __timers[ id ]
 
-def addDispatcher( method ):
+def dispatcher_add( method ):
     """The notifier supports external dispatcher functions that will be called
     within each scheduler step. This functionality may be usful for
     applications having an own event mechanism that needs to be triggered as
@@ -109,7 +109,7 @@ def addDispatcher( method ):
     __dispatchers.append( method )
     __min_timer = MIN_TIMER
 
-def removeDispatcher( method ):
+def dispatcher_remove( method ):
     """Removes an external dispatcher function from the list"""
     global __dispatchers
     if method in __dispatchers:
@@ -180,7 +180,6 @@ def step( sleep = True, external = True ):
     for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
         sockets, condition = sl
         for sock in sockets:
-            print 'type', type( sock )
             if ( isinstance( sock, socket.socket ) and \
                  sock.fileno() != -1 ) or \
                  ( isinstance( sock, socket._socketobject ) and \
@@ -189,7 +188,6 @@ def step( sleep = True, external = True ):
                    ( isinstance( sock, int ) and sock != -1 ):
                 if __sockets[ condition ].has_key( sock ):
                     try:
-                        print __sockets[ condition ][ sock ]
                         if not __sockets[ condition ][ sock ]( sock ):
                             removeSocket( sock, condition )
                     except ( KeyboardInterrupt, SystemExit ), e:

@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# log.py
+# signal.py
 #
-# Author: Andreas Büsching <crunchy@tzi.de>
+# Author: Andreas Büsching  <crunchy@tzi.de>
 #
-# log - a logging facility for the generic notifier module
+# signal
 #
-# $Id$
+# $Id: file.py,v 1.1 2004/09/20 12:39:43 crunchy Exp $
 #
-# Copyright (C) 2004 Andreas Büsching <crunchy@tzi.de>
+# Copyright (C) 2005 Andreas Büsching <crunchy@tzi.de>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,15 +25,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import logging
-import sys
+import notifier
+import notifier.signals as signals
 
-instance = logging.getLogger( 'notifier' )
-instance.addHandler(logging.StreamHandler(sys.stderr))
+def _wait_for_click( signal ):
+  print "clicked"
 
-debug = instance.debug
-info = instance.info
-warn = instance.warn
-error = instance.error
-critical = instance.critical
-exception = instance.exception
+def _wait_for_movement( signal, optional ):
+  if signal == "moved":
+    print "signal moved"
+  else:
+    print "not what I'm looking for", signal
+
+def _emitting():
+  signals.emit( "clicked" )
+
+notifier.init( notifier.GENERIC )
+
+signals.new( "clicked" )
+signals.connect( "clicked", _wait_for_click )
+signals.connect( "clicked", notifier.Callback( _wait_for_movement, 'optional something' ) )
+notifier.addTimer( 3000, _emitting )
+
+notifier.loop()

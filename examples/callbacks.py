@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# log.py
+# callbacks.py
 #
-# Author: Andreas Büsching <crunchy@tzi.de>
+# Author: Andreas Büsching  <crunchy@tzi.de>
 #
-# log - a logging facility for the generic notifier module
+# callbacks
 #
-# $Id$
+# $Id: file.py,v 1.1 2004/09/20 12:39:43 crunchy Exp $
 #
-# Copyright (C) 2004 Andreas Büsching <crunchy@tzi.de>
+# Copyright (C) 2005 Andreas Büsching <crunchy@tzi.de>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,15 +25,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import logging
-import sys
+import notifier
 
-instance = logging.getLogger( 'notifier' )
-instance.addHandler(logging.StreamHandler(sys.stderr))
 
-debug = instance.debug
-info = instance.info
-warn = instance.warn
-error = instance.error
-critical = instance.critical
-exception = instance.exception
+notifier.init( notifier.GENERIC )
+
+def cb( bla, fasel, fasel2 ):
+    print bla
+    print fasel
+    print fasel2
+
+b = notifier.Callback( cb )
+c = notifier.Callback( cb, 'addional user data', 'more additional user data' )
+c( 'mandatory arguments' )
+
+print 'b == c', b == c
+print 'b == cb', b == cb

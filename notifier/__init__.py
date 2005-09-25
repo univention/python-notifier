@@ -32,23 +32,20 @@ from version import *
 from select import select
 from time import time
 
-addSocket = None
-removeSocket = None
+socket_add = None
+socket_remove = None
 
-addTimer = None
-removeTimer = None
+timer_add = None
+timer_remove = None
 
-addDispatcher = None
-removeDispatcher = None
+dispatcher_add = None
+dispatcher_remove = None
 
 loop = None
 step = None
 
 # notifier types
-GENERIC = 0
-QT      = 1
-GTK     = 2
-WX      = 3
+( GENERIC, QT, GTK, WX ) = range( 4 )
 
 # socket conditions
 IO_READ = None
@@ -56,12 +53,12 @@ IO_WRITE = None
 IO_EXCEPT = None
 
 def init( type = GENERIC ):
-    global addTimer
-    global addSocket
-    global addDispatcher
-    global removeTimer
-    global removeSocket
-    global removeDispatcher
+    global timer_add
+    global socket_add
+    global dispatcher_add
+    global timer_remove
+    global socket_remove
+    global dispatcher_remove
     global loop, step
     global IO_READ, IO_WRITE, IO_EXCEPT
 
@@ -76,12 +73,12 @@ def init( type = GENERIC ):
     else:
         raise Exception( 'unknown notifier type' )
 
-    addSocket = nf_impl.addSocket
-    removeSocket = nf_impl.removeSocket
-    addTimer = nf_impl.addTimer
-    removeTimer = nf_impl.removeTimer
-    addDispatcher = nf_impl.addDispatcher
-    removeDispatcher = nf_impl.removeDispatcher
+    socket_add = nf_impl.socket_add
+    socket_remove = nf_impl.socket_remove
+    timer_add = nf_impl.timer_add
+    timer_remove = nf_impl.timer_remove
+    dispatcher_add = nf_impl.dispatcher_add
+    dispatcher_remove = nf_impl.dispatcher_remove
     loop = nf_impl.loop
     step = nf_impl.step
     IO_READ = nf_impl.IO_READ
