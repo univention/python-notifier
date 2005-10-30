@@ -1,3 +1,8 @@
+2005-10-30  Andreas Büsching  <crunchy@bitkipper.net>
+
+        * setup.py: do not import notifier.version; use execfile instead to
+	avoid import of all files from notifier (through __init__.py)
+
 2005-06-16  Andreas Büsching  <crunchy@tzi.de>
 
         * notifier/version.py: set version to 0.3.8

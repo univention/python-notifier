@@ -10,7 +10,7 @@ with """
 
 from distutils.core import setup
 
-from notifier import version
+execfile( 'notifier/version.py' )
 
 classifiers = """\
 Development Status :: 5 - Production/Stable
@@ -26,7 +26,7 @@ Operating System :: Unix
 
 doclines = __doc__.split( '\n' )
 setup( name	= 'pyNotifier',
-       version	= version.VERSION,
+       version	= VERSION,
        license  = 'GPLv2',
        description = doclines[ 0 ],
        long_description = '\n'.join( doclines[ 2 : ] ),
