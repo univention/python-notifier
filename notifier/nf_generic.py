@@ -189,7 +189,7 @@ def step( sleep = True, external = True ):
                 if __sockets[ condition ].has_key( sock ):
                     try:
                         if not __sockets[ condition ][ sock ]( sock ):
-                            removeSocket( sock, condition )
+                            socket_remove( sock, condition )
                     except ( KeyboardInterrupt, SystemExit ), e:
                         raise e
                     except:
