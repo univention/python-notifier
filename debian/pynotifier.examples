@@ -1,0 +1,7 @@
+examples/callbacks.py
+examples/logger.py
+examples/signal2.py
+examples/signal.py
+examples/test-generic.py
+examples/test-gtk.py
+examples/test-qt.py

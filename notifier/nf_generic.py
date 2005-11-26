@@ -115,6 +115,11 @@ def dispatcher_remove( method ):
     if method in __dispatchers:
         __dispatcher.remove( method )
 
+__current_sockets = {}
+__current_sockets[ IO_READ ] = []
+__current_sockets[ IO_WRITE ] = []
+__current_sockets[ IO_EXCEPT ] = []
+
 def step( sleep = True, external = True ):
     # IDEA: Add parameter to specify max timeamount to spend in mainloop
     """Do one step forward in the main loop. First all timers are checked for
@@ -179,7 +184,12 @@ def step( sleep = True, external = True ):
 
     for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
         sockets, condition = sl
-        for sock in sockets:
+	# append all unknown sockets to check list
+	for s in sockets:
+	    if not s in __current_sockets[ condition ]:
+	        __current_sockets[ condition ].append( s )
+        while len( __current_sockets[ condition ] ):
+	    sock = __current_sockets[ condition ].pop( 0 )
             if ( isinstance( sock, socket.socket ) and \
                  sock.fileno() != -1 ) or \
                  ( isinstance( sock, socket._socketobject ) and \

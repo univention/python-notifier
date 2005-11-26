@@ -1,3 +1,7 @@
+2005-11-25  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* add debian packaging information
+
 2005-10-30  Andreas Büsching  <crunchy@bitkipper.net>
 
         * setup.py: do not import notifier.version; use execfile instead to

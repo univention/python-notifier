@@ -11,6 +11,6 @@ def timeout( data ):
 # when no argument is given to init default is GENERIC
 notifier.init()
 
-notifier.addTimer( 2000, notifier.Callback( timeout, 'hello' ) )
+notifier.timer_add( 2000, notifier.Callback( timeout, 'hello' ) )
 
 notifier.loop()
