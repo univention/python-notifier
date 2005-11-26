@@ -26,9 +26,9 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 major_number    = 0
-minor_number    = 3
-revision_number = 8
-extension       = ''
+minor_number    = 4
+revision_number = 0
+extension       = 'pre1'
 
 VERSION = "%d.%d.%d%s" % ( major_number, minor_number,
                            revision_number, extension )
