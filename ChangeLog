@@ -1,3 +1,7 @@
+2005-12-25  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.4.0
+
 2005-11-25  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.4.0pre1

@@ -28,7 +28,7 @@
 major_number    = 0
 minor_number    = 4
 revision_number = 0
-extension       = 'pre1'
+extension       = ''
 
 VERSION = "%d.%d.%d%s" % ( major_number, minor_number,
                            revision_number, extension )

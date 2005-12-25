@@ -1,3 +1,9 @@
+pynotifier (0.4.0-1) unstable; urgency=low
+
+  * no changes to debian package
+
+ -- Andreas Büsching <crunchy@bitkipper.net>  Sun, 25 Dec 2005 11:57:55 +0100
+
 pynotifier (0.4.0pre1-1) unstable; urgency=low
 
   * Initial release.
