@@ -1,3 +1,8 @@
+2006-04-16  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* examples/signal.py, examples/signal2.py, examples/test-gtk.py,
+	examples/test-qt.py: updated examples
+
 2005-12-25  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.4.0

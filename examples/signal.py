@@ -31,19 +31,19 @@ import notifier.signals as signals
 class TestSignal( signals.Provider ):
     def __init__( self ):
         signals.Provider.__init__( self )
-        self.signalNew( 'test-signal' )
+        self.signal_new( 'test-signal' )
 
 test = TestSignal()
 
 def timer_cb( a ):
     print 'timer argument', a
     signals.emit( 'test-signal' )
-    test.signalEmit( 'test-signal' )
+    test.signal_emit( 'test-signal' )
     print '-------------------------'
     return True
 
-def signal_cb( signal, a, b, c ):
-    print 'signal arguments', signal, a, b, c
+def signal_cb( signal, a, b ):
+    print 'signal arguments', signal, a, b
     signals.disconnect( 'test-signal', signal_cb )
 
 notifier.init( notifier.GENERIC )
@@ -51,8 +51,8 @@ notifier.init( notifier.GENERIC )
 signals.new( 'test-signal' )
 signals.connect( 'test-signal', notifier.Callback( signal_cb, 1, 2,
                                                    'global signal' ) )
-test.signalConnect( 'test-signal',notifier.Callback( signal_cb, 1, 2,
+test.signal_connect( 'test-signal',notifier.Callback( signal_cb, 1, 2,
                                                'TestSignal signal' ) )
-notifier.addTimer( 2000, notifier.Callback( timer_cb, 7 ) )
+notifier.timer_add( 2000, notifier.Callback( timer_cb, 7 ) )
 
 notifier.loop()

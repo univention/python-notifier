@@ -28,14 +28,11 @@
 import notifier
 import notifier.signals as signals
 
-def _wait_for_click( signal ):
+def _wait_for_click():
   print "clicked"
 
-def _wait_for_movement( signal, optional ):
-  if signal == "moved":
-    print "signal moved"
-  else:
-    print "not what I'm looking for", signal
+def _wait_for_movement( optional = None ):
+  print "optional:", optional 
 
 def _emitting():
   signals.emit( "clicked" )
@@ -45,6 +42,6 @@ notifier.init( notifier.GENERIC )
 signals.new( "clicked" )
 signals.connect( "clicked", _wait_for_click )
 signals.connect( "clicked", notifier.Callback( _wait_for_movement, 'optional something' ) )
-notifier.addTimer( 3000, _emitting )
+notifier.timer_add( 3000, _emitting )
 
 notifier.loop()

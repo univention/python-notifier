@@ -41,5 +41,5 @@ if __name__ == '__main__':
     notifier.init()
     log = open( '/var/log/messages', 'rb' )
     log.seek( os.stat( '/var/log/messages' )[ 6 ] )
-    notifier.addTimer( 100, notifier.Callback( tail_minus_f, log ) )
+    notifier.timer_add( 100, notifier.Callback( tail_minus_f, log ) )
     notifier.loop()

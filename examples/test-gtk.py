@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys
+
 import gtk
 
 import notifier
@@ -11,7 +13,7 @@ def hello( *args ):
 
 def destroy(*args):
     window.hide()
-    gtk.mainquit()
+    sys.exit( 0 )
 
 window = gtk.Window( gtk.WINDOW_TOPLEVEL )
 window.connect( 'destroy', destroy )
@@ -29,7 +31,7 @@ def timer_test():
     print "timer_test"
     return True
 
-notifier.addTimer( 4000, notifier.Callback( timer_test ) )
+notifier.timer_add( 4000, notifier.Callback( timer_test ) )
 
 notifier.loop()
 

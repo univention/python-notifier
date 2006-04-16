@@ -14,7 +14,7 @@ class QTestApp( qt.QApplication ):
         self.dialog.show()
 	qt.QObject.connect( self.button, qt.SIGNAL( 'clicked()' ), \
 				self.clickedButton )
-        self.timer_id = notifier.addTimer( 4, self.timerTest )
+        self.timer_id = notifier.timer_addd( 4, self.timerTest )
 
     def recvPrint( self, mmsg, data = None ):
         print "received print command, args =", mmsg.payload[0].args
