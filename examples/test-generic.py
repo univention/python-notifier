@@ -8,9 +8,15 @@ def timeout( data ):
 
     return True
 
+def dispatch( data ):
+    print 'dispatch', data
+    
+    return True
+
 # when no argument is given to init default is GENERIC
 notifier.init()
 
-notifier.timer_add( 2000, notifier.Callback( timeout, 'hello' ) )
+notifier.timer_add( 10000, notifier.Callback( timeout, 'hello' ) )
+notifier.dispatcher_add( notifier.Callback( dispatch, 'hello' ) )
 
 notifier.loop()

@@ -32,6 +32,9 @@ import gtk
 
 import popen2
 
+import notifier
+import dispatch
+
 IO_READ = gobject.IO_IN
 IO_WRITE = gobject.IO_OUT
 IO_EXCEPT = gobject.IO_ERR
@@ -82,19 +85,20 @@ def timer_remove( id ):
     scheduler."""
     gobject.source_remove( id )
 
-def dispatcher_add( method ):
-    global _gtk_dispatchers
-    _gtk_dispatchers[ method ] = gobject.idle_add( method )
-    
-def dispatcher_remove( method ):
-    global _gtk_dispatchers
-    if _gtk_dispatchers.has_key( method ):
-        gobject.source_remove( _gtk_dispatchers[ method ] )
-        del _gtk_dispatchers[ method ]
+dispatcher_add = dispatch.dispatcher_add
+dispatcher_remove = dispatch.dispatcher_remove
 
+__last_dispatcher_call = None
 def step( sleep = True ):
+    global __last_dispatcher_call
     gtk.main_iteration_do( block = sleep )
 
+    now = notifier.millisecs()
+    if not __last_dispatcher_call or \
+           ( now - __last_dispatcher_call ) >= dispatch.MIN_TIMER:
+        __last_dispatcher_call = now
+        dispatch.dispatcher_run()
+    
 def loop():
     """Execute main loop forver."""
     while 1:

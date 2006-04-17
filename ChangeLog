@@ -2,12 +2,16 @@
 
 	* examples/test-gtk.py: add dispatcher test
 
-	* notifier/nf_gtk.py (dispatcher_remove, dispatcher_add): add a
-	dispatcher implemenation based on gobject.idle_add
+	* notifier/nf_gtk.py (dispatcher_remove, dispatcher_add): add
+	links to internal dispatcher implementation (note: idle stuff from
+	glib is not compatible to the internal dispatch implementation)
 
 	* notifier/__init__.py (Callback.__hash__): add hash method to
 	make it usable as key for dicts
 
+	* notifier/dispatch.py: moved dispatcher implementation to new
+	file (currently used by GENERIC and GTK)
+	
 2006-04-16  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* examples/signal.py, examples/signal2.py, examples/test-gtk.py,
