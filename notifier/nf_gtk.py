@@ -88,15 +88,9 @@ def timer_remove( id ):
 dispatcher_add = dispatch.dispatcher_add
 dispatcher_remove = dispatch.dispatcher_remove
 
-__last_dispatcher_call = None
-def step( sleep = True ):
-    global __last_dispatcher_call
+def step( sleep = True, external = True ):
     gtk.main_iteration_do( block = sleep )
-
-    now = notifier.millisecs()
-    if not __last_dispatcher_call or \
-           ( now - __last_dispatcher_call ) >= dispatch.MIN_TIMER:
-        __last_dispatcher_call = now
+    if external:
         dispatch.dispatcher_run()
     
 def loop():
