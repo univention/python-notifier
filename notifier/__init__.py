@@ -9,7 +9,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@bitkipper.net>
+# Copyright (C) 2004, 2005, 2006 Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -111,3 +111,6 @@ class Callback:
 
     def __nonzero__( self ):
         return bool( self._function )
+
+    def __hash__( self ):
+        return self._function.__hash__()

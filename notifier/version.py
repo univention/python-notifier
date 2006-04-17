@@ -9,7 +9,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@bitkipper.net>
+# Copyright (C) 2004, 2005, 2006 Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 
 major_number    = 0
 minor_number    = 4
-revision_number = 0
+revision_number = 1
 extension       = ''
 
 VERSION = "%d.%d.%d%s" % ( major_number, minor_number,

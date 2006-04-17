@@ -9,7 +9,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@bitkipper.net>
+# Copyright (C) 2004, 2005, 2006 Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ IO_EXCEPT = gobject.IO_ERR
 _gtk_socketIDs = {}
 _gtk_socketIDs[ IO_READ ] = {}
 _gtk_socketIDs[ IO_WRITE ] = {}
+_gtk_dispatchers = {}
 
 def socket_add( socket, method, condition = IO_READ ):
     """The first argument specifies a socket, the second argument has to be a
@@ -81,11 +82,18 @@ def timer_remove( id ):
     scheduler."""
     gobject.source_remove( id )
 
-dispatcher_add = None
-dispatcher_remove = None
+def dispatcher_add( method ):
+    global _gtk_dispatchers
+    _gtk_dispatchers[ method ] = gobject.idle_add( method )
+    
+def dispatcher_remove( method ):
+    global _gtk_dispatchers
+    if _gtk_dispatchers.has_key( method ):
+        gobject.source_remove( _gtk_dispatchers[ method ] )
+        del _gtk_dispatchers[ method ]
 
-def step():
-    gtk.main_iteration_do()
+def step( sleep = True ):
+    gtk.main_iteration_do( block = sleep )
 
 def loop():
     """Execute main loop forver."""

@@ -1,3 +1,9 @@
+pynotifier (0.4.1-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Andreas Büsching <crunchy@bitkipper.net>  Mon, 17 Apr 2006 15:48:08 +0200
+
 pynotifier (0.4.0-1) unstable; urgency=low
 
   * no changes to debian package

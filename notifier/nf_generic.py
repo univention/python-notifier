@@ -9,7 +9,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@bitkipper.net>
+# Copyright (C) 2004, 2005, 2006 Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ def dispatcher_remove( method ):
     """Removes an external dispatcher function from the list"""
     global __dispatchers
     if method in __dispatchers:
-        __dispatcher.remove( method )
+        __dispatchers.remove( method )
 
 __current_sockets = {}
 __current_sockets[ IO_READ ] = []
