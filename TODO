@@ -9,3 +9,8 @@
   gtk	  DONE
   qt	  TBD
   wx	  TBD
+* dispatcher support
+  generic DONE
+  gtk	  DONE
+  qt	  TBD
+  wx	  TBD

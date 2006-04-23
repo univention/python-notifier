@@ -1,3 +1,7 @@
+2006-04-23  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.4.1
+
 2006-04-17  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* examples/test-gtk.py: add dispatcher test
