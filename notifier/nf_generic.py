@@ -51,6 +51,9 @@ __sockets[ IO_EXCEPT ] = {}
 __timers = {}
 __timer_id = 0
 __min_timer = None
+__in_step = False
+__step_depth = 0
+__step_depth_max = 2
 
 def socket_add( id, method, condition = IO_READ ):
     """The first argument specifies a socket, the second argument has to be a
@@ -81,7 +84,7 @@ def timer_add( interval, method ):
     except OverflowError:
         __timer_id = 0
 
-    __timers[ __timer_id ] = ( interval, notifier.millisecs(), method )
+    __timers[ __timer_id ] = [ interval, notifier.millisecs(), method ]
 
     return __timer_id
 
@@ -94,7 +97,7 @@ def dispatcher_add( method ):
     global __min_timer
     __min_timer = dispatch.MIN_TIMER
     dispatch.dispatcher_add( method )
-    
+
 dispatcher_remove = dispatch.dispatcher_remove
 
 __current_sockets = {}
@@ -102,8 +105,9 @@ __current_sockets[ IO_READ ] = []
 __current_sockets[ IO_WRITE ] = []
 __current_sockets[ IO_EXCEPT ] = []
 
+( INTERVAL, TIMESTAMP, CALLBACK ) = range( 3 )
+
 def step( sleep = True, external = True ):
-    # IDEA: Add parameter to specify max timeamount to spend in mainloop
     """Do one step forward in the main loop. First all timers are checked for
     expiration and if necessary the accociated callback function is called.
     After that the timer list is searched for the next timer that will expire.
@@ -112,34 +116,48 @@ def step( sleep = True, external = True ):
     callback functions from the sockets reported by the select system call are
     invoked. As a final task in a notifier step all registered external
     dispatcher functions are invoked."""
+
+    global __in_step, __step_depth, __step_depth_max
+
+    __in_step = True
+    __step_depth += 1
+
+    if __step_depth > __step_depth_max:
+	log.exception( 'maximum recursion depth reached' )
+	__step_depth -= 1
+	__in_step = False
+	return
+
     # handle timers
-    trash_can = []
     _copy = __timers.copy()
-    for i in _copy:
-        interval, timestamp, callback = _copy[ i ]
-	if interval + timestamp <= notifier.millisecs():
-	    retval = None
+    for i, timer in _copy.items():
+	now = notifier.millisecs()
+	if timer[ INTERVAL ] + timer[ TIMESTAMP ] <= now:
             # Update timestamp on timer before calling the callback to
             # prevent infinite recursion in case the callback calls
             # step().
-            __timers[ i ] = ( interval, notifier.millisecs(), callback )
+            timer[ TIMESTAMP ] = 0
 	    try:
-		if not callback():
-		    trash_can.append( i )
-		elif i in __timers:
+		if not timer[ CALLBACK ]():
+		    if __timers.has_key( i ):
+			del __timers[ i ]
+		else:
                     # Update timer's timestamp again to reflect callback
                     # execution time.
-		    __timers[ i ] = ( interval, notifier.millisecs(), callback )
+		    timer[ TIMESTAMP ] = now + timer[ INTERVAL ]
             except ( KeyboardInterrupt, SystemExit ), e:
+		__step_depth -= 1
+		__in_step = False
                 raise e
 	    except:
                 log.exception( 'removed timer %d' % i )
-                trash_can.append( i )
+		if __timers.has_key( i ):
+		    del __timers[ i ]
 
-    # remove functions that returned false from scheduler
-    trash_can.reverse()
-    for r in trash_can:
-        if __timers.has_key( r ): del __timers[ r ]
+	# if it causes problems to iterate over probably non-existing
+	# timers, I think about adding the following code:
+	# if not __in_step:
+	#     break
 
     # get minInterval for max timeout
     timeout = None
@@ -190,7 +208,20 @@ def step( sleep = True, external = True ):
 
     # handle external dispatchers
     if external:
-        dispatch.dispatcher_run()
+	try:
+	    dispatch.dispatcher_run()
+        except ( KeyboardInterrupt, SystemExit ), e:
+            __step_depth -= 1
+            __in_step = False
+            raise e
+        except Exception, e:
+            __step_depth -= 1
+            __in_step = False
+            log.exception( 'error in dispatcher function' )
+            raise e
+
+    __step_depth -= 1
+    __in_step = False
 
 def loop():
     """Executes the "main loop" forever by calling step in an endless loop"""

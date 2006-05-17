@@ -32,6 +32,8 @@ from version import *
 from select import select
 from time import time
 
+import log
+
 socket_add = None
 socket_remove = None
 
@@ -70,6 +72,7 @@ def init( type = GENERIC ):
         import nf_gtk as nf_impl
     elif type == WX:
         import nf_wx as nf_impl
+	log.warn( 'the WX notifier is deprecated and is no longer maintained' )
     else:
         raise Exception( 'unknown notifier type' )
 
@@ -118,4 +121,3 @@ class Callback:
 def millisecs():
     """returns the current time in milliseconds"""
     return int( time() * 1000 )
-

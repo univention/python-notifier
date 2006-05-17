@@ -9,7 +9,7 @@
 #
 # $Id$
 #
-# Copyright (C) 2004 Andreas Büsching <crunchy@bitkipper.net>
+# Copyright (C) 2005, 2006 Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import logging
 import sys
 
 instance = logging.getLogger( 'notifier' )
-instance.addHandler(logging.StreamHandler(sys.stderr))
+instance.addHandler( logging.StreamHandler( sys.stderr ) )
 
 debug = instance.debug
 info = instance.info

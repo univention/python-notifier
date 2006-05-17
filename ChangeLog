@@ -1,3 +1,12 @@
+2006-05-02  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/nf_generic.py (step): applied some ideas from Dirk
+	"Dischi" Meyer <dischi@freevo.org>; ensure, that timer callbacks
+	are not called recursively; timer object are now deleted directly
+	without using a temporary storage; add counter for recursion depth
+	in step and a maximum depth (include API for modifing it)
+
+
 2006-04-23  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.4.1
@@ -15,7 +24,7 @@
 
 	* notifier/dispatch.py: moved dispatcher implementation to new
 	file (currently used by GENERIC and GTK)
-	
+
 2006-04-16  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* examples/signal.py, examples/signal2.py, examples/test-gtk.py,
@@ -60,7 +69,7 @@
 	to Markus-S. Schröder <marcus-sebastian@web.de> for the test
 	environment and his patience
 
-	
+
 
 2005-06-02  Andreas Büsching  <crunchy@tzi.de>
 
