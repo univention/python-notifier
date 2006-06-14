@@ -132,7 +132,8 @@ def step( sleep = True, external = True ):
     _copy = __timers.copy()
     for i, timer in _copy.items():
 	now = notifier.millisecs()
-	if timer[ INTERVAL ] + timer[ TIMESTAMP ] <= now:
+	timestamp = timer[ TIMESTAMP ]
+	if timer[ INTERVAL ] + timestamp <= now:
             # Update timestamp on timer before calling the callback to
             # prevent infinite recursion in case the callback calls
             # step().
@@ -142,9 +143,7 @@ def step( sleep = True, external = True ):
 		    if __timers.has_key( i ):
 			del __timers[ i ]
 		else:
-                    # Update timer's timestamp again to reflect callback
-                    # execution time.
-		    timer[ TIMESTAMP ] = now + timer[ INTERVAL ]
+		    timer[ TIMESTAMP ] = timestamp + timer[ INTERVAL ]
             except ( KeyboardInterrupt, SystemExit ), e:
 		__step_depth -= 1
 		__in_step = False

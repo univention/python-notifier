@@ -1,3 +1,17 @@
+2006-06-15  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.4.1
+
+	* notifier/nf_generic.py (step): timer interval is set
+	exactly (last timestamp + interval). processing time is not taking
+	into account.
+
+	* examples/process.py: new example for popen.py
+
+	* notifier/popen.py: new utility to handle child
+	processes. catches stdout and stderr and emits signals providing
+	access to the data (line buffered)
+
 2006-05-02  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/nf_generic.py (step): applied some ideas from Dirk
