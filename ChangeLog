@@ -1,6 +1,6 @@
 2006-06-15  Andreas Büsching  <crunchy@bitkipper.net>
 
-	* notifier/version.py: set version to 0.4.1
+	* notifier/version.py: set version to 0.4.2
 
 	* notifier/nf_generic.py (step): timer interval is set
 	exactly (last timestamp + interval). processing time is not taking
