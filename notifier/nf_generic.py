@@ -167,8 +167,11 @@ def step( sleep = True, external = True ):
             interval, timestamp, callback = __timers[ t ]
             nextCall = interval + timestamp - notifier.millisecs()
             if timeout == None or nextCall < timeout:
-                if nextCall > 0: timeout = nextCall
-                else: timeout = 0
+                if nextCall > 0:
+		    timeout = nextCall
+                else:
+		    timeout = 0
+		    break
         if timeout == None: timeout = dispatch.MIN_TIMER
         if __min_timer and __min_timer < timeout: timeout = __min_timer
 

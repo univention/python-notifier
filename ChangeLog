@@ -1,3 +1,11 @@
+2006-06-28  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/nf_generic.py (step): add an optimitation provided by
+	Stefan Kunaschk <kunaschk@informatik.uni-bremen.de>: When
+	determining the timeout for the following select statement by
+	iterating over the timer list, the iteration is stopped when the
+	timeout is set to zero.
+
 2006-06-15  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.4.2
