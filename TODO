@@ -3,14 +3,14 @@
   generic DONE
   gtk	  DONE
   qt	  DONE
-  wx	  TBD
+  wx	  TBD (deprecated)
 * add support for write notification
   generic DONE
   gtk	  DONE
   qt	  TBD
-  wx	  TBD
+  wx	  TBD (deprecated)
 * dispatcher support
   generic DONE
   gtk	  DONE
   qt	  TBD
-  wx	  TBD
+  wx	  TBD (deprecated)
