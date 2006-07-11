@@ -30,9 +30,6 @@
 import gobject
 import gtk
 
-import popen2
-
-import notifier
 import dispatch
 
 IO_READ = gobject.IO_IN
@@ -97,3 +94,7 @@ def loop():
     """Execute main loop forver."""
     while 1:
         step()
+
+def _init():
+    print 'local init'
+    gobject.threads_init()

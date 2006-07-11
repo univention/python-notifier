@@ -88,6 +88,9 @@ def init( type = GENERIC ):
     IO_WRITE = nf_impl.IO_WRITE
     IO_EXCEPT = nf_impl.IO_EXCEPT
 
+    if hasattr( nf_impl, '_init' ):
+        nf_impl._init()
+
 class Callback:
     def __init__( self, function, *args ):
         self._function = function

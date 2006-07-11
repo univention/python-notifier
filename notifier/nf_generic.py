@@ -84,7 +84,7 @@ def timer_add( interval, method ):
     except OverflowError:
         __timer_id = 0
 
-    __timers[ __timer_id ] = [ interval, notifier.millisecs(), method ]
+    __timers[ __timer_id ] = [ interval, notifier.millisecs() + interval, method ]
 
     return __timer_id
 
@@ -133,7 +133,7 @@ def step( sleep = True, external = True ):
     for i, timer in _copy.items():
 	now = notifier.millisecs()
 	timestamp = timer[ TIMESTAMP ]
-	if timer[ INTERVAL ] + timestamp <= now:
+	if timestamp <= now:
             # Update timestamp on timer before calling the callback to
             # prevent infinite recursion in case the callback calls
             # step().
@@ -143,6 +143,12 @@ def step( sleep = True, external = True ):
 		    if __timers.has_key( i ):
 			del __timers[ i ]
 		else:
+		    # find a moment in the future
+		    now = notifier.millisecs()
+		    while ( timestamp + timer[ INTERVAL ] ) < now:
+		        timestamp += timer[ INTERVAL ]
+			print timer[ INTERVAL ]
+			print timestamp
 		    timer[ TIMESTAMP ] = timestamp + timer[ INTERVAL ]
             except ( KeyboardInterrupt, SystemExit ), e:
 		__step_depth -= 1

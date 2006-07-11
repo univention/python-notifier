@@ -14,3 +14,9 @@
   gtk	  DONE
   qt	  TBD
   wx	  TBD (deprecated)
+
+for 0.5.0
+---------
+* update README
+* add simple thread handler
+* check qt notifier

@@ -60,7 +60,7 @@ def timer_test():
     return True
 
 def dispatcher_test( a, b, c ):
-    print 'dispatcher', a, b, c
+#    print 'dispatcher', a, b, c
     return True
 
 notifier.timer_add( 4000, notifier.Callback( timer_test ) )
