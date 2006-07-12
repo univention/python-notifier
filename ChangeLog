@@ -1,3 +1,9 @@
+2006-07-12  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/nf_generic.py (step): applied 95% of a patch from Dirk
+	"Dischi" Meyer <dischi@freevo.org> that fixes a bug in calculation
+	of timer expiration timestamps; add a optimatation
+
 2006-07-11  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/nf_gtk.py: removed two unnecessary imports

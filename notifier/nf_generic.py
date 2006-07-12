@@ -131,8 +131,11 @@ def step( sleep = True, external = True ):
     # handle timers
     _copy = __timers.copy()
     for i, timer in _copy.items():
-	now = notifier.millisecs()
 	timestamp = timer[ TIMESTAMP ]
+        if not timestamp:
+            # prevert recursion, ignore this timer
+            continue
+	now = notifier.millisecs()
 	if timestamp <= now:
             # Update timestamp on timer before calling the callback to
             # prevent infinite recursion in case the callback calls
@@ -143,13 +146,14 @@ def step( sleep = True, external = True ):
 		    if __timers.has_key( i ):
 			del __timers[ i ]
 		else:
-		    # find a moment in the future
+		    # Find a moment in the future. If interval is 0, we
+                    # just reuse the old timestamp, doesn't matter.
 		    now = notifier.millisecs()
-		    while ( timestamp + timer[ INTERVAL ] ) < now:
-		        timestamp += timer[ INTERVAL ]
-			print timer[ INTERVAL ]
-			print timestamp
-		    timer[ TIMESTAMP ] = timestamp + timer[ INTERVAL ]
+		    if timer[ INTERVAL ]:
+			timestamp += timer[ INTERVAL ]
+			while timestamp <= now:
+			    timestamp += timer[ INTERVAL ]
+		    timer[ TIMESTAMP ] = timestamp
             except ( KeyboardInterrupt, SystemExit ), e:
 		__step_depth -= 1
 		__in_step = False
@@ -169,9 +173,13 @@ def step( sleep = True, external = True ):
     if not sleep:
         timeout = 0
     else:
+        now = notifier.millisecs()
         for t in __timers:
             interval, timestamp, callback = __timers[ t ]
-            nextCall = interval + timestamp - notifier.millisecs()
+            if not timestamp:
+                # timer is blocked (recursion), ignore it
+                continue
+            nextCall = timestamp - now
             if timeout == None or nextCall < timeout:
                 if nextCall > 0:
 		    timeout = nextCall
