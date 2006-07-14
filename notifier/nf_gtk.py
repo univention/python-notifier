@@ -36,29 +36,28 @@ IO_READ = gobject.IO_IN
 IO_WRITE = gobject.IO_OUT
 IO_EXCEPT = gobject.IO_ERR
 
-# map of Sockets/Methods -> gtk_input_handler_id
+# map of Sockets/Methods -> GTK source IDs
 _gtk_socketIDs = {}
 _gtk_socketIDs[ IO_READ ] = {}
 _gtk_socketIDs[ IO_WRITE ] = {}
-_gtk_dispatchers = {}
 
 def socket_add( socket, method, condition = IO_READ ):
     """The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket."""
     global _gtk_socketIDs
     source = gobject.io_add_watch( socket, condition,
-                                   _socketCallback, method )
+                                   _socket_callback, method )
     _gtk_socketIDs[ condition ][ socket ] = source
 
-def _socketCallback( source, condition, method ):
+def _socket_callback( source, condition, method ):
     global _gtk_socketIDs
     if _gtk_socketIDs[ condition ].has_key( source ):
         ret = method( source )
         if not ret:
-            del _gtk_socketIDs[ condition ][ source ]
-        return ret
+	    socket_remove( socket, condition )
+	return ret
 
-    print 'socket not found'
+    log.warn( 'socket not found' )
     return False
 
 def socket_remove( socket, condition = IO_READ ):
@@ -78,8 +77,7 @@ def timer_add( interval, method ):
     return gobject.timeout_add( interval, method )
 
 def timer_remove( id ):
-    """Removes _all_ functioncalls to the method given as argument from the
-    scheduler."""
+    """Removes the timer specified by id from the scheduler."""
     gobject.source_remove( id )
 
 dispatcher_add = dispatch.dispatcher_add
@@ -89,12 +87,11 @@ def step( sleep = True, external = True ):
     gtk.main_iteration_do( block = sleep )
     if external:
         dispatch.dispatcher_run()
-    
+
 def loop():
     """Execute main loop forver."""
     while 1:
         step()
 
 def _init():
-    print 'local init'
     gobject.threads_init()

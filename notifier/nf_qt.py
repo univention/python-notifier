@@ -9,7 +9,8 @@
 #
 # $Id$
 #
-# Copyright (C) 2004, 2005 Andreas Büsching <crunchy@bitkipper.net>
+# Copyright (C) 2004, 2005, 2006
+#		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +30,10 @@
 
 #from select import select
 #from time import time
-import qt
+try:
+    import PyQt4.Qt as qt
+except:
+    import qt
 
 _qt_socketIDs = {} # map of Sockets/Methods -> qt.QSocketNotifier
 

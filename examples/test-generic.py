@@ -2,14 +2,16 @@
 
 import notifier
 
+import time
+
 def timeout( data ):
-    print 'timeout', notifier.millisecs()
+    print 'timeout', time.time()
     print '  data    :', data
 
     return True
 
 def zero( data ):
-    print 'timeout', notifier.millisecs()
+    print 'timeout', time.time()
     print '  data    :', data
 
     return True

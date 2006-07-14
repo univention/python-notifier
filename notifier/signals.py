@@ -9,7 +9,8 @@
 #
 # $Id: file.py,v 1.1 2004/09/20 12:39:43 crunchy Exp $
 #
-# Copyright (C) 2005 Andreas Büsching <crunchy@bitkipper.net>
+# Copyright (C) 2005, 2006
+#		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -78,7 +79,7 @@ def new( signal, signals = None ):
         signal = Signal( signal )
 
     if _signals.has_key( signal.name ):
-        print "Signal already exists"
+        raise SignalExistsError( "Signal '%s' already exists" % signal.name )
     else:
         _signals[ signal.name ] = signal
 
@@ -86,8 +87,12 @@ def connect( signal, callback, signals = None ):
     _signals = _select_signals( signals )
     if isinstance( signal, Signal ) and _signals.has_key( signal.name ):
         _signals[ signal.name ].connect( callback )
-    elif isinstance( signal, str ) and _signals.has_key( signal ):
-        _signals[ signal ].connect( callback )
+    elif isinstance( signal, str ):
+	if _signals.has_key( signal ):
+	    _signals[ signal ].connect( callback )
+	else:
+	    raise UnknownSignalError( "unknown signal '%s'" % signal )
+
 
 def disconnect( signal, callback, signals = None ):
     _signals = _select_signals( signals )
@@ -99,5 +104,14 @@ def disconnect( signal, callback, signals = None ):
 def emit( signal, *args ):
     if isinstance( signal, Signal ) and __signals.has_key( signal.name ):
         __signals[ signal.name ].emit( *args )
-    elif isinstance( signal, str ) and __signals.has_key( signal ):
-        __signals[ signal ].emit( *args )
+    elif isinstance( signal, str ):
+	if __signals.has_key( signal ):
+	    __signals[ signal ].emit( *args )
+	else:
+	    raise UnknownSignalError( "unknown signal '%s'" % signal )
+
+class UnknownSignalError( Exception ):
+    pass
+
+class SignalExistsError( Exception ):
+    pass

@@ -31,12 +31,12 @@
 from copy import copy
 from select import select
 from select import error as select_error
+from time import time
 import os, sys
 
 import socket
 
 # internal packages
-import notifier
 import log
 import dispatch
 
@@ -84,7 +84,8 @@ def timer_add( interval, method ):
     except OverflowError:
         __timer_id = 0
 
-    __timers[ __timer_id ] = [ interval, notifier.millisecs() + interval, method ]
+    __timers[ __timer_id ] = \
+	[ interval, int( time() * 1000 ) + interval, method ]
 
     return __timer_id
 
@@ -135,7 +136,7 @@ def step( sleep = True, external = True ):
         if not timestamp:
             # prevert recursion, ignore this timer
             continue
-	now = notifier.millisecs()
+	now = int( time() * 1000 )
 	if timestamp <= now:
             # Update timestamp on timer before calling the callback to
             # prevent infinite recursion in case the callback calls
@@ -148,7 +149,7 @@ def step( sleep = True, external = True ):
 		else:
 		    # Find a moment in the future. If interval is 0, we
                     # just reuse the old timestamp, doesn't matter.
-		    now = notifier.millisecs()
+		    now = int( time() * 1000 )
 		    if timer[ INTERVAL ]:
 			timestamp += timer[ INTERVAL ]
 			while timestamp <= now:
@@ -173,7 +174,7 @@ def step( sleep = True, external = True ):
     if not sleep:
         timeout = 0
     else:
-        now = notifier.millisecs()
+        now = int( time() * 1000 )
         for t in __timers:
             interval, timestamp, callback = __timers[ t ]
             if not timestamp:

@@ -2,25 +2,25 @@
 # -*- coding: utf-8 -*-
 #
 # nf_wx.py
-# 
+#
 # Author: Andreas Büsching <crunchy@bitkipper.net>
-# 
+#
 # wxWindows notifier wrapper
-# 
+#
 # $Id$
-# 
+#
 # Copyright (C) 2004, 2005 Andreas Büsching <crunchy@bitkipper.net>
-# 
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2, or (at your option)
 # any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -45,10 +45,6 @@ def EVT_UDPSOCKETEVENT( handler, func ):
     """Bind UDP-Socket events to a callback function"""
     handler.Connect( -1, -1, wxEVT_UDPSOCKETEVENT, func )
 
-## What can we do with the id?
-#def EVT_UDPSOCKETEVENT( handler, id, func ):
-#    handler.Connect( id, -1, wxEVT_UDPSOCKETEVENT, func )
-
 class UDPSocketEvent( wxPyEvent ):
     """UDP-Socket events. Send from select-thread to gui-thread"""
     def __init__( self, socket ):
@@ -66,20 +62,6 @@ class UDPSocketEvent( wxPyEvent ):
 	    self.msg = self.msg[size:]
 	return ( res, self.sender )
 
-#wxEVT_MBUSTIMEREVENT = wxNewEventType()
-#
-#def EVT_MBUSTIMEREVENT( handler, func ):
-#    handler.Connect( -1, -1, wxEVT_MBUSTIMEREVENT, func )
-#
-#
-#class MbusTimerEvent( wxPyEvent ):
-#    def __init__( self, data = None ):
-#	wxPyEvent.__init__( self )
-#	self.SetEventType( wxEVT_MBUSTIMEREVENT )
-#	self.data = data
-
-#------------------------------------------------------------------------------
-
 ID_Timer = wxNewId()
 
 class Notifier( wxEvtHandler ):
@@ -90,10 +72,10 @@ class Notifier( wxEvtHandler ):
         # max seconds till new socket gets "selected"
         # decrease this value if you want to add/remove
         # sockets often
-        self.timeout = 5 
+        self.timeout = 5
         thread.start_new_thread( self.otherThreadLoop, () )
         self.app = wxPySimpleApp()
-        EVT_UDPSOCKETEVENT( self, self.OnSocket )
+	EVT_UDPSOCKETEVENT( self, self.OnSocket )
         self.timer = wxTimer( self, ID_Timer )
         EVT_TIMER( self, ID_Timer, self.OnTimer )
 
@@ -107,7 +89,7 @@ class Notifier( wxEvtHandler ):
     def removeSocket( self, socket ):
         """Remove given socket from scheduler"""
         del self.sockets[socket]
-        
+
     def addTimer( self, interval, method, data = None ):
         """The first argument specifies an interval in seconds, the
         second argument a function. This is function is called after
@@ -115,7 +97,7 @@ class Notifier( wxEvtHandler ):
         interval seconds, otherwise it is removed from the
         scheduler. The third (optional) argument is a parameter given
         to the called function."""
-        
+
         t = time.time()
         self.timers.append( (interval, t, method, data) )
         if len( self.timers ) == 1:
@@ -131,7 +113,7 @@ class Notifier( wxEvtHandler ):
         remove.reverse()
         for i in remove: del self.timers[ i ]
 
-    def otherThreadLoop( self ):        
+    def otherThreadLoop( self ):
         """socketloop sits in its own thread and sends events to the
         main thread"""
         while 1:
@@ -175,16 +157,14 @@ class Notifier( wxEvtHandler ):
     def step( self ):
         raise Error, "stepping not supported in wx-Mode"
 
-# standard Notifier-Interface used by pyMbus 0.5.4 and above:
-
 notifier_instance = Notifier()
 
-addSocket	=  notifier_instance.addSocket
-removeSocket	=  notifier_instance.removeSocket
-addTimer	=  notifier_instance.addTimer
-removeTimer	=  notifier_instance.removeTimer
+socket_add	=  notifier_instance.addSocket
+socket_remove	=  notifier_instance.removeSocket
+timer_add	=  notifier_instance.addTimer
+timer_remove	=  notifier_instance.removeTimer
 step		=  notifier_instance.step
 loop		=  notifier_instance.loop
 
-addDispatcher = None
-removeDispatcher = None
+dispatcher_add = None
+dispatcher_remove = None

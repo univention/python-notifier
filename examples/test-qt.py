@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 
-import qt
+try:
+    import PyQt4.Qt as qt
+    version = 4
+except:
+    import qt
+    version = 3
+
+import notifier
 
 import sys
 
@@ -8,33 +15,41 @@ class QTestApp( qt.QApplication ):
     def __init__( self ):
         qt.QApplication.__init__( self, sys.argv )
         self.dialog = qt.QDialog()
-        self.setMainWidget( self.dialog )
-        self.dialog.setCaption( "Qt - pyNotifier Test" )
+	if version == 4:
+	    self.setActiveWindow( self.dialog )
+	else:
+	    self.setMainWidget( self.dialog )
+
+        self.dialog.setWindowTitle( "Qt - pyNotifier Test" )
 	self.button = qt.QPushButton( 'Hello World', self.dialog )
         self.dialog.show()
 	qt.QObject.connect( self.button, qt.SIGNAL( 'clicked()' ), \
 				self.clickedButton )
-        self.timer_id = notifier.timer_addd( 4, self.timerTest )
-
-    def recvPrint( self, mmsg, data = None ):
-        print "received print command, args =", mmsg.payload[0].args
-        return 1 # keep command registered
+        self.timer_id = notifier.timer_add( 4, self.timerTest )
 
     def recvQuit( self, mmsg, data = None ):
-        self.exit_loop()
-        
+	if version == 4:
+	    self.exit()
+	else:
+	    self.exit_loop()
+
     def clickedButton( self ):
     	print "bye"
-	self.exit_loop()
+	if version == 4:
+	    self.exit()
+	else:
+	    self.exit_loop()
 
     def timerTest( self, data ):
         print 'tick'
         return False
-        
+
 if __name__ == '__main__':
+    notifier.init( notifier.QT )
     app = QTestApp()
 
     # can not use notifier.loop()
-    app.exec_loop()
-
-
+    if version == 4:
+	app.exec_()
+    else:
+	app.exec_loop()
