@@ -1,3 +1,15 @@
+2006-07-15  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/nf_gtk.py (_socket_callback): fixed a symbol error and
+	add a documentation string
+
+	* COPYING: next release will be under LGPL 2.1
+
+	* examples/threads.py: an example demonstrating the new thread handler
+
+	* notifier/threads.py: a simple thread handler that starts a
+	thread and informs about the result y invoking a callback function
+
 2006-07-14  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* examples/signal2.py (_emitting): demonstrate UnknownSignalError

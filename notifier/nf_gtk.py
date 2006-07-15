@@ -1,29 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# nf_gtk.py
-#
 # Author: Andreas Büsching <crunchy@bitkipper.net>
 #
 # notifier wrapper for GTK+ 2.x
 #
 # $Id$
 #
-# Copyright (C) 2004, 2005, 2006 Andreas Büsching <crunchy@bitkipper.net>
+# Copyright (C) 2004, 2005, 2006
+#		Andreas Büsching <crunchy@bitkipper.net>
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2, or (at your option)
-# any later version.
+# This library is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as
+# published by the Free Software Foundation; either version 2.1 of the
+# License, or (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# This library is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301 USA
 
 """Simple mainloop that watches sockets and timers."""
 
@@ -31,6 +31,7 @@ import gobject
 import gtk
 
 import dispatch
+import log
 
 IO_READ = gobject.IO_IN
 IO_WRITE = gobject.IO_OUT
@@ -50,14 +51,17 @@ def socket_add( socket, method, condition = IO_READ ):
     _gtk_socketIDs[ condition ][ socket ] = source
 
 def _socket_callback( source, condition, method ):
+    """This is an internal callback function, that maps the GTK source IDs
+    to the socket objects that are used by pynotifier as an identifier
+    """
     global _gtk_socketIDs
     if _gtk_socketIDs[ condition ].has_key( source ):
         ret = method( source )
         if not ret:
-	    socket_remove( socket, condition )
+	    socket_remove( source, condition )
 	return ret
 
-    log.warn( 'socket not found' )
+    log.warn( "socket '%s' not found" % source )
     return False
 
 def socket_remove( socket, condition = IO_READ ):
@@ -66,6 +70,8 @@ def socket_remove( socket, condition = IO_READ ):
     if _gtk_socketIDs[ condition ].has_key( socket ):
 	gobject.source_remove( _gtk_socketIDs[ condition ][ socket ] )
 	del _gtk_socketIDs[ condition ][ socket ]
+    else:
+	log.warn( "socket '%s' not found" % socket )
 
 def timer_add( interval, method ):
     """The first argument specifies an interval in milliseconds, the
