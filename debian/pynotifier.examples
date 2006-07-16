@@ -5,3 +5,6 @@ examples/signal.py
 examples/test-generic.py
 examples/test-gtk.py
 examples/test-qt.py
+examples/test-wx.py
+examples/threads.py
+examples/process.py
