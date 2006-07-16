@@ -60,7 +60,7 @@ def _socket_callback( source, condition, method ):
 	    socket_remove( source, condition )
 	return ret
 
-    log.warn( "socket '%s' not found" % source )
+    log.info( "socket '%s' not found" % source )
     return False
 
 def socket_remove( socket, condition = IO_READ ):
@@ -70,7 +70,7 @@ def socket_remove( socket, condition = IO_READ ):
 	gobject.source_remove( _gtk_socketIDs[ condition ][ socket ] )
 	del _gtk_socketIDs[ condition ][ socket ]
     else:
-	log.warn( "socket '%s' not found" % socket )
+	log.info( "socket '%s' not found" % socket )
 
 def timer_add( interval, method ):
     """The first argument specifies an interval in milliseconds, the

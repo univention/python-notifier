@@ -1,7 +1,13 @@
-2006-07-15  Andreas Büsching  <crunchy@bitkipper.net>
+2006-07-16  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.5.0
 	first release under the LGPL
+
+	* notifier/nf_gtk.py (_socket_callback, socket_remove): set log
+	level to 'info' for the message informing that the socket could
+	not be removed
+
+2006-07-15  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/*.py, examples/*.py: changed header from GPL to LGPL
 
