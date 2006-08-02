@@ -1,3 +1,13 @@
+2006-08-02  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.5.1
+
+	* examples/threads.py (doing_something_else): renamed class from
+	Thread to Simple
+
+	* notifier/dispatch.py (dispatcher_run): use global variable
+	__dispatchers
+
 2006-07-16  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.5.0

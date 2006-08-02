@@ -64,14 +64,27 @@ implementation of pyNotifier is used. Other possible choices for the
 'type' argument are GTK, QT and WX (current support for wxWindows is
 not up-to-date).
 
+Some notifier implementations provide a set of options that control the
+behaviour of the notifier. The options are passed to the implementation
+as a keyword list through the 'init' function as shown in the following
+example:
+
+{{{
+def init( type = GTK, x11 = False )
+}}}
+
+This example uses the 'x11' option for the GTK notifier. If set
+to False the notifier does not require gtk anymore and uses gobject
+instead.
+
 == Sockets ==
 
 To get notified when a specific event occurs the application has to
 register its interest for this event. For sockets and files this is
-done with the 'addSocket' function'.
+done with the 'socket_add' function'.
 
 {{{
-def addSocket( id, method, condition = IO_IN )
+def socket_add( id, method, condition = IO_IN )
 }}}
 
 The 'id' argument may be a socket or file object or a file descriptor
@@ -83,13 +96,13 @@ argument. Instead of a normal function the [@callbacks 'Callback']
 object provided by pyNotifier may be usful at this point.
 
 To remove a registered socket or file from the notifier the
-'removeSocket' function has to be invoked. The 'id' is the socket or
-file object or the file descriptor given to 'addSocket' and the
+'socket_remove' function has to be invoked. The 'id' is the socket or
+file object or the file descriptor given to 'socket_add' and the
 optional argument 'condition' may be set to IO_IN or IO_OUT depending
 on the prevuoisly registered event.
 
 {{{
-def removeSocket( id, condition = IO_IN )
+def socket_remove( id, condition = IO_IN )
 }}}
 
 Another way to achieve the removal of a socket or file object from the
@@ -101,26 +114,26 @@ never again triggered if this specific event occurs.
 
 pyNotifier supports just one type of timer. If a timer is registered
 for a given interval of time the application is recurrently triggered
-when the timer expires. To register a timer the 'addTimer' function
+when the timer expires. To register a timer the 'timer_add' function
 has to be invoked. The first argument 'interval' must be specified in
 milliseconds. 'method' is the callback function that is invoked by the
 notifier without any argument when the timer expires.
 
 {{{
-def addTimer( interval, method ) -> unique timer identifier
+def timer_add( interval, method ) -> unique timer identifier
 }}}
 
 To implement a one-shot timer that is just triggered once and never
 again the application can use the return value of its callback
 function for this timer and return False or None. In this case the
 notifier automatically removes the timer. Another way to remove a
-timer is to call the method 'removeTimer'.
+timer is to call the method 'timer_remove'.
 
 {{{
-def removeTimer( id )
+def timer_remove( id )
 }}}
 
-The 'id' argument is the unique timer identifier returned by 'addTimer'.
+The 'id' argument is the unique timer identifier returned by 'timer_add'.
 
 == External Dispatcher ==
 
@@ -134,25 +147,25 @@ pyNotifier provides the feature to add so called external
 dispatchers. These dispatchers are functions that will be invoked in
 each notifier step after all timers and sockets were checked. To add a
 dispatcher function to the notifier main loop the function
-'addDispatcher' is provided. The only argument to this function is the
+'dispatcher_add' is provided. The only argument to this function is the
 callback methodthat will be called.
 
 {{{
-def addDispatcher( method )
+def dispatcher_add( method )
 }}}
 
 To remove such a dispatcher function from the notifier main loop
-'removeDispatcher' is used with the call back method as the only argument.
+'dispatcher_remove' is used with the call back method as the only argument.
 
 {{{
-def removeDispatcher( method )
+def dispatcher_remove( method )
 }}}
 
 [[Anchor(callbacks)]]
 == Callbacks ==
 
 pyNotifier provides a class 'Callback' that can be used as a callback
-function that is passed to the 'addSocket' and 'addTimer'
+function that is passed to the 'socket_add' and 'timer_add'
 function. This class provides the possibility to pass more than the
 specified arguments to the callback functions. For example the socket
 callback function is called with one single argument. To pass some
@@ -163,21 +176,22 @@ like 'socket1'.
 {{{
 import notifier
 ...
-notifier.addSocket( fd, socket1 )
+notifier.socket_add( fd, socket1 )
 ...
 
 def socket1( fd ):
     print 'data received on socket', fd
+    return True
 }}}
 
-'fd' is the 'id' given to 'addSocket'. To pass some state information
+'fd' is the 'id' given to 'socket_add'. To pass some state information
 to the callback function it can be done as shown in the following
 example.
 
 {{{
 import notifier
 ...
-notifier.addSocket( fd, notifier.Callback( arg1, arg2 ) )
+notifier.socket_add( fd, notifier.Callback( arg1, arg2 ) )
 ...
 
 def socket1( fd, arg1, arg2 ):
@@ -219,9 +233,9 @@ def standard_in( in ):
 if __name__ == "__main__":
    notifier.init( notifier.GENERIC )
 
-   notifier.addTimer( 60000, another_minute )
-   notifier.addTimer( 10000, notifier.Callback( first_10_secs, 10 ) )
-   notifier.addSocket( sys.stdin, standard_in )
+   notifier.timer_add( 60000, another_minute )
+   notifier.timer_add( 10000, notifier.Callback( first_10_secs, 10 ) )
+   notifier.socket_add( sys.stdin, standard_in )
 
    notifier.loop()
 }}}
@@ -229,4 +243,3 @@ if __name__ == "__main__":
 Any comments or questions can be send to
 
 crunchy@bitkipper.net
-

@@ -49,7 +49,7 @@ if __name__ == '__main__':
     notifier.init( notifier.GENERIC )
 
 #     notifier.dispatcher_add( threads.results )
-    task = threads.Thread( 'test',
+    task = threads.Simple( 'test',
 			   notifier.Callback( my_thread, [ 'hello', 'world' ] ),
 			   done_with_it )
     task.run()
