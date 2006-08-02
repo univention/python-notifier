@@ -2,6 +2,15 @@
 
 	* notifier/version.py: set version to 0.5.1
 
+	* notifier/__init__.py (init): if the notifier implementation has
+	an attribute '_options' (a dict) the keyword arguments are
+	compared with the keys in the '_options' dict; if they match the
+	value is copied.
+
+	* notifier/nf_gtk.py (_options): add options dict
+	(_init): check _option 'x11': if True use gtk otherwise fallback
+	to gobject
+
 	* examples/threads.py (doing_something_else): renamed class from
 	Thread to Simple
 
