@@ -46,7 +46,7 @@ Operating System :: Unix
 """
 
 doclines = __doc__.split( '\n' )
-setup( name	= 'pyNotifier',
+setup( name	= 'pynotifier',
        version	= VERSION,
        license  = 'GPLv2',
        description = doclines[ 0 ],
