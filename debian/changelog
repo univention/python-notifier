@@ -1,8 +1,14 @@
+pynotifier (0.5.2-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Andreas Büsching <crunchy@bitkipper.net>  Thu, 10 Aug 2006 21:45:35 +0200
+
 pynotifier (0.5.1-1) unstable; urgency=low
 
   * new upstream release
 
- -- Andreas Büsching <crunchy@buesching.local>  Wed,  2 Aug 2006 22:28:13 +0200
+ -- Andreas Büsching <crunchy@bitkipper.net>  Wed,  2 Aug 2006 22:28:13 +0200
 
 pynotifier (0.5.0-1) unstable; urgency=low
 

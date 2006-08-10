@@ -1,3 +1,16 @@
+2006-08-10  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.5.2
+
+	* examples/process.py: extend example to demonstrate blocking
+	technique
+
+	* notifier/nf_generic.py (_init): add implementation specific init
+	function and an option recursive_depth to define max recursive
+	depth
+
+	* notifier/popen.py: fixed indentation and a few minor bugs
+
 2006-08-02  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.5.1

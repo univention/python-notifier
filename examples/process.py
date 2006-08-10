@@ -3,7 +3,7 @@
 #
 # Author: Andreas Büsching <crunchy@bitkipper.net>
 #
-# en example demonstrating the process handler class
+# an example demonstrating the process handler class
 #
 # $Id$
 #
@@ -29,6 +29,8 @@ import os, sys
 import notifier
 import notifier.popen
 
+proc = None
+
 def stdout( pid, line ):
     print "(%d>1): %s" % ( pid, line )
 
@@ -39,14 +41,37 @@ def died( pid, status ):
     print ">>> process %d died" % pid
     sys.exit( os.WEXITSTATUS( status[ 1 ] ) )
 
+def tick():
+	print 'tick'
+	return True
+
+def runit():
+	global proc
+	print 'runit ...',
+	proc = notifier.popen.Process( '/bin/sleep 5' )
+	proc.signal_connect( 'stdout', stdout )
+	proc.signal_connect( 'stderr', stderr )
+	proc.signal_connect( 'killed', died )
+	proc.start()
+	while True:
+		if proc.is_alive():
+			notifier.step()
+		else:
+			break
+
 if __name__ == '__main__':
-    notifier.init( notifier.GENERIC )
-    proc = notifier.popen.Process( '/bin/ls -latr /etc' )
-#     proc = notifier.popen.Process( '/bin/ls -latr /var/log/exim4' )
+	notifier.init( notifier.GENERIC )
 
-    proc.signal_connect( 'stdout', stdout )
-    proc.signal_connect( 'stderr', stderr )
-    proc.signal_connect( 'killed', died )
+	# run a process and wait for its death
+	notifier.timer_add( 1000, runit )
 
-    proc.start()
-    notifier.loop()
+	# show we can still do things
+	notifier.timer_add( 1000, tick )
+
+#  	proc = notifier.popen.Process( '/bin/ls -latr /etc' )
+# 	proc.signal_connect( 'stdout', stdout )
+# 	proc.signal_connect( 'stderr', stderr )
+# 	proc.signal_connect( 'killed', died )
+# 	proc.start()
+
+	notifier.loop()

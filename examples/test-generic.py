@@ -45,7 +45,7 @@ def dispatch( data ):
     return True
 
 # when no argument is given to init default is GENERIC
-notifier.init()
+notifier.init( notifier.GENERIC, recursive_depth = 5 )
 notifier.timer_add( 1000, notifier.Callback( timeout, 'hello' ) )
 #notifier.timer_add( 0, notifier.Callback( zero, 'hello' ) )
 notifier.dispatcher_add( notifier.Callback( dispatch, 'hello' ) )

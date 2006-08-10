@@ -52,7 +52,11 @@ __timer_id = 0
 __min_timer = None
 __in_step = False
 __step_depth = 0
-__step_depth_max = 2
+__step_depth_max = 0
+
+_options = {
+    'recursive_depth' : 2,
+}
 
 def socket_add( id, method, condition = IO_READ ):
     """The first argument specifies a socket, the second argument has to be a
@@ -243,3 +247,8 @@ def loop():
     """Executes the "main loop" forever by calling step in an endless loop"""
     while 1:
 	step()
+
+def _init():
+    global __step_depth_max
+
+    __step_depth_max = _options[ 'recursive_depth' ]
