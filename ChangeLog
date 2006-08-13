@@ -1,3 +1,21 @@
+2006-08-13  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* examples/process2.py: add example demonstrating popen.RunIt
+
+	* notifier/popen.py (RunIt): new class providing a very simple
+	interface for running processes and collecting the output
+
+	* notifier/popen.py (Process.start): return process ID of child
+	process
+	(Process._normalize_cmd): replace command line parser code with
+	shlex.split
+	(Process.__init__): removed self.read_stdout and self.read_stderr
+	used by the callback technique that was an alternative to the
+	signals
+	(_processes, _watcher): add a global processes that is used bei a
+	dispatcher function to monitor the processes
+	(Process._closed): check if process is already dead and buried
+
 2006-08-10  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.5.2

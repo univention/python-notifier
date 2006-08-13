@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 #
 # Author: Andreas Büsching <crunchy@bitkipper.net>
 #
-# version information
+# an example demonstrating the process handler class RunIt
 #
 # $Id$
 #
-# Copyright (C) 2004, 2005, 2006
+# Copyright (C) 2006
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -24,10 +24,29 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-major_number    = 0
-minor_number    = 5
-revision_number = 3
-extension       = ''
+import os, sys
 
-VERSION = "%d.%d.%d%s" % ( major_number, minor_number,
-                           revision_number, extension )
+import notifier
+import notifier.popen
+
+def tick():
+	print 'tick'
+	return True
+
+def find_result( pid, status, result ):
+	print 'process %d died (%d)' % ( pid, status )
+	print 'output:', len( result )
+
+if __name__ == '__main__':
+	notifier.init( notifier.GENERIC )
+
+	# show we can still do things
+	notifier.timer_add( 500, tick )
+
+	cmd = '/bin/sh -c "/bin/sleep 2 && /usr/bin/find /usr/bin"'
+#	cmd = '/usr/bin/find /var/log'
+  	proc = notifier.popen.RunIt( cmd )
+	print 'started process', proc.start()
+ 	proc.signal_connect( 'finished', find_result )
+
+	notifier.loop()

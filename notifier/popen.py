@@ -24,7 +24,7 @@
 
 """process control using notifier."""
 
-__all__ = [ 'Process' ]
+__all__ = [ 'Process', 'RunIt' ]
 
 # python imports
 import os
@@ -32,12 +32,15 @@ import fcntl
 import popen2
 import glob
 import re
+import shlex
 import logging
 
 # notifier imports
 import notifier
 import signals
 import log
+
+_processes = []
 
 class Process( signals.Provider ):
 	"""
@@ -59,9 +62,6 @@ class Process( signals.Provider ):
 		self.signal_new( 'stdout' );
 		self.signal_new( 'killed' );
 
-		self.read_stdout = None
-		self.read_stderr = None
-
 		self._cmd = self._normalize_cmd(cmd)
 		self._stop_cmd = None
 		if self._cmd:
@@ -71,6 +71,11 @@ class Process( signals.Provider ):
 		self.__dead = True
 		self.stopping = False
 		self.__kill_timer = None
+
+		global _processes
+		if not _processes:
+			notifier.dispatcher_add( _watcher )
+		_processes.append( self )
 
 	def _normalize_cmd( self, cmd ):
 		"""
@@ -87,38 +92,15 @@ class Process( signals.Provider ):
 
 		assert( type( cmd ) == str )
 
-		cmdlist = []
-		curarg = ''
-		waiting = None
-		last = None
-		for c in cmd:
-			if ( c == ' ' and not waiting ) or c == waiting:
-				if curarg:
-					cmdlist.append( curarg )
-					curarg = ''
-				waiting = None
-			elif c in ("'", '"') and not waiting and last != '\\':
-				waiting = c
-			else:
-				curarg += c
-			last = c
-
-		if curarg:
-			cmdlist.append( curarg )
+		cmdlist = shlex.split( cmd )
 
 		return cmdlist
 
 	def _read_stdout( self, line ):
-		if self.read_stdout:
-			self.read_stdout( self.child.pid, line )
-		else:
-			self.signal_emit( 'stdout', self.child.pid, line )
+		self.signal_emit( 'stdout', self.child.pid, line )
 
 	def _read_stderr( self, line ):
-		if self.read_stderr:
-			self.read_stderr( self.child.pid, line )
-		else:
-			self.signal_emit( 'stderr', self.child.pid, line )
+		self.signal_emit( 'stderr', self.child.pid, line )
 
 	def start( self, args = None ):
 		"""
@@ -136,7 +118,7 @@ class Process( signals.Provider ):
 		self.__dead = False
 		self.binary = cmd[ 0 ]
 
-		self.child = popen2.Popen3( cmd, True, 100 )
+		self.child = popen2.Popen3( cmd, True, 1000 )
 
 		log.info( 'running %s (pid=%s)' % ( self.binary, self.child.pid ) )
 
@@ -150,6 +132,12 @@ class Process( signals.Provider ):
 		self.stdout.signal_connect( 'closed', self._closed )
 		self.stderr.signal_connect( 'closed', self._closed )
 
+		return self.child.pid
+
+	def dead( self, pid, status ):
+		self.__dead = True
+		self.signal_emit( 'killed', pid, status )
+
 	def _closed( self, name ):
 		if name == 'stderr':
 			self.stderr = None
@@ -157,10 +145,12 @@ class Process( signals.Provider ):
 			self.stdout = None
 
 		if not self.stdout and not self.stderr:
-			status = os.waitpid( self.child.pid, os.WNOHANG )
-			if status[ 0 ]:
-				self.__dead = True
-				self.signal_emit( 'killed', self.child.pid, status )
+			try:
+				pid, status = os.waitpid( self.child.pid, os.WNOHANG )
+				if pid:
+					self.dead( pid, status )
+			except OSError: # already dead and buried
+				pass
 
 	def write( self, line ):
 		"""
@@ -258,6 +248,23 @@ class Process( signals.Provider ):
 
 		return False
 
+def _watcher():
+	global _processes
+	finished = []
+
+	for proc in _processes:
+		try:
+			pid, status = os.waitpid( proc.child.pid, os.WNOHANG )
+			if pid:
+				proc.dead( pid, status )
+				finished.append( proc )
+		except OSError: # already dead and buried
+			finished.append( proc )
+
+	for i in finished:
+		_processes.remove( i )
+
+	return ( len( _processes ) > 0 )
 
 class IO_Handler( signals.Provider ):
 	"""
@@ -270,22 +277,9 @@ class IO_Handler( signals.Provider ):
 		self.fp = fp
 		fcntl.fcntl( self.fp.fileno(), fcntl.F_SETFL, os.O_NONBLOCK )
 		self.callback = callback
-		self.logger = None
 		self.saved = ''
 		notifier.socket_add( fp, self._handle_input )
 		self.signal_new( 'closed' )
-
-		if logger:
-			logger = '%s-%s.log' % ( logger, name )
-			try:
-				try:
-					os.unlink(logger)
-				except:
-					pass
-				self.logger = open(logger, 'w')
-				log.info('logging child to "%s"' % logger)
-			except IOError:
-				log.warn('Error: Cannot open "%s" for logging' % logger)
 
 	def close( self ):
 		"""
@@ -293,9 +287,6 @@ class IO_Handler( signals.Provider ):
 		"""
 		notifier.socket_remove( self.fp )
 		self.fp.close()
-		if self.logger:
-			self.logger.close()
-			self.logger = None
 		self.signal_emit( 'closed', self.name )
 
 	def _handle_input( self, socket ):
@@ -303,6 +294,7 @@ class IO_Handler( signals.Provider ):
 		Handle data input from socket.
 		"""
 		try:
+			self.fp.flush()
 			data = self.fp.read( 10000 )
 		except IOError, (errno, msg):
 			if errno == 11:
@@ -312,21 +304,17 @@ class IO_Handler( signals.Provider ):
 			data = None
 
 		if not data:
-			log.info('No data on %s for pid %s.' % ( self.name, os.getpid()))
 			self.close()
 			return False
 
 		data  = data.replace('\r', '\n')
 		lines = data.split('\n')
-
 		# Only one partial line?
 		if len(lines) == 1:
 			self.saved += data
 			return True
 
 		# Combine saved data and first line, send to app
-		if self.logger:
-			self.logger.write( self.saved + lines[ 0 ] + '\n' )
 		self.callback( self.saved + lines[ 0 ] )
 		self.saved = ''
 
@@ -336,20 +324,27 @@ class IO_Handler( signals.Provider ):
 			self.saved = lines[ -1 ]
 
 			# Send all lines except the last partial line to the app
-			for line in lines[ 1 : -1 ]:
-				if not line:
-					continue
-				if self.logger:
-					self.logger.write( line + '\n' )
-				self.callback( line )
+			self.callback( lines[ 1 : -1 ] )
 		else:
 			# Send all lines to the app
-			for line in lines[ 1 : ]:
-				if not line:
-					continue
-				if self.logger:
-					self.logger.write( line + '\n' )
-
-		self.callback( line )
+			self.callback( lines[ 1 : ] )
 
 		return True
+
+class RunIt( Process ):
+	def __init__( self, command ):
+		Process.__init__( self, command )
+		self.__buffer = []
+		self.signal_new( 'finished' )
+		self.signal_connect( 'stdout', self._stdout )
+		self.signal_connect( 'killed', self._finished )
+
+	def _stdout( self, pid, line ):
+		if isinstance( line, list ):
+			self.__buffer.extend( line )
+		else:
+			self.__buffer.append( line )
+
+	def _finished( self, pid, status ):
+		self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ),
+						  self.__buffer )

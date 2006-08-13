@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Author: Andreas Büsching  <crunchy@bitkipper.net>
+# Author: Andreas Büsching	<crunchy@bitkipper.net>
 #
 # simple interface to handle threads synchron to the notifier loop
 #
@@ -16,7 +16,7 @@
 #
 # This library is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
@@ -28,58 +28,60 @@ import notifier
 
 import thread
 
+__all__ = [ 'Simple' ]
+
 _threads = []
 
 class Simple( object ):
-    def __init__( self, name, function, callback ):
-	self._name = name
-	self._function = function
-	self._callback = callback
-	self._result = None
-	self._finished = False
-	self._id = None
-	self._lock = thread.allocate_lock()
+	def __init__( self, name, function, callback ):
+		self._name = name
+		self._function = function
+		self._callback = callback
+		self._result = None
+		self._finished = False
+		self._id = None
+		self._lock = thread.allocate_lock()
+		global _threads
+		if not _threads:
+			notifier.dispatcher_add( _results )
+		_threads.append( self )
+
+	def run( self ):
+		self._id = thread.start_new_thread( self._run, () )
+
+	def _run( self ):
+		tmp = self._function()
+		self._lock.acquire()
+		self._result = tmp
+		self._finished = True
+		self._lock.release()
+
+	def lock( self ):
+		self._lock.acquire()
+
+	def unlock( self ):
+		self._lock.release()
+
+	def name( self ):
+		return self._name
+
+	def finished( self ):
+		return self._finished
+
+	def announce( self ):
+		self._callback( self, self._result )
+
+def _results():
+	finished = []
 	global _threads
-	if not _threads:
-	    notifier.dispatcher_add( results )
-	_threads.append( self )
+	for task in _threads:
+		task.lock()
+		if task.finished():
+			task.announce()
+			finished.append( task )
+		task.unlock()
 
-    def run( self ):
-	self._id = thread.start_new_thread( self._run, () )
+	for t in finished:
+		_threads.remove( t )
 
-    def _run( self ):
-	tmp = self._function()
-	self._lock.acquire()
-	self._result = tmp
-	self._finished = True
-	self._lock.release()
-
-    def lock( self ):
-	self._lock.acquire()
-
-    def unlock( self ):
-	self._lock.release()
-
-    def name( self ):
-	return self._name
-
-    def finished( self ):
-	return self._finished
-
-    def announce( self ):
-	self._callback( self, self._result )
-
-def results():
-    finished = []
-    global _threads
-    for task in _threads:
-	task.lock()
-	if task.finished():
-	    task.announce()
-	    finished.append( task )
-	task.unlock()
-
-    for t in finished:
-	_threads.remove( t )
-
-    return ( len( _threads ) > 0 )
+	return ( len( _threads ) > 0 )
