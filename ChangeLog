@@ -1,5 +1,7 @@
 2006-08-13  Andreas Büsching  <crunchy@bitkipper.net>
 
+	* notifier/version.py: set version to 0.5.3
+
 	* examples/process2.py: add example demonstrating popen.RunIt
 
 	* notifier/popen.py (RunIt): new class providing a very simple

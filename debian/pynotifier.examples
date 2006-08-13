@@ -8,3 +8,4 @@ examples/test-qt.py
 examples/test-wx.py
 examples/threads.py
 examples/process.py
+examples/process2.py
