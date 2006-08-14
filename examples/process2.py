@@ -35,7 +35,12 @@ def tick():
 
 def find_result( pid, status, result ):
 	print 'process %d died (%d)' % ( pid, status )
-	print 'output:', len( result )
+	print 'output:',
+	if result:
+		print len( result )
+	else:
+		print result
+
 
 if __name__ == '__main__':
 	notifier.init( notifier.GENERIC )
@@ -45,7 +50,7 @@ if __name__ == '__main__':
 
 	cmd = '/bin/sh -c "/bin/sleep 2 && /usr/bin/find /usr/bin"'
 #	cmd = '/usr/bin/find /var/log'
-  	proc = notifier.popen.RunIt( cmd )
+  	proc = notifier.popen.RunIt( cmd, buffer = True )
 	print 'started process', proc.start()
  	proc.signal_connect( 'finished', find_result )
 

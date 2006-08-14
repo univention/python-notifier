@@ -46,24 +46,24 @@ class Process( signals.Provider ):
 	"""
 	Base class for started child processes
 	"""
-	def __init__( self, cmd ):
+	def __init__( self, cmd, stdout = True, stderr = True ):
 		""" Init the child process 'cmd'. This can either be a string or a list
-		of arguments (similar to popen2). stdout and stderr can be
-		handled by a subclass by overriding the member functions
-		read_stdout and/or read_stderr or by connecting to the signals
-		'stdout' and/or 'stderr'. The signal functions have one argument
-		that is of type list and contains all new lines """
+		of arguments (similar to popen2). stdout and stderr of the child
+		process can be handled by connecting to the signals 'stdout'
+		and/or 'stderr'. The signal functions have one argument that is
+		of type list and contains all new lines. By setting one of the
+		boolean arguments 'stdout' and 'stderr' to False the monitoring
+		of these files can be deactivated."""
 
 		# Setup signal handlers for the process; allows the class to be
 		# useful without subclassing.
 
 		signals.Provider.__init__( self )
-		self.signal_new( 'stderr' );
-		self.signal_new( 'stdout' );
+		if stderr: self.signal_new( 'stderr' );
+		if stdout: self.signal_new( 'stdout' );
 		self.signal_new( 'killed' );
 
 		self._cmd = self._normalize_cmd(cmd)
-		self._stop_cmd = None
 		if self._cmd:
 			self._name = self._cmd[ 0 ].split( '/' )[ -1 ]
 		else:
@@ -122,15 +122,18 @@ class Process( signals.Provider ):
 
 		log.info( 'running %s (pid=%s)' % ( self.binary, self.child.pid ) )
 
-		# IO_Handler for stdout
-		self.stdout = IO_Handler( 'stdout', self.child.fromchild,
-								  self._read_stdout, self._name )
-		# IO_Handler for stderr
-		self.stderr = IO_Handler( 'stderr', self.child.childerr,
-								  self._read_stderr, self._name )
+		self.stdout = self.stderr = None
+		if self.signal_exists( 'stdout' ):
+			# IO_Handler for stdout
+			self.stdout = IO_Handler( 'stdout', self.child.fromchild,
+									  self._read_stdout, self._name )
+			self.stdout.signal_connect( 'closed', self._closed )
 
-		self.stdout.signal_connect( 'closed', self._closed )
-		self.stderr.signal_connect( 'closed', self._closed )
+		if self.signal_exists( 'stderr' ):
+			# IO_Handler for stderr
+			self.stderr = IO_Handler( 'stderr', self.child.childerr,
+									  self._read_stderr, self._name )
+			self.stderr.signal_connect( 'closed', self._closed )
 
 		return self.child.pid
 
@@ -154,7 +157,7 @@ class Process( signals.Provider ):
 
 	def write( self, line ):
 		"""
-		Write a string to the app.
+		Pass a string to the process
 		"""
 		try:
 			self.child.tochild.write(line)
@@ -164,7 +167,7 @@ class Process( signals.Provider ):
 
 	def is_alive( self ):
 		"""
-		Return True if the app is still running
+		Return True if the process is still running
 		"""
 		return not self.__dead
 
@@ -332,14 +335,18 @@ class IO_Handler( signals.Provider ):
 		return True
 
 class RunIt( Process ):
-	def __init__( self, command ):
-		Process.__init__( self, command )
-		self.__buffer = []
-		self.signal_new( 'finished' )
-		self.signal_connect( 'stdout', self._stdout )
+	def __init__( self, command, buffer = True ):
+		Process.__init__( self, command, stdout = buffer, stderr = False )
+		if buffer:
+			self.__buffer = []
+			self.signal_connect( 'stdout', self._stdout )
+		else:
+			self.__buffer = None
 		self.signal_connect( 'killed', self._finished )
+		self.signal_new( 'finished' )
 
 	def _stdout( self, pid, line ):
+		if self.__buffer == None: return
 		if isinstance( line, list ):
 			self.__buffer.extend( line )
 		else:

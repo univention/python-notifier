@@ -36,16 +36,19 @@ def _wait_for_movement( optional = None ):
 def _emitting():
   signals.emit( "clicked" )
 
-notifier.init( notifier.GENERIC )
+if __name__ == '__main__':
+  notifier.init( notifier.GENERIC )
 
-signals.new( "clicked" )
-try:
-  signals.connect( "clicked2", _wait_for_click )
-except signals.UnknownSignalError, e:
-  print 'Exception:', e
-signals.connect( 'clicked', _wait_for_click )
-signals.connect( 'clicked', notifier.Callback( _wait_for_movement,
-                                               'optional something' ) )
-notifier.timer_add( 3000, _emitting )
+  signals.new( "clicked" )
+  try:
+    signals.connect( "clicked2", _wait_for_click )
+  except signals.UnknownSignalError, e:
+    print 'Exception:', e
+  if not signals.exists( 'clicked3' ):
+    print "signal 'clicked3' does not exist"
+  signals.connect( 'clicked', _wait_for_click )
+  signals.connect( 'clicked', notifier.Callback( _wait_for_movement,
+                                                 'optional something' ) )
+  notifier.timer_add( 3000, _emitting )
 
-notifier.loop()
+  notifier.loop()

@@ -1,3 +1,18 @@
+2006-08-14  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.5.4
+
+	* notifier/signals.py (exists, Provider.signal_exists): add method
+	to check the existance of a signal
+
+	* notifier/popen.py (RunIt.__init__): add boolean option buffer
+	which is by default True. In that case stdout of the child process
+	is buffered and otherwise not
+
+	* notifier/popen.py (Process.__init__): add two boolean options
+	stdout and stderr to deactivate the monitoring of the
+	corresponding file descriptor
+
 2006-08-13  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.5.3
