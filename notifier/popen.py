@@ -24,7 +24,7 @@
 
 """process control using notifier."""
 
-__all__ = [ 'Process', 'RunIt' ]
+__all__ = [ 'Process', 'RunIt', 'Shell' ]
 
 # python imports
 import os
@@ -68,8 +68,11 @@ class Process( signals.Provider ):
 			self._name = self._cmd[ 0 ].split( '/' )[ -1 ]
 		else:
 			self._name = '<unknown>'
-		self.__dead = True
 		self.stopping = False
+		self.pid = None
+		self.child = None
+
+		self.__dead = True
 		self.__kill_timer = None
 
 		global _processes
@@ -97,10 +100,10 @@ class Process( signals.Provider ):
 		return cmdlist
 
 	def _read_stdout( self, line ):
-		self.signal_emit( 'stdout', self.child.pid, line )
+		self.signal_emit( 'stdout', self.pid, line )
 
 	def _read_stderr( self, line ):
-		self.signal_emit( 'stderr', self.child.pid, line )
+		self.signal_emit( 'stderr', self.pid, line )
 
 	def start( self, args = None ):
 		"""
@@ -118,24 +121,29 @@ class Process( signals.Provider ):
 		self.__dead = False
 		self.binary = cmd[ 0 ]
 
-		self.child = popen2.Popen3( cmd, True, 1000 )
-
-		log.info( 'running %s (pid=%s)' % ( self.binary, self.child.pid ) )
-
 		self.stdout = self.stderr = None
-		if self.signal_exists( 'stdout' ):
-			# IO_Handler for stdout
-			self.stdout = IO_Handler( 'stdout', self.child.fromchild,
-									  self._read_stdout, self._name )
-			self.stdout.signal_connect( 'closed', self._closed )
+		if not self.signal_exists( 'stdout' ) and \
+			   not self.signal_exists( 'stderr' ):
+			self.pid = os.spawnvp( os.P_NOWAIT, self.binary, cmd )
+		else:
+			self.child = popen2.Popen3( cmd, True, 1000 )
+			self.pid = self.child.pid
 
-		if self.signal_exists( 'stderr' ):
-			# IO_Handler for stderr
-			self.stderr = IO_Handler( 'stderr', self.child.childerr,
-									  self._read_stderr, self._name )
-			self.stderr.signal_connect( 'closed', self._closed )
+			if self.signal_exists( 'stdout' ):
+				# IO_Handler for stdout
+				self.stdout = IO_Handler( 'stdout', self.child.fromchild,
+										  self._read_stdout, self._name )
+				self.stdout.signal_connect( 'closed', self._closed )
 
-		return self.child.pid
+			if self.signal_exists( 'stderr' ):
+				# IO_Handler for stderr
+				self.stderr = IO_Handler( 'stderr', self.child.childerr,
+										  self._read_stderr, self._name )
+				self.stderr.signal_connect( 'closed', self._closed )
+
+		log.info( 'running %s (pid=%s)' % ( self.binary, self.pid ) )
+
+		return self.pid
 
 	def dead( self, pid, status ):
 		self.__dead = True
@@ -149,7 +157,7 @@ class Process( signals.Provider ):
 
 		if not self.stdout and not self.stderr:
 			try:
-				pid, status = os.waitpid( self.child.pid, os.WNOHANG )
+				pid, status = os.waitpid( self.pid, os.WNOHANG )
 				if pid:
 					self.dead( pid, status )
 			except OSError: # already dead and buried
@@ -160,9 +168,9 @@ class Process( signals.Provider ):
 		Pass a string to the process
 		"""
 		try:
-			self.child.tochild.write(line)
+			self.child.tochild.write( line )
 			self.child.tochild.flush()
-		except (IOError, ValueError):
+		except ( IOError, ValueError ):
 			pass
 
 	def is_alive( self ):
@@ -195,7 +203,7 @@ class Process( signals.Provider ):
 			return False
 		# child needs some assistance with dying ...
 		try:
-			os.kill( self.child.pid, signal )
+			os.kill( self.pid, signal )
 		except OSError:
 			pass
 
@@ -221,33 +229,33 @@ class Process( signals.Provider ):
 			# commandline. This implementation uses the /proc filesystem,
 			# it is Linux-dependent.
 			unify_name = re.compile( '[^A-Za-z0-9]' ).sub
-			appname = unify_name('', self.binary)
+			appname = unify_name( '', self.binary )
 
-			cmdline_filenames = glob.glob('/proc/[0-9]*/cmdline')
+			cmdline_filenames = glob.glob( '/proc/[0-9]*/cmdline' )
 
 			for cmdline_filename in cmdline_filenames:
 				try:
-					fd = open(cmdline_filename)
+					fd = open( cmdline_filename )
 					cmdline = fd.read()
 					fd.close()
 				except IOError:
 					continue
-				if unify_name('', cmdline).find(appname) != -1:
+				if unify_name( '', cmdline ).find( appname ) != -1:
 					# Found one, kill it
-					pid = int(cmdline_filename.split('/')[2])
+					pid = int( cmdline_filename.split( '/' )[ 2 ] )
 					try:
-						os.kill(pid, signal)
+						os.kill( pid, signal )
 					except:
 						pass
 		except OSError:
 			pass
 
-		log.info('kill -%d %s' % ( signal, self.binary ))
+		log.info( 'kill -%d %s' % ( signal, self.binary ) )
 		if signal == 15:
 			cb = Callback( self.__killall, 9 )
 			self.__kill_timer = notifier.timer_add( 2000, cb )
 		else:
-			log.critical('PANIC %s' % self.binary)
+			log.critical( 'PANIC %s' % self.binary )
 
 		return False
 
@@ -257,7 +265,7 @@ def _watcher():
 
 	for proc in _processes:
 		try:
-			pid, status = os.waitpid( proc.child.pid, os.WNOHANG )
+			pid, status = os.waitpid( proc.pid, os.WNOHANG )
 			if pid:
 				proc.dead( pid, status )
 				finished.append( proc )
@@ -335,23 +343,46 @@ class IO_Handler( signals.Provider ):
 		return True
 
 class RunIt( Process ):
-	def __init__( self, command, buffer = True ):
-		Process.__init__( self, command, stdout = buffer, stderr = False )
-		if buffer:
-			self.__buffer = []
-			self.signal_connect( 'stdout', self._stdout )
+	def __init__( self, command, stdout = True, stderr = False ):
+		Process.__init__( self, command, stdout = stdout, stderr = stderr )
+		if stdout:
+			self.__stdout = []
+			cb = notifier.Callback( self._output, self.__stdout )
+			self.signal_connect( 'stdout', cb )
 		else:
-			self.__buffer = None
+			self.__stdout = None
+		if stderr:
+			self.__stderr = []
+			cb = notifier.Callback( self._output, self.__stderr )
+			self.signal_connect( 'stderr', self._stderr )
+		else:
+			self.__stderr = None
 		self.signal_connect( 'killed', self._finished )
 		self.signal_new( 'finished' )
 
-	def _stdout( self, pid, line ):
-		if self.__buffer == None: return
+	def _output( self, pid, line, buffer ):
 		if isinstance( line, list ):
-			self.__buffer.extend( line )
+			buffer.extend( line )
 		else:
-			self.__buffer.append( line )
+			buffer.append( line )
 
 	def _finished( self, pid, status ):
-		self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ),
-						  self.__buffer )
+		if self.__stdout != None:
+			if self.__stderr == None:
+				self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ),
+								  self.__stdout )
+			else:
+				self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ),
+								  self.__stdout, self.__stderr )
+		else:
+			self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ) )
+
+class Shell( RunIt ):
+	def __init__( self, command, stdout = True, stderr = False ):
+		cmd = [ '/bin/sh', '-c' ]
+		if isinstance( command, str ):
+			cmd.append( command )
+		else:
+			cmd.append( ' '.join( command ) )
+		print cmd
+		RunIt.__init__( self, cmd, stdout = stdout, stderr = stderr )

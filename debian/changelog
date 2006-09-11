@@ -1,10 +1,16 @@
+pynotifier (0.5.5-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Andreas Büsching <crunchy@bitkipper.net>  Mon, 11 Sep 2006 21:01:54 +0200
+
 pynotifier (0.5.4-1) unstable; urgency=low
 
   * new upstream release
 
  -- Andreas Büsching <crunchy@bitkipper.net>  Mon, 14 Aug 2006 13:20:10 +0200
 
-pynotifier (0.5.3-1) unstable; urgency=low 
+pynotifier (0.5.3-1) unstable; urgency=low
 
   * new upstream release
 
@@ -22,7 +28,7 @@ pynotifier (0.5.1-1) unstable; urgency=low
 
  -- Andreas Büsching <crunchy@bitkipper.net>  Wed,  2 Aug 2006 22:28:13 +0200
 
-pynotifier (0.5.0-1) unstable; urgency=low 
+pynotifier (0.5.0-1) unstable; urgency=low
 
   * new upstream release
 
@@ -38,16 +44,16 @@ pynotifier (0.4.1-1) unstable; urgency=low
 
   * new upstream version
 
- -- Andreas B�sching <crunchy@bitkipper.net>  Mon, 17 Apr 2006 15:48:08 +0200
+ -- Andreas Büsching <crunchy@bitkipper.net>  Mon, 17 Apr 2006 15:48:08 +0200
 
 pynotifier (0.4.0-1) unstable; urgency=low
 
   * no changes to debian package
 
- -- Andreas B�sching <crunchy@bitkipper.net>  Sun, 25 Dec 2005 11:57:55 +0100
+ -- Andreas Büsching <crunchy@bitkipper.net>  Sun, 25 Dec 2005 11:57:55 +0100
 
 pynotifier (0.4.0pre1-1) unstable; urgency=low
 
   * Initial release.
 
- -- Andreas B�sching <crunchy@bitkipper.net>  Sat, 26 Nov 2005 20:09:00 +0100
+ -- Andreas Büsching <crunchy@bitkipper.net>  Sat, 26 Nov 2005 20:09:00 +0100
