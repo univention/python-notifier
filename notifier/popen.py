@@ -34,6 +34,7 @@ import glob
 import re
 import shlex
 import logging
+import types
 
 # notifier imports
 import notifier
@@ -93,9 +94,9 @@ class Process( signals.Provider ):
 				cmd.remove( '' )
 			return cmd
 
-		assert( type( cmd ) == str )
+		assert( type( cmd ) in types.StringTypes )
 
-		cmdlist = shlex.split( cmd )
+		cmdlist = shlex.split( str( cmd ) )
 
 		return cmdlist
 
@@ -378,11 +379,11 @@ class RunIt( Process ):
 			self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ) )
 
 class Shell( RunIt ):
+	BINARY = '/bin/sh'
 	def __init__( self, command, stdout = True, stderr = False ):
-		cmd = [ '/bin/sh', '-c' ]
-		if isinstance( command, str ):
+		cmd = [ Shell.BINARY, '-c' ]
+		if type( command ) in types.StringTypes:
 			cmd.append( command )
-		else:
+		elif type( command ) in ( types.ListType, types.TupleType ):
 			cmd.append( ' '.join( command ) )
-		print cmd
 		RunIt.__init__( self, cmd, stdout = stdout, stderr = stderr )

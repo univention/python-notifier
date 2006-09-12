@@ -1,3 +1,12 @@
+2006-09-12  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.5.6
+
+	* notifier/popen.py (Shell.__init__): if given command is of type
+	str or unicode just append to the command list otherwise join list
+	with spaces to a string and append it; previous version did not
+	check for unicode strings
+
 2006-09-11  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.5.5
