@@ -5,8 +5,6 @@
 #
 # a generic signal implementation for propagating asynchron events
 #
-# $Id$
-#
 # Copyright (C) 2005, 2006
 #	Andreas Büsching <crunchy@bitkipper.net>
 #

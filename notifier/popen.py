@@ -3,8 +3,6 @@
 #
 # Author: Andreas Büsching <crunchy@bitkipper.net>
 #
-# $Id$
-#
 # Copyright (C) 2004, 2005, 2006
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
@@ -22,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-"""process control using notifier."""
+"""child process control using notifier."""
 
 __all__ = [ 'Process', 'RunIt', 'Shell' ]
 
@@ -45,7 +43,8 @@ _processes = []
 
 class Process( signals.Provider ):
 	"""
-	Base class for started child processes
+	Base class for starting child processes and monitoring standard
+	output and error.
 	"""
 	def __init__( self, cmd, stdout = True, stderr = True ):
 		""" Init the child process 'cmd'. This can either be a string or a list
@@ -54,11 +53,21 @@ class Process( signals.Provider ):
 		and/or 'stderr'. The signal functions have one argument that is
 		of type list and contains all new lines. By setting one of the
 		boolean arguments 'stdout' and 'stderr' to False the monitoring
-		of these files can be deactivated."""
+		of these files can be deactivated.
 
-		# Setup signal handlers for the process; allows the class to be
-		# useful without subclassing.
 
+		Signals:
+		'stderr' ( pid, line )
+			emmited when the IO_Handler reported another line of input
+			(from stdout).
+			pid			: PID of the process that produced the output
+			line		: line of output
+		'stdout' ( pid, line )
+			emmited when the IO_Handler reported another line of input
+			(from stderr).
+			pid			: PID of the process that produced the output
+			line		: line of output
+		"""
 		signals.Provider.__init__( self )
 		if stderr: self.signal_new( 'stderr' );
 		if stdout: self.signal_new( 'stdout' );
@@ -101,9 +110,13 @@ class Process( signals.Provider ):
 		return cmdlist
 
 	def _read_stdout( self, line ):
+		"""emit signal 'stdout', announcing that there is another line
+		of output"""
 		self.signal_emit( 'stdout', self.pid, line )
 
 	def _read_stderr( self, line ):
+		"""emit signal 'stdout', announcing that there is another line
+		of output"""
 		self.signal_emit( 'stderr', self.pid, line )
 
 	def start( self, args = None ):
@@ -281,6 +294,11 @@ def _watcher():
 class IO_Handler( signals.Provider ):
 	"""
 	Reading data from socket (stdout or stderr)
+
+	Signals:
+	'closed' ( name )
+		emmited when the file was closed.
+		name			: name of the IO_Handler
 	"""
 	def __init__( self, name, fp, callback, logger = None ):
 		signals.Provider.__init__( self )
@@ -344,6 +362,18 @@ class IO_Handler( signals.Provider ):
 		return True
 
 class RunIt( Process ):
+	"""Is a more simple child process handler based on Process that
+	caches the output and provides it to the caller with the signal
+	'finished'.
+
+	Signals:
+	'finished' ( pid, status[, stdout[, stderr ] ] )
+		emmited when the child process is dead.
+		pid				: process ID
+		status			: exit code of the child process
+		stdout, stderr	: are only provided when stdout and/or stderr is
+						  monitored
+		"""
 	def __init__( self, command, stdout = True, stderr = False ):
 		Process.__init__( self, command, stdout = stdout, stderr = stderr )
 		if stdout:
@@ -379,6 +409,7 @@ class RunIt( Process ):
 			self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ) )
 
 class Shell( RunIt ):
+	"""A simple interface for running shell commands as child processes"""
 	BINARY = '/bin/sh'
 	def __init__( self, command, stdout = True, stderr = False ):
 		cmd = [ Shell.BINARY, '-c' ]

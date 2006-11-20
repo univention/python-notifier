@@ -5,8 +5,6 @@
 #
 # test programm for the QT3 and QT4 notifier
 #
-# $Id$
-#
 # Copyright (C) 2004, 2005, 2006
 #	Andreas Büsching <crunchy@bitkipper.net>
 #

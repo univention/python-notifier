@@ -5,8 +5,6 @@
 #
 # simple interface to handle threads synchron to the notifier loop
 #
-# $Id$
-#
 # Copyright (C) 2006
 #	Andreas Büsching <crunchy@bitkipper.net>
 #

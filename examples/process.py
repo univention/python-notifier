@@ -5,8 +5,6 @@
 #
 # an example demonstrating the process handler class
 #
-# $Id$
-#
 # Copyright (C) 2006
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
@@ -32,14 +30,14 @@ import notifier.popen
 proc = None
 
 def stdout( pid, line ):
-    print "(%d>1): %s" % ( pid, line )
+	print "(%d>1): %s" % ( pid, line )
 
 def stderr( pid, line ):
-    print "(%d>2): %s" % ( pid, line )
+	print "(%d>2): %s" % ( pid, line )
 
 def died( pid, status ):
-    print ">>> process %d died" % pid
-    sys.exit( os.WEXITSTATUS( status[ 1 ] ) )
+	print ">>> process %d died" % pid
+	sys.exit( status )
 
 def tick():
 	print 'tick'
@@ -68,10 +66,10 @@ if __name__ == '__main__':
 	# show we can still do things
 	notifier.timer_add( 1000, tick )
 
-#  	proc = notifier.popen.Process( '/bin/ls -latr /etc' )
-# 	proc.signal_connect( 'stdout', stdout )
-# 	proc.signal_connect( 'stderr', stderr )
-# 	proc.signal_connect( 'killed', died )
-# 	proc.start()
+#	proc = notifier.popen.Process( '/bin/ls -latr /etc' )
+#	proc.signal_connect( 'stdout', stdout )
+#	proc.signal_connect( 'stderr', stderr )
+#	proc.signal_connect( 'killed', died )
+#	proc.start()
 
 	notifier.loop()

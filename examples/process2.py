@@ -5,10 +5,8 @@
 #
 # an example demonstrating the process handler class RunIt
 #
-# $Id$
-#
 # Copyright (C) 2006
-#	Andreas Büsching <crunchy@bitkipper.net>
+#		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License version
@@ -16,7 +14,7 @@
 #
 # This library is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
@@ -50,8 +48,8 @@ if __name__ == '__main__':
 
 	cmd = u'/bin/sh -c "/bin/sleep 2 && /usr/bin/find /usr/bin"'
 #	cmd = '/usr/bin/find /var/log'
-  	proc = notifier.popen.RunIt( cmd, stdout = True )
+	proc = notifier.popen.RunIt( cmd, stdout = True )
 	print 'started process', proc.start()
- 	proc.signal_connect( 'finished', find_result )
+	proc.signal_connect( 'finished', find_result )
 
 	notifier.loop()

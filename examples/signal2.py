@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Author: Andreas Büsching  <crunchy@bitkipper.net>
+# Author: Andreas Büsching	<crunchy@bitkipper.net>
 #
 # signal - implementation of asynchron events
 #
-# $Id$
-#
 # Copyright (C) 2005, 2006
-#       Andreas Büsching <crunchy@bitkipper.net>
+#		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License version
@@ -16,7 +14,7 @@
 #
 # This library is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
@@ -28,27 +26,27 @@ import notifier
 import notifier.signals as signals
 
 def _wait_for_click():
-  print "clicked"
+	print "clicked"
 
 def _wait_for_movement( optional = None ):
-  print "optional:", optional
+	print "optional:", optional
 
 def _emitting():
-  signals.emit( "clicked" )
+	signals.emit( "clicked" )
 
 if __name__ == '__main__':
-  notifier.init( notifier.GENERIC )
+	notifier.init( notifier.GENERIC )
 
-  signals.new( "clicked" )
-  try:
-    signals.connect( "clicked2", _wait_for_click )
-  except signals.UnknownSignalError, e:
-    print 'Exception:', e
-  if not signals.exists( 'clicked3' ):
-    print "signal 'clicked3' does not exist"
-  signals.connect( 'clicked', _wait_for_click )
-  signals.connect( 'clicked', notifier.Callback( _wait_for_movement,
-                                                 'optional something' ) )
-  notifier.timer_add( 3000, _emitting )
+	signals.new( "clicked" )
+	try:
+		signals.connect( "clicked2", _wait_for_click )
+	except signals.UnknownSignalError, e:
+		print 'Exception:', e
+	if not signals.exists( 'clicked3' ):
+		print "signal 'clicked3' does not exist"
+	signals.connect( 'clicked', _wait_for_click )
+	signals.connect( 'clicked', notifier.Callback( _wait_for_movement,
+												 'optional something' ) )
+	notifier.timer_add( 3000, _emitting )
 
-  notifier.loop()
+	notifier.loop()

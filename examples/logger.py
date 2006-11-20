@@ -5,8 +5,6 @@
 #
 # logger
 #
-# $Id$
-#
 # Copyright (C) 2005, 2006
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
@@ -16,7 +14,7 @@
 #
 # This library is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
@@ -29,16 +27,16 @@ import os
 import notifier
 
 def tail_minus_f( logfile ):
-    new_size = os.stat( logfile.name )[ 6 ]
-    if new_size > logfile.tell():
-        buffer = logfile.read( 65536 )
-        if buffer: print buffer,
+	new_size = os.stat( logfile.name )[ 6 ]
+	if new_size > logfile.tell():
+		buffer = logfile.read( 65536 )
+		if buffer: print buffer,
 
-    return True
+	return True
 
 if __name__ == '__main__':
-    notifier.init()
-    log = open( '/var/log/messages', 'rb' )
-    log.seek( os.stat( '/var/log/messages' )[ 6 ] )
-    notifier.timer_add( 100, notifier.Callback( tail_minus_f, log ) )
-    notifier.loop()
+	notifier.init()
+	log = open( '/var/log/messages', 'rb' )
+	log.seek( os.stat( '/var/log/messages' )[ 6 ] )
+	notifier.timer_add( 100, notifier.Callback( tail_minus_f, log ) )
+	notifier.loop()
