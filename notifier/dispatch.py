@@ -5,10 +5,8 @@
 #
 # a generic dispatcher implementation
 #
-# $Id$
-#
 # Copyright (C) 2006
-#	Andreas Büsching <crunchy@bitkipper.net>
+#		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License version
@@ -35,24 +33,24 @@ MIN_TIMER = 100
 __dispatchers = []
 
 def dispatcher_add( method ):
-    """The notifier supports external dispatcher functions that will be called
-    within each scheduler step. This functionality may be usful for
-    applications having an own event mechanism that needs to be triggered as
-    often as possible. This method registers a new dispatcher function. To
-    ensure that the notifier loop does not suspend to long in the sleep state
-    during the select a minimal timer MIN_TIMER is set to guarantee that the
-    dispatcher functions are called at least every MIN_TIMER milliseconds."""
-    global __dispatchers
-    __dispatchers.append( method )
+	"""The notifier supports external dispatcher functions that will be called
+	within each scheduler step. This functionality may be usful for
+	applications having an own event mechanism that needs to be triggered as
+	often as possible. This method registers a new dispatcher function. To
+	ensure that the notifier loop does not suspend to long in the sleep state
+	during the select a minimal timer MIN_TIMER is set to guarantee that the
+	dispatcher functions are called at least every MIN_TIMER milliseconds."""
+	global __dispatchers
+	__dispatchers.append( method )
 
 def dispatcher_remove( method ):
-    """Removes an external dispatcher function from the list"""
-    global __dispatchers
-    if method in __dispatchers:
-        __dispatchers.remove( method )
+	"""Removes an external dispatcher function from the list"""
+	global __dispatchers
+	if method in __dispatchers:
+		__dispatchers.remove( method )
 
 def dispatcher_run():
-    global __dispatchers
-    for disp in copy( __dispatchers ):
-        if not disp():
-            dispatcher_remove( disp )
+	global __dispatchers
+	for disp in copy( __dispatchers ):
+		if not disp():
+			dispatcher_remove( disp )

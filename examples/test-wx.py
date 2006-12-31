@@ -41,10 +41,10 @@ class MyPanel( wxPanel ):
 		self.SetSizer( self.box )
 		self.box.Fit( self )
 
-    def OnQuit( self, event ):
+	def OnQuit( self, event ):
 		self.parent.Close()
 
-    def OnSend( self, event ):
+	def OnSend( self, event ):
 		print 'Hello World!'
 
 class MyFrame( wxFrame ):

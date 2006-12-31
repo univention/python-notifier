@@ -1,3 +1,12 @@
+2006-11-20  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.5.7
+
+	* notifier/*.py: tabified sources
+
+	* notifier/nf_generic.py (step): wrap step in try-except block to
+	catch KeyboardInterrupt and SystemExit exceptions globally
+
 2006-09-12  Andreas BÃ¼sching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.5.6
