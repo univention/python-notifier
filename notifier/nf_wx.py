@@ -44,20 +44,22 @@ def EVT_UDPSOCKETEVENT( handler, func ):
 
 class UDPSocketEvent( wxPyEvent ):
 	"""UDP-Socket events. Send from select-thread to gui-thread"""
+
 	def __init__( self, socket ):
-	wxPyEvent.__init__( self )
-	self.SetEventType( wxEVT_UDPSOCKETEVENT )
-	self.socket = socket
-	self.msg, self.sender = socket.recvfrom( 256000 )
+		wxPyEvent.__init__( self )
+		self.SetEventType( wxEVT_UDPSOCKETEVENT )
+		self.socket = socket
+		self.msg, self.sender = socket.recvfrom( 256000 )
+
 	def recvfrom( self, size ):
-	"""this function is to fake a real socket"""
-	if size >= len( self.msg ):
-		res = self.msg
-		self.msg = []
-	else:
-		res = self.msg[:size]
-		self.msg = self.msg[size:]
-	return ( res, self.sender )
+		"""this function is to fake a real socket"""
+		if size >= len( self.msg ):
+			res = self.msg
+			self.msg = []
+		else:
+			res = self.msg[:size]
+			self.msg = self.msg[size:]
+		return ( res, self.sender )
 
 ID_Timer = wxNewId()
 

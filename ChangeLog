@@ -1,3 +1,7 @@
+2007-01-10  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/nf_wx.py (UDPSocketEvent): fixed indentation
+
 2006-11-20  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.5.7
