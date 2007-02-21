@@ -1,3 +1,9 @@
+pynotifier (0.5.8-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Andreas Büsching <crunchy@bitkipper.net>  Wed, 21 Feb 2007 18:05:46 +0100
+
 pynotifier (0.5.7-1) unstable; urgency=low
 
   * new upstream release 
