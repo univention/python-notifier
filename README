@@ -12,8 +12,8 @@ external event dispatchers may be called during an idle period.
 Applications using such an notifier mechanism implemented by
 pyNotifier have a specific software architecture. These applications
 are interactive, meaning that almost all action is only done because
-an event occured that was watched by the application. For example a
-server appliciation has to react if there is data waiting on a socket
+an event occurred that was watched by the application. For example a
+server application has to react if there is data waiting on a socket
 or the socket is again ready to write data to the network. Some
 applications may need to act in a recurrently interval of
 time. Another type of interaction can be found in applications having
@@ -24,13 +24,13 @@ is a mechanism that may help to solve some problems, but in most cases
 it causes more problems than it solves. Threads are very often used to
 process two or more tasks in parallel. The belief that threads are the
 solution to this problem is a fallacy. The only solution to this
-prolbem is the existence of several CPUs. A quasi parallel order of
+problem is the existence of several CPUs. A quasi parallel order of
 events may be solved by using threads, but can also be solved by using
 a notifier. When using threads the critical sections of the programs
 must be locked by using adequate algorithm as the thread scheduler may
 interrupt a function at any point. By using a notifier this problems
 are irrelevant as a notifier just schedules the next event, when the
-handler of the previous event is finished, i.e. there are no critcal
+handler of the previous event is finished, i.e. there are no critical
 sections that have to be protected. Being able to forego on any kind
 of protection for critical sections reduces the length and increases
 the clarity of the source code.
@@ -93,13 +93,13 @@ these objects. The second argument 'method' has to be a callable
 python object that is invoked by the notifier if the registered event
 has occured. The function is invoked with the 'id' as an
 argument. Instead of a normal function the [@callbacks 'Callback']
-object provided by pyNotifier may be usful at this point.
+object provided by pyNotifier may be useful at this point.
 
 To remove a registered socket or file from the notifier the
 'socket_remove' function has to be invoked. The 'id' is the socket or
 file object or the file descriptor given to 'socket_add' and the
 optional argument 'condition' may be set to IO_IN or IO_OUT depending
-on the prevuoisly registered event.
+on the previously registered event.
 
 {{{
 def socket_remove( id, condition = IO_IN )
@@ -135,10 +135,87 @@ def timer_remove( id )
 
 The 'id' argument is the unique timer identifier returned by 'timer_add'.
 
+== Signals ==
+
+Currently there are two types of events that could cause a reaction of
+the process: sockets and timers. With signals pyNotifier provides a
+third technique to trigger a reaction within the process. This type does
+not depend on external events or constant intervals of time. It can be
+emitted whenever the application reaches a specific state and it can be
+caught several times.
+
+A signal is identified by a simple character string which must be unique
+within the context. Before a signal can be emitted it has to be
+created. Depending on the context (global or within an object) the
+method names differ a little. In the following examples, demonstrating
+the usage of signals, both variants will be shown.
+
+The first thing to do is to create a new signal. The following example
+shows that a signal '''signal1''' can be created in different contexts,
+with the same name, because the uniqueness is just required within the
+context.
+
+{{{
+import notifier.signals as signals
+
+# global context
+signals.new( 'signal1' )
+
+class Test( signals.Provider ):
+    def __init__( self ):
+	    signals.Provider.__init__( self )
+		self.signal_new( 'signal1' )
+}}}
+
+To get informed when a signal is emitted a connection must be created as
+shown in the following code snippet.
+
+{{{
+# global context
+def _cb_signal( signal ):
+    pass
+
+signals.connect( 'signal1', _cb_signal )
+
+# within the object
+class Test2( object ):
+	def __init__( self, test ):
+		test.signals_connect( 'signal1', self._cb_signal )
+
+	def _cb_signal( self, signal ):
+	    pass
+
+test = Test()
+test2 = Test2( test )
+}}}
+
+There is no restriction in how many connection to a signal may exist,
+but it should be noted, that to many connected instances may result an a
+quite long amount of time where the application can not react on other
+events.
+
+So far it is possible to create new signals and to connect to them. To
+emit a signal its name and possibly optional arguments are passed to a
+function as shown in the following snippet.
+
+{{{
+# global context
+signals.emit( 'signal1', a, b )
+
+# within an object
+test.signals_emit( 'signal1', a, b, c )
+}}}
+
+The signature of the callback function for a signal depends on the
+specific signal provider, e.g. each signal may provide as many arguments
+of different types as wanted. As there are currently no descriptions of
+the callback signatures stored with the signals, the signal providers
+hopefully provide some information.
+
 == External Dispatcher ==
 
 All already described tasks of an applications are scheduled by events
-that have occured on sockets or files or by pre-defined recurrently
+that have occurred on sockets or files or by predefined recurrently
 time intervals. But some applications may also have some tasks that
 may not need to be scheduled by any events or an exact timing. These
 tasks should be repeated quite often, if there is some time to do it.
@@ -148,7 +225,7 @@ dispatchers. These dispatchers are functions that will be invoked in
 each notifier step after all timers and sockets were checked. To add a
 dispatcher function to the notifier main loop the function
 'dispatcher_add' is provided. The only argument to this function is the
-callback methodthat will be called.
+callback method that will be called.
 
 {{{
 def dispatcher_add( method )
@@ -221,7 +298,7 @@ def another_minute():
 
 def first_10_secs( secs ):
     print "the first %d secs are elapsed" % secs
-    # tis shoudl be a one-shot timer
+    # this should be a one-shot timer
     return False
 
 def standard_in( in ):
@@ -239,6 +316,18 @@ if __name__ == "__main__":
 
    notifier.loop()
 }}}
+
+= Download =
+
+You can find the current development source at
+{{{
+svn co svn://svn.bitkipper.net/pyNotifier/trunk
+}}}
+
+The latest release can be found at ["Downloads/pynotifier"]
+
+
+
 
 Any comments or questions can be send to
 
