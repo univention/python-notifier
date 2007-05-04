@@ -5,8 +5,9 @@ Build-Depends: debhelper (>= 4.0.0), python-dev, cdbs
 Standards-Version: 3.6.2
 Section: python
 
-Package: pynotifier
+Package: python-notifier
 Architecture: all
+Replaces: pynotifier
 Depends: ${python:Depends}
 Description: a generic event scheduler providing one own implementation and adaption code for GTK+ und QT
  To be notified or to be threaded that is the question!
