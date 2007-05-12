@@ -5,7 +5,7 @@
 #
 # generic notifier implementation
 #
-# Copyright (C) 2004, 2005, 2006
+# Copyright (C) 2004, 2005, 2006, 2007
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -100,7 +100,11 @@ def dispatcher_add( method ):
 	__min_timer = dispatch.MIN_TIMER
 	dispatch.dispatcher_add( method )
 
-dispatcher_remove = dispatch.dispatcher_remove
+def dispatcher_remove( method ):
+	global __min_timer
+	dispatch.dispatcher_remove( method )
+	if not dispatch.dispatcher_count():
+		__min_timer = None
 
 __current_sockets = {}
 __current_sockets[ IO_READ ] = []
@@ -189,7 +193,6 @@ def step( sleep = True, external = True ):
 					else:
 						timeout = 0
 						break
-			if timeout == None: timeout = dispatch.MIN_TIMER
 			if __min_timer and __min_timer < timeout: timeout = __min_timer
 
 		r = w = e = ()

@@ -1,3 +1,10 @@
+2007-05-12  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/nf_generic.py (dispatcher_remove),
+	notifier/dispatch.py (dispatcher_count, step): when there is no
+	dispatcher function, there is need to wake up early; based on a
+	patch by Jason Tackaberry <tack@urandom.ca>
+
 2007-02-21  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.5.8

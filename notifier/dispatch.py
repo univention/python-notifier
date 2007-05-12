@@ -5,7 +5,7 @@
 #
 # a generic dispatcher implementation
 #
-# Copyright (C) 2006
+# Copyright (C) 2006, 2007
 #		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -54,3 +54,7 @@ def dispatcher_run():
 	for disp in copy( __dispatchers ):
 		if not disp():
 			dispatcher_remove( disp )
+
+def dispatcher_count():
+	global __dispatchers
+	return len( __dispatchers )
