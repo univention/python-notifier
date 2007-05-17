@@ -1,5 +1,10 @@
 2007-05-17  Andreas Büsching  <crunchy@bitkipper.net>
 
+	* notifier/dispatch.py (dispatcher_add, dispatcher_remove):
+	support for adding dispatcher function that do not require a
+	minimal timeout; the return value indicates if the minimal timeout
+	is required (MIN_TIMER) or nor (None)
+
 	* notifier/nf_generic.py (step): just recalculate timeout in
 	seconds if timeout is not None
 

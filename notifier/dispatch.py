@@ -30,9 +30,11 @@ from copy import copy
 # required for dispatcher use
 MIN_TIMER = 100
 
-__dispatchers = []
+__dispatchers = {}
+__dispatchers[ True ] = []
+__dispatchers[ False ] = []
 
-def dispatcher_add( method ):
+def dispatcher_add( method, min_timeout = True ):
 	"""The notifier supports external dispatcher functions that will be called
 	within each scheduler step. This functionality may be usful for
 	applications having an own event mechanism that needs to be triggered as
@@ -40,20 +42,32 @@ def dispatcher_add( method ):
 	ensure that the notifier loop does not suspend to long in the sleep state
 	during the select a minimal timer MIN_TIMER is set to guarantee that the
 	dispatcher functions are called at least every MIN_TIMER milliseconds."""
-	global __dispatchers
-	__dispatchers.append( method )
+	global __dispatchers, MIN_TIMER
+	__dispatchers[ min_timeout ].append( method )
+	if __dispatchers[ True ]:
+		return MIN_TIMER
+	else:
+		return None
+
 
 def dispatcher_remove( method ):
 	"""Removes an external dispatcher function from the list"""
-	global __dispatchers
-	if method in __dispatchers:
-		__dispatchers.remove( method )
+	global __dispatchers, MIN_TIMER
+	for bool in ( True, False ):
+		if method in __dispatchers[ bool ]:
+			__dispatchers[ bool ].remove( method )
+			break
+	if __dispatchers[ True ]:
+		return MIN_TIMER
+	else:
+		return None
 
 def dispatcher_run():
 	global __dispatchers
-	for disp in copy( __dispatchers ):
-		if not disp():
-			dispatcher_remove( disp )
+	for bool in ( True, False ):
+		for disp in copy( __dispatchers[ bool ] ):
+			if not disp():
+				dispatcher_remove( disp )
 
 def dispatcher_count():
 	global __dispatchers

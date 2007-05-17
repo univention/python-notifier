@@ -95,16 +95,13 @@ def timer_remove( id ):
 	if __timers.has_key( id ):
 		del __timers[ id ]
 
-def dispatcher_add( method ):
+def dispatcher_add( method, min_timeout = True ):
 	global __min_timer
-	__min_timer = dispatch.MIN_TIMER
-	dispatch.dispatcher_add( method )
+	__min_timer = dispatch.dispatcher_add( method, min_timeout )
 
 def dispatcher_remove( method ):
 	global __min_timer
-	dispatch.dispatcher_remove( method )
-	if not dispatch.dispatcher_count():
-		__min_timer = None
+	__min_timer = dispatch.dispatcher_remove( method )
 
 __current_sockets = {}
 __current_sockets[ IO_READ ] = []
