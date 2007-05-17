@@ -197,9 +197,11 @@ def step( sleep = True, external = True ):
 
 		r = w = e = ()
 		try:
+			if timeout:
+			  timeout /= 1000.0
 			r, w, e = select( __sockets[ IO_READ ].keys(),
 							  __sockets[ IO_WRITE ].keys(),
-							  __sockets[ IO_EXCEPT ].keys(), timeout / 1000.0 )
+							  __sockets[ IO_EXCEPT ].keys(), timeout )
 		except ( ValueError, select_error ):
 			log.exception( 'error in select' )
 			sys.exit( 1 )
