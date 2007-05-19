@@ -120,7 +120,7 @@ def step( sleep = True, external = True ):
 	invoked. As a final task in a notifier step all registered external
 	dispatcher functions are invoked."""
 
-	global __in_step, __step_depth, __step_depth_max
+	global __in_step, __step_depth, __step_depth_max, __min_timer
 
 	__in_step = True
 	__step_depth += 1
@@ -190,7 +190,8 @@ def step( sleep = True, external = True ):
 					else:
 						timeout = 0
 						break
-			if __min_timer and __min_timer < timeout: timeout = __min_timer
+			if __min_timer and ( __min_timer < timeout or timeout is None ):
+				timeout = __min_timer
 
 		r = w = e = ()
 		try:
@@ -228,7 +229,7 @@ def step( sleep = True, external = True ):
 		# handle external dispatchers
 		if external:
 			try:
-				dispatch.dispatcher_run()
+				__min_timer = dispatch.dispatcher_run()
 			except ( KeyboardInterrupt, SystemExit ), e:
 				raise e
 			except Exception, e:

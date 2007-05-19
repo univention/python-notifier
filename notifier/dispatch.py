@@ -68,6 +68,10 @@ def dispatcher_run():
 		for disp in copy( __dispatchers[ bool ] ):
 			if not disp():
 				dispatcher_remove( disp )
+	if __dispatchers[ True ]:
+		return MIN_TIMER
+	else:
+		return None
 
 def dispatcher_count():
 	global __dispatchers
