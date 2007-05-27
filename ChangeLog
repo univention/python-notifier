@@ -1,3 +1,20 @@
+2007-05-28  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.6.0
+
+	* notifier/popen.py (RunIt._finished): fixed typo and support
+	monitoring of stderr only
+
+	* examples/test-qt.py: updated example and do more testing
+
+	* notifier/nf_gtk.py (dispatcher_add, dispatcher_remove): support
+	dispatchers with GTK+ notifier using the 'idle' functions
+
+	* notifier/nf_qt.py (step, loop): implement these functions using
+	processEvents; use generic dispatcher implementation as Qt does not have one
+	(_exit): this function override QApplication.(quit|exit) to
+	support interruption
+
 2007-05-19  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/dispatch.py (dispatcher_run),

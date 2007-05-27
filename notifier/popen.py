@@ -385,7 +385,7 @@ class RunIt( Process ):
 		if stderr:
 			self.__stderr = []
 			cb = notifier.Callback( self._output, self.__stderr )
-			self.signal_connect( 'stderr', self._stderr )
+			self.signal_connect( 'stderr', cb )
 		else:
 			self.__stderr = None
 		self.signal_connect( 'killed', self._finished )
@@ -398,15 +398,16 @@ class RunIt( Process ):
 			buffer.append( line )
 
 	def _finished( self, pid, status ):
+		exit_code = os.WEXITSTATUS( status )
 		if self.__stdout != None:
 			if self.__stderr == None:
-				self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ),
-								  self.__stdout )
+				self.signal_emit( 'finished', pid, exit_code, self.__stdout )
 			else:
-				self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ),
-								  self.__stdout, self.__stderr )
+				self.signal_emit( 'finished', pid, exit_code ,self.__stdout, self.__stderr )
+		elif self.__stderr != None:
+			self.signal_emit( 'finished', pid, exit_code, self.__stderr )
 		else:
-			self.signal_emit( 'finished', pid, os.WEXITSTATUS( status ) )
+			self.signal_emit( 'finished', pid, exit_code )
 
 class Shell( RunIt ):
 	"""A simple interface for running shell commands as child processes"""

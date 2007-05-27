@@ -49,7 +49,6 @@ def dispatcher_add( method, min_timeout = True ):
 	else:
 		return None
 
-
 def dispatcher_remove( method ):
 	"""Removes an external dispatcher function from the list"""
 	global __dispatchers, MIN_TIMER

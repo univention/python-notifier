@@ -5,7 +5,7 @@
 #
 # test programm for the QT3 and QT4 notifier
 #
-# Copyright (C) 2004, 2005, 2006
+# Copyright (C) 2004, 2005, 2006, 2007
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 #
 # This library is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
@@ -23,55 +23,58 @@
 # 02110-1301 USA
 
 try:
-    import PyQt4.Qt as qt
-    version = 4
+	import PyQt4.Qt as qt
+	version = 4
 except:
-    import qt
-    version = 3
+	import qt
+	version = 3
 
 import notifier
 
 import sys
 
 class QTestApp( qt.QApplication ):
-    def __init__( self ):
-        qt.QApplication.__init__( self, sys.argv )
-        self.dialog = qt.QDialog()
-	if version == 4:
-	    self.setActiveWindow( self.dialog )
-	else:
-	    self.setMainWidget( self.dialog )
+	def __init__( self ):
+		qt.QApplication.__init__( self, sys.argv )
+		self.dialog = qt.QDialog()
+		if version == 4:
+			self.setActiveWindow( self.dialog )
+		else:
+			self.setMainWidget( self.dialog )
 
-        self.dialog.setWindowTitle( "Qt - pyNotifier Test" )
-	self.button = qt.QPushButton( 'Hello World', self.dialog )
-        self.dialog.show()
-	qt.QObject.connect( self.button, qt.SIGNAL( 'clicked()' ), \
-				self.clickedButton )
-        self.timer_id = notifier.timer_add( 4, self.timerTest )
+			self.dialog.setWindowTitle( "Qt - pyNotifier Test" )
 
-    def recvQuit( self, mmsg, data = None ):
-	if version == 4:
-	    self.exit()
-	else:
-	    self.exit_loop()
+		self.button = qt.QPushButton( 'Hello World', self.dialog )
+		self.dialog.show()
+		qt.QObject.connect( self.button, qt.SIGNAL( 'clicked()' ), self.clickedButton )
+		self.timer_id = notifier.timer_add( 1000, self.timerTest )
+		self.dispatch_it = 10
 
-    def clickedButton( self ):
-    	print "bye"
-	if version == 4:
-	    self.exit()
-	else:
-	    self.exit_loop()
+	def recvQuit( self, mmsg, data = None ):
+		if version == 4:
+			self.quit()
+		else:
+			self.exit_loop()
 
-    def timerTest( self, data ):
-        print 'tick'
-        return False
+	def clickedButton( self ):
+		print "bye"
+		if version == 4:
+			self.quit( 1 )
+		else:
+			self.exit_loop()
+
+	def timerTest( self, data ):
+		print 'tick'
+		return True
+
+	def _dispatch( self ):
+		print 'dispatch'
+		self.dispatch_it -= 1
+		return self.dispatch_it > 0
 
 if __name__ == '__main__':
-    notifier.init( notifier.QT )
-    app = QTestApp()
+	notifier.init( notifier.QT )
+	app = QTestApp()
 
-    # can not use notifier.loop()
-    if version == 4:
-	app.exec_()
-    else:
-	app.exec_loop()
+	notifier.dispatcher_add( app._dispatch )
+	print 'exit code: %d' % notifier.loop()

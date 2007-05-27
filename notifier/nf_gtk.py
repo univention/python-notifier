@@ -5,7 +5,7 @@
 #
 # notifier wrapper for GTK+ 2.x
 #
-# Copyright (C) 2004, 2005, 2006
+# Copyright (C) 2004, 2005, 2006, 2007
 #		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -26,7 +26,6 @@
 
 import gobject
 
-import dispatch
 import log
 
 IO_READ = gobject.IO_IN
@@ -41,6 +40,7 @@ _options = {
 _gtk_socketIDs = {}
 _gtk_socketIDs[ IO_READ ] = {}
 _gtk_socketIDs[ IO_WRITE ] = {}
+_gtk_idleIDs = {}
 
 def socket_add( socket, method, condition = IO_READ ):
 	"""The first argument specifies a socket, the second argument has to be a
@@ -86,8 +86,17 @@ def timer_remove( id ):
 	"""Removes the timer specified by id from the scheduler."""
 	gobject.source_remove( id )
 
-dispatcher_add = dispatch.dispatcher_add
-dispatcher_remove = dispatch.dispatcher_remove
+def dispatcher_add( func ):
+	global _gtk_idleIDs
+
+	if _gtk_idleIDs.has_key( func ):
+		_gtk_idleIDs[ func ] = gobject.idle_add( func )
+
+def dispatcher_remove( func ):
+	global _gtk_idleIDs
+
+	if _gtk_idleIDs.has_key( func ):
+		gobject.source_remove( _gtk_idleIDs[ func ] )
 
 _mainloop = None
 _step = None
@@ -95,8 +104,6 @@ _step = None
 def step( sleep = True, external = True ):
 	global _step
 	_step( sleep )
-	if external:
-		dispatch.dispatcher_run()
 
 def loop():
 	"""Execute main loop forever."""

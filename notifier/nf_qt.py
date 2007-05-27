@@ -5,7 +5,7 @@
 #
 # QT notifier wrapper
 #
-# Copyright (C) 2004, 2005, 2006
+# Copyright (C) 2004, 2005, 2006, 2007
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -31,11 +31,16 @@ try:
 except:
 	import qt
 
+import dispatch
+
 _qt_socketIDs = {} # map of Sockets/Methods -> qt.QSocketNotifier
 
 IO_READ = qt.QSocketNotifier.Read
 IO_WRITE = qt.QSocketNotifier.Write
 IO_EXCEPT = qt.QSocketNotifier.Exception
+
+__min_timer = None
+__exit = None
 
 class Socket( qt.QSocketNotifier ):
 	def __init__( self, socket, method ):
@@ -92,12 +97,42 @@ def timer_remove( id ):
 		id.stop()
 		del id
 
-dispatcher_add = None
-dispatcher_remove = None
+def dispatcher_add( method, min_timeout = True ):
+	global __min_timer
+	__min_timer = dispatch.dispatcher_add( method, min_timeout )
+
+def dispatcher_remove( method ):
+	global __min_timer
+	__min_timer = dispatch.dispatcher_remove( method )
 
 def loop():
 	"""Execute main loop forever."""
-	raise Error, "Not supported with Qt notifier. Use the run method of your QApplication object"
+	global __exit
 
-def step():
-	raise Error, "stepping not supported in qt-Mode"
+	while __exit == None:
+		step()
+
+	return __exit
+
+def step( sleep = True, external = True ):
+	global __min_timer
+
+	if __min_timer and sleep:
+		time = qt.QTime()
+		time.start()
+		qt.QApplication.processEvents( qt.QEventLoop.AllEvents | qt.QEventLoop.WaitForMoreEvents,
+									   __min_timer )
+		if time.elapsed() < __min_timer:
+			qt.QThread.usleep( __min_timer - time.elapsed() )
+	else:
+		qt.QApplication.processEvents( qt.QEventLoop.AllEvents | qt.QEventLoop.WaitForMoreEvents )
+
+	if external:
+		dispatch.dispatcher_run()
+
+def _exit( dummy, code = 0 ):
+	global __exit
+	__exit = code
+
+qt.QApplication.exit = _exit
+qt.QApplication.quit = _exit
