@@ -29,7 +29,7 @@ from copy import copy
 from select import select
 from select import error as select_error
 from time import time
-import os, sys
+import errno, os, sys
 
 import socket
 
@@ -137,7 +137,7 @@ def step( sleep = True, external = True ):
 		for i, timer in _copy.items():
 			timestamp = timer[ TIMESTAMP ]
 			if not timestamp:
-				# prevert recursion, ignore this timer
+				# prevent recursion, ignore this timer
 				continue
 			now = int( time() * 1000 )
 			if timestamp <= now:
@@ -145,27 +145,18 @@ def step( sleep = True, external = True ):
 				# prevent infinite recursion in case the callback calls
 				# step().
 				timer[ TIMESTAMP ] = 0
-				try:
-					if not timer[ CALLBACK ]():
-						if __timers.has_key( i ):
-							del __timers[ i ]
-					else:
-						# Find a moment in the future. If interval is 0, we
-							# just reuse the old timestamp, doesn't matter.
-						now = int( time() * 1000 )
-						if timer[ INTERVAL ]:
-							timestamp += timer[ INTERVAL ]
-							while timestamp <= now:
-								timestamp += timer[ INTERVAL ]
-						timer[ TIMESTAMP ] = timestamp
-				except ( KeyboardInterrupt, SystemExit ), e:
-					__step_depth -= 1
-					__in_step = False
-					raise e
-				except:
-					log.exception( 'removed timer %d' % i )
+				if not timer[ CALLBACK ]():
 					if __timers.has_key( i ):
 						del __timers[ i ]
+				else:
+					# Find a moment in the future. If interval is 0, we
+						# just reuse the old timestamp, doesn't matter.
+					now = int( time() * 1000 )
+					if timer[ INTERVAL ]:
+						timestamp += timer[ INTERVAL ]
+						while timestamp <= now:
+							timestamp += timer[ INTERVAL ]
+					timer[ TIMESTAMP ] = timestamp
 
 			# if it causes problems to iterate over probably non-existing
 			# timers, I think about adding the following code:
@@ -196,13 +187,13 @@ def step( sleep = True, external = True ):
 		r = w = e = ()
 		try:
 			if timeout:
-			  timeout /= 1000.0
+				timeout /= 1000.0
 			r, w, e = select( __sockets[ IO_READ ].keys(),
 							  __sockets[ IO_WRITE ].keys(),
 							  __sockets[ IO_EXCEPT ].keys(), timeout )
-		except ( ValueError, select_error ):
-			log.exception( 'error in select' )
-			sys.exit( 1 )
+		except select_error, e:
+			if e[ 0 ] != errno.EINTR:
+				raise e
 
 		for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
 			sockets, condition = sl
@@ -217,14 +208,8 @@ def step( sleep = True, external = True ):
 				if ( is_socket and sock.fileno() != -1 ) or \
 					   ( isinstance( sock, int ) and sock != -1 ):
 					if __sockets[ condition ].has_key( sock ):
-						try:
-							if not __sockets[ condition ][ sock ]( sock ):
-								socket_remove( sock, condition )
-						except ( KeyboardInterrupt, SystemExit ), e:
-							raise e
-						except:
-							log.exception( 'error in socket callback' )
-							sys.exit( 1 )
+						if not __sockets[ condition ][ sock ]( sock ):
+							socket_remove( sock, condition )
 
 		# handle external dispatchers
 		if external:

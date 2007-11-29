@@ -1,3 +1,9 @@
+2007-11-29  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/nf_generic.py (step): removed some unnecessary
+	try-except blocks; handle EINTR error code returned by select and
+	ignore it
+
 2007-05-28  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.6.0
