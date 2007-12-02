@@ -128,40 +128,7 @@ def step( sleep = True, external = True ):
 	try:
 		if __step_depth > __step_depth_max:
 			log.exception( 'maximum recursion depth reached' )
-			__step_depth -= 1
-			__in_step = False
 			return
-
-		# handle timers
-		_copy = __timers.copy()
-		for i, timer in _copy.items():
-			timestamp = timer[ TIMESTAMP ]
-			if not timestamp:
-				# prevent recursion, ignore this timer
-				continue
-			now = int( time() * 1000 )
-			if timestamp <= now:
-				# Update timestamp on timer before calling the callback to
-				# prevent infinite recursion in case the callback calls
-				# step().
-				timer[ TIMESTAMP ] = 0
-				if not timer[ CALLBACK ]():
-					if __timers.has_key( i ):
-						del __timers[ i ]
-				else:
-					# Find a moment in the future. If interval is 0, we
-						# just reuse the old timestamp, doesn't matter.
-					now = int( time() * 1000 )
-					if timer[ INTERVAL ]:
-						timestamp += timer[ INTERVAL ]
-						while timestamp <= now:
-							timestamp += timer[ INTERVAL ]
-					timer[ TIMESTAMP ] = timestamp
-
-			# if it causes problems to iterate over probably non-existing
-			# timers, I think about adding the following code:
-			# if not __in_step:
-			#	  break
 
 		# get minInterval for max timeout
 		timeout = None
@@ -184,51 +151,66 @@ def step( sleep = True, external = True ):
 			if __min_timer and ( __min_timer < timeout or timeout is None ):
 				timeout = __min_timer
 
+		# wait for event
 		r = w = e = ()
 		try:
 			if timeout:
 				timeout /= 1000.0
-			r, w, e = select( __sockets[ IO_READ ].keys(),
-							  __sockets[ IO_WRITE ].keys(),
+			r, w, e = select( __sockets[ IO_READ ].keys(), __sockets[ IO_WRITE ].keys(),
 							  __sockets[ IO_EXCEPT ].keys(), timeout )
 		except select_error, e:
 			if e[ 0 ] != errno.EINTR:
 				raise e
 
+		# handle timers
+		_copy = __timers.copy()
+		for i, timer in _copy.items():
+			timestamp = timer[ TIMESTAMP ]
+			if not timestamp:
+				# prevent recursion, ignore this timer
+				continue
+			now = int( time() * 1000 )
+			if timestamp <= now:
+				# Update timestamp on timer before calling the callback to
+				# prevent infinite recursion in case the callback calls
+				# step().
+				timer[ TIMESTAMP ] = 0
+				if not timer[ CALLBACK ]():
+					if __timers.has_key( i ):
+						del __timers[ i ]
+				else:
+					# Find a moment in the future. If interval is 0, we
+					# just reuse the old timestamp, doesn't matter.
+					now = int( time() * 1000 )
+					if timer[ INTERVAL ]:
+						timestamp += timer[ INTERVAL ]
+						while timestamp <= now:
+							timestamp += timer[ INTERVAL ]
+					timer[ TIMESTAMP ] = timestamp
+
+		# handle sockets
 		for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
 			sockets, condition = sl
 			# append all unknown sockets to check list
 			for s in sockets:
 				if not s in __current_sockets[ condition ]:
 					__current_sockets[ condition ].append( s )
+
 			while len( __current_sockets[ condition ] ):
 				sock = __current_sockets[ condition ].pop( 0 )
-				is_socket = isinstance( sock, ( socket.socket, file,
-												socket._socketobject ) )
+				is_socket = isinstance( sock, ( socket.socket, file, socket._socketobject ) )
 				if ( is_socket and sock.fileno() != -1 ) or \
 					   ( isinstance( sock, int ) and sock != -1 ):
-					if __sockets[ condition ].has_key( sock ):
-						if not __sockets[ condition ][ sock ]( sock ):
-							socket_remove( sock, condition )
+					if __sockets[ condition ].has_key( sock ) and \
+						   not __sockets[ condition ][ sock ]( sock ):
+						socket_remove( sock, condition )
 
 		# handle external dispatchers
 		if external:
-			try:
-				__min_timer = dispatch.dispatcher_run()
-			except ( KeyboardInterrupt, SystemExit ), e:
-				raise e
-			except Exception, e:
-				__step_depth -= 1
-				__in_step = False
-				log.exception( 'error in dispatcher function' )
-				raise e
-	except ( KeyboardInterrupt, SystemExit ), e:
+			__min_timer = dispatch.dispatcher_run()
+	finally:
 		__step_depth -= 1
 		__in_step = False
-		raise e
-
-	__step_depth -= 1
-	__in_step = False
 
 def loop():
 	"""Executes the 'main loop' forever by calling step in an endless loop"""
