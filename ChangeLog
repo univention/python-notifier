@@ -1,3 +1,10 @@
+2008-02-02  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.6.0
+
+	* notifier/nf_twisted.py: updated notifier implementation using
+	Twisted; provided by Rob Shortt <rob@tvcentric.com>
+
 2008-01-07  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* examples/test-twisted.py: add simple test program for the
