@@ -268,7 +268,7 @@ example.
 {{{
 import notifier
 ...
-notifier.socket_add( fd, notifier.Callback( arg1, arg2 ) )
+notifier.socket_add( fd, notifier.Callback( socket1, arg1, arg2 ) )
 ...
 
 def socket1( fd, arg1, arg2 ):
