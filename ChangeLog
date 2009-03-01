@@ -1,6 +1,19 @@
-2008-02-02  Andreas Büsching  <crunchy@bitkipper.net>
+2009-03-01  Andreas Büsching  <crunchy@bitkipper.net>
 
-	* notifier/version.py: set version to 0.6.0
+	* notifier/nf_generic.py (step): applied a patch from Jason
+	Tackaberry <tack@urandom.ca>: fixes a race condition when timers
+	are added or removed in signal handlers and omit an unnecessary
+	copy
+
+2008-09-26  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.7.0
+
+	* examples/process.py: update test
+
+	* notifier/popen.py: replace popen module with subprocess
+
+2008-02-02  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/nf_twisted.py: updated notifier implementation using
 	Twisted; provided by Rob Shortt <rob@tvcentric.com>

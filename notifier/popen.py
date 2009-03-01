@@ -27,12 +27,11 @@ __all__ = [ 'Process', 'RunIt', 'Shell' ]
 # python imports
 import os
 import fcntl
-import popen2
 import glob
 import re
 import shlex
-import logging
 import types
+import subprocess
 
 # notifier imports
 import notifier
@@ -46,7 +45,7 @@ class Process( signals.Provider ):
 	Base class for starting child processes and monitoring standard
 	output and error.
 	"""
-	def __init__( self, cmd, stdout = True, stderr = True ):
+	def __init__( self, cmd, stdout = True, stderr = True, shell = False ):
 		""" Init the child process 'cmd'. This can either be a string or a list
 		of arguments (similar to popen2). stdout and stderr of the child
 		process can be handled by connecting to the signals 'stdout'
@@ -74,6 +73,7 @@ class Process( signals.Provider ):
 		self.signal_new( 'killed' );
 
 		self._cmd = self._normalize_cmd(cmd)
+		self._shell = shell
 		if self._cmd:
 			self._name = self._cmd[ 0 ].split( '/' )[ -1 ]
 		else:
@@ -136,22 +136,28 @@ class Process( signals.Provider ):
 		self.binary = cmd[ 0 ]
 
 		self.stdout = self.stderr = None
-		if not self.signal_exists( 'stdout' ) and \
-			   not self.signal_exists( 'stderr' ):
-			self.pid = os.spawnvp( os.P_NOWAIT, self.binary, cmd )
+		if not self.signal_exists( 'stdout' ) and not self.signal_exists( 'stderr' ):
+			self.pid =  subprocess.Popen( cmd, shell = self._shell ).pid
 		else:
-			self.child = popen2.Popen3( cmd, True, 1000 )
+			if self.signal_exists( 'stdout' ):
+				self.stdout = subprocess.PIPE
+			if self.signal_exists( 'stderr' ):
+				self.stderr = subprocess.PIPE
+
+			# line buffered, no shell
+			self.child = subprocess.Popen( cmd, shell = False, bufsize = 1, , shell = self._shell,
+										   stdout = self.stdout, stderr = self.stderr )
 			self.pid = self.child.pid
 
-			if self.signal_exists( 'stdout' ):
+			if self.stdout:
 				# IO_Handler for stdout
-				self.stdout = IO_Handler( 'stdout', self.child.fromchild,
+				self.stdout = IO_Handler( 'stdout', self.child.stdout,
 										  self._read_stdout, self._name )
 				self.stdout.signal_connect( 'closed', self._closed )
 
-			if self.signal_exists( 'stderr' ):
+			if self.stderr:
 				# IO_Handler for stderr
-				self.stderr = IO_Handler( 'stderr', self.child.childerr,
+				self.stderr = IO_Handler( 'stderr', self.child.stderr,
 										  self._read_stderr, self._name )
 				self.stderr.signal_connect( 'closed', self._closed )
 
@@ -182,8 +188,7 @@ class Process( signals.Provider ):
 		Pass a string to the process
 		"""
 		try:
-			self.child.tochild.write( line )
-			self.child.tochild.flush()
+			self.child.communicate( line )
 		except ( IOError, ValueError ):
 			pass
 
@@ -279,6 +284,8 @@ def _watcher():
 
 	for proc in _processes:
 		try:
+			if not proc.pid:
+				continue
 			pid, status = os.waitpid( proc.pid, os.WNOHANG )
 			if pid:
 				proc.dead( pid, status )
@@ -374,8 +381,8 @@ class RunIt( Process ):
 		stdout, stderr	: are only provided when stdout and/or stderr is
 						  monitored
 		"""
-	def __init__( self, command, stdout = True, stderr = False ):
-		Process.__init__( self, command, stdout = stdout, stderr = stderr )
+	def __init__( self, command, stdout = True, stderr = False, shell = False ):
+		Process.__init__( self, command, stdout = stdout, stderr = stderr, shell = shell )
 		if stdout:
 			self.__stdout = []
 			cb = notifier.Callback( self._output, self.__stdout )
@@ -413,9 +420,4 @@ class Shell( RunIt ):
 	"""A simple interface for running shell commands as child processes"""
 	BINARY = '/bin/sh'
 	def __init__( self, command, stdout = True, stderr = False ):
-		cmd = [ Shell.BINARY, '-c' ]
-		if type( command ) in types.StringTypes:
-			cmd.append( command )
-		elif type( command ) in ( types.ListType, types.TupleType ):
-			cmd.append( ' '.join( command ) )
-		RunIt.__init__( self, cmd, stdout = stdout, stderr = stderr )
+		RunIt.__init__( self, cmd, stdout = stdout, stderr = stderr, shell = True )

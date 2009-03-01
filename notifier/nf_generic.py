@@ -5,7 +5,7 @@
 #
 # generic notifier implementation
 #
-# Copyright (C) 2004, 2005, 2006, 2007
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -136,8 +136,7 @@ def step( sleep = True, external = True ):
 			timeout = 0
 		else:
 			now = int( time() * 1000 )
-			for t in __timers:
-				interval, timestamp, callback = __timers[ t ]
+			for interval, timestamp, callback in __timers:
 				if not timestamp:
 					# timer is blocked (recursion), ignore it
 					continue
@@ -163,8 +162,7 @@ def step( sleep = True, external = True ):
 				raise e
 
 		# handle timers
-		_copy = __timers.copy()
-		for i, timer in _copy.items():
+		for i, timer in __timers.items():
 			timestamp = timer[ TIMESTAMP ]
 			if not timestamp:
 				# prevent recursion, ignore this timer
