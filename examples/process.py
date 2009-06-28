@@ -43,7 +43,7 @@ def stderr( pid, line ):
 
 def died( pid, status ):
 	print ">>> process %d died" % pid
-	sys.exit( status )
+	# sys.exit( status )
 
 def tick():
 	print 'tick'

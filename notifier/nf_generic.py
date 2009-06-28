@@ -26,21 +26,25 @@
 
 # python core packages
 from copy import copy
-from select import select
-from select import error as select_error
 from time import time
-import errno, os, sys
 
+import errno
+import os
+import select
 import socket
+import sys
 
 # internal packages
 import log
 import dispatch
 
-IO_READ = 1
-IO_WRITE = 2
-IO_EXCEPT = 4
+IO_READ = select.POLLIN | select.POLLPRI
+IO_WRITE = select.POLLOUT
+IO_EXCEPT = select.POLLERR | select.POLLHUP | select.POLLNVAL
 
+IO_ALL = IO_READ | IO_WRITE
+
+__poll = select.poll()
 __sockets = {}
 __sockets[ IO_READ ] = {}
 __sockets[ IO_WRITE ] = {}
@@ -60,14 +64,30 @@ def socket_add( id, method, condition = IO_READ ):
 	"""The first argument specifies a socket, the second argument has to be a
 	function that is called whenever there is data ready in the socket.
 	The callback function gets the socket back as only argument."""
-	global __sockets
+	global __sockets, __poll
+
+	# ensure that already registered condition do not get lost
+	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
+		if id in __sockets[ cond ]:
+			condition |= cond
 	__sockets[ condition ][ id ] = method
+	__poll.register( id, condition )
 
 def socket_remove( id, condition = IO_READ ):
 	"""Removes the given socket from scheduler. If no condition is specified the
 	default is IO_READ."""
-	global __sockets
-	if __sockets[ condition ].has_key( id ):
+	global __sockets, __poll
+	remain = 0
+	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
+		if id in __sockets[ cond ] and condition != cond:
+			remain |= cond
+
+	if remain:
+		__poll.register( id, remain )
+	else:
+		__poll.unregister( id )
+
+	if id in __sockets[ condition ]:
 		del __sockets[ condition ][ id ]
 
 def timer_add( interval, method ):
@@ -92,7 +112,7 @@ def timer_add( interval, method ):
 
 def timer_remove( id ):
 	"""Removes the timer identifed by the unique ID from the main loop."""
-	if __timers.has_key( id ):
+	if id in __timers:
 		del __timers[ id ]
 
 def dispatcher_add( method, min_timeout = True ):
@@ -136,7 +156,7 @@ def step( sleep = True, external = True ):
 			timeout = 0
 		else:
 			now = int( time() * 1000 )
-			for interval, timestamp, callback in __timers:
+			for interval, timestamp, callback in __timers.values():
 				if not timestamp:
 					# timer is blocked (recursion), ignore it
 					continue
@@ -151,15 +171,7 @@ def step( sleep = True, external = True ):
 				timeout = __min_timer
 
 		# wait for event
-		r = w = e = ()
-		try:
-			if timeout:
-				timeout /= 1000.0
-			r, w, e = select( __sockets[ IO_READ ].keys(), __sockets[ IO_WRITE ].keys(),
-							  __sockets[ IO_EXCEPT ].keys(), timeout )
-		except select_error, e:
-			if e[ 0 ] != errno.EINTR:
-				raise e
+		fds = __poll.poll( timeout )
 
 		# handle timers
 		for i, timer in __timers.items():
@@ -174,7 +186,7 @@ def step( sleep = True, external = True ):
 				# step().
 				timer[ TIMESTAMP ] = 0
 				if not timer[ CALLBACK ]():
-					if __timers.has_key( i ):
+					if i in __timers:
 						del __timers[ i ]
 				else:
 					# Find a moment in the future. If interval is 0, we
@@ -187,21 +199,15 @@ def step( sleep = True, external = True ):
 					timer[ TIMESTAMP ] = timestamp
 
 		# handle sockets
-		for sl in ( ( r, IO_READ ), ( w, IO_WRITE ), ( e, IO_EXCEPT ) ):
-			sockets, condition = sl
-			# append all unknown sockets to check list
-			for s in sockets:
-				if not s in __current_sockets[ condition ]:
-					__current_sockets[ condition ].append( s )
-
-			while len( __current_sockets[ condition ] ):
-				sock = __current_sockets[ condition ].pop( 0 )
-				is_socket = isinstance( sock, ( socket.socket, file, socket._socketobject ) )
-				if ( is_socket and ( getattr( sock, 'closed', False ) or sock.fileno() != -1 ) ) or \
-					   ( isinstance( sock, int ) and sock != -1 ):
-					if __sockets[ condition ].has_key( sock ) and \
-						   not __sockets[ condition ][ sock ]( sock ):
-						socket_remove( sock, condition )
+		for fd, condition in fds:
+			is_socket = isinstance( fd, ( socket.socket, file, socket._socketobject ) )
+			if ( is_socket and ( getattr( fd, 'closed', False ) or fd.fileno() != -1 ) ) or \
+				   ( isinstance( fd, int ) and fd != -1 ):
+				for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
+					# TODO: this might not work with IO_EXCEPT
+					if cond & condition and fd in __sockets[ cond ] and \
+						   not __sockets[ cond ][ fd ]( fd ):
+						socket_remove( fd, cond )
 
 		# handle external dispatchers
 		if external:

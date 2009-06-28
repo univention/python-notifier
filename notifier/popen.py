@@ -145,7 +145,7 @@ class Process( signals.Provider ):
 				self.stderr = subprocess.PIPE
 
 			# line buffered, no shell
-			self.child = subprocess.Popen( cmd, shell = False, bufsize = 1, , shell = self._shell,
+			self.child = subprocess.Popen( cmd, bufsize = 1, shell = self._shell,
 										   stdout = self.stdout, stderr = self.stderr )
 			self.pid = self.child.pid
 
