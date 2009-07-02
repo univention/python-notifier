@@ -38,11 +38,10 @@ import sys
 import log
 import dispatch
 
-IO_READ = select.POLLIN | select.POLLPRI
+IO_READ = select.POLLIN
 IO_WRITE = select.POLLOUT
-IO_EXCEPT = select.POLLERR | select.POLLHUP | select.POLLNVAL
-
-IO_ALL = IO_READ | IO_WRITE
+IO_EXCEPT = select.POLLERR
+IO_ALL = IO_READ | IO_WRITE | IO_EXCEPT
 
 __poll = select.poll()
 __sockets = {}
@@ -76,7 +75,6 @@ def socket_add( id, method, condition = IO_READ ):
 	The callback function gets the socket back as only argument."""
 	global __sockets, __sock_objects, __poll
 
-
 	# ensure that already registered condition do not get lost
 	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
 		if id in __sockets[ cond ]:
@@ -93,6 +91,12 @@ def socket_remove( id, condition = IO_READ ):
 	"""Removes the given socket from scheduler. If no condition is specified the
 	default is IO_READ."""
 	global __sockets, __poll
+
+	if condition == IO_ALL:
+		for c in ( IO_READ, IO_WRITE, IO_EXCEPT ):
+			socket_remove( id, c )
+		return
+
 	remain = 0
 	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
 		if id in __sockets[ cond ] and condition != cond:
@@ -101,9 +105,9 @@ def socket_remove( id, condition = IO_READ ):
 	if remain:
 		__poll.register( id, remain )
 	else:
-		__poll.unregister( id )
 		if id in __sockets[ condition ]:
 			del __sockets[ condition ][ id ]
+			__poll.unregister( id )
 		for k, v in __sock_objects.items():
 			if v == id:
 				del __sock_objects[ k ]
@@ -190,9 +194,7 @@ def step( sleep = True, external = True ):
 				timeout = __min_timer
 
 		# wait for event
-		print timeout
-		fds = __poll.poll( timeout * 1000 )
-		if fds: print fds
+		fds = __poll.poll( timeout )
 		# handle timers
 		for i, timer in __timers.items():
 			timestamp = timer[ TIMESTAMP ]
@@ -220,11 +222,18 @@ def step( sleep = True, external = True ):
 
 		# handle sockets
 		for fd, condition in fds:
-			for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
-				# TODO: this might not work with IO_EXCEPT
-				sock_obj = __sock_objects[ fd ]
-				if cond & condition and sock_obj in __sockets[ cond ] and \
-					   not __sockets[ cond ][ sock_obj ]( sock_obj ):
+			sock_obj = __sock_objects[ fd ]
+			# check for closed pipes/sockets
+			if condition == select.POLLHUP:
+				socket_remove( sock_obj, IO_ALL )
+				break
+			# check for errors
+			if condition in ( select.POLLERR, select.POLLNVAL ):
+				if sock_obj in __sockets[ IO_EXCEPT ] and not __sockets[ cond ][ sock_obj ]( sock_obj ):
+					socket_remove( sock_obj, cond )
+				break
+			for cond in ( IO_READ, IO_WRITE ):
+				if cond & condition and sock_obj in __sockets[ cond ] and not __sockets[ cond ][ sock_obj ]( sock_obj ):
 					socket_remove( sock_obj, cond )
 
 		# handle external dispatchers
