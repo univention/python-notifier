@@ -46,6 +46,7 @@ IO_ALL = IO_READ | IO_WRITE
 
 __poll = select.poll()
 __sockets = {}
+__sock_objects = {}
 __sockets[ IO_READ ] = {}
 __sockets[ IO_WRITE ] = {}
 __sockets[ IO_EXCEPT ] = {}
@@ -60,18 +61,33 @@ _options = {
 	'recursive_depth' : 2,
 }
 
+def _get_fd( sock ):
+	if isinstance( sock, int ):
+		return sock
+
+	if isinstance( sock, ( socket.socket, file, socket._socketobject ) ):
+		return sock.fileno()
+
+	return -1
+
 def socket_add( id, method, condition = IO_READ ):
 	"""The first argument specifies a socket, the second argument has to be a
 	function that is called whenever there is data ready in the socket.
 	The callback function gets the socket back as only argument."""
-	global __sockets, __poll
+	global __sockets, __sock_objects, __poll
+
 
 	# ensure that already registered condition do not get lost
 	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
 		if id in __sockets[ cond ]:
 			condition |= cond
-	__sockets[ condition ][ id ] = method
-	__poll.register( id, condition )
+	fd = _get_fd( id )
+	if fd>= 0:
+		__sock_objects[ fd ] = id
+		__sockets[ condition ][ id ] = method
+		__poll.register( id, condition )
+	else:
+		raise AttributeError( 'could not get file description: %s' % id )
 
 def socket_remove( id, condition = IO_READ ):
 	"""Removes the given socket from scheduler. If no condition is specified the
@@ -86,9 +102,12 @@ def socket_remove( id, condition = IO_READ ):
 		__poll.register( id, remain )
 	else:
 		__poll.unregister( id )
-
-	if id in __sockets[ condition ]:
-		del __sockets[ condition ][ id ]
+		if id in __sockets[ condition ]:
+			del __sockets[ condition ][ id ]
+		for k, v in __sock_objects.items():
+			if v == id:
+				del __sock_objects[ k ]
+				break
 
 def timer_add( interval, method ):
 	"""The first argument specifies an interval in milliseconds, the second
@@ -171,8 +190,9 @@ def step( sleep = True, external = True ):
 				timeout = __min_timer
 
 		# wait for event
-		fds = __poll.poll( timeout )
-
+		print timeout
+		fds = __poll.poll( timeout * 1000 )
+		if fds: print fds
 		# handle timers
 		for i, timer in __timers.items():
 			timestamp = timer[ TIMESTAMP ]
@@ -200,14 +220,12 @@ def step( sleep = True, external = True ):
 
 		# handle sockets
 		for fd, condition in fds:
-			is_socket = isinstance( fd, ( socket.socket, file, socket._socketobject ) )
-			if ( is_socket and ( getattr( fd, 'closed', False ) or fd.fileno() != -1 ) ) or \
-				   ( isinstance( fd, int ) and fd != -1 ):
-				for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
-					# TODO: this might not work with IO_EXCEPT
-					if cond & condition and fd in __sockets[ cond ] and \
-						   not __sockets[ cond ][ fd ]( fd ):
-						socket_remove( fd, cond )
+			for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
+				# TODO: this might not work with IO_EXCEPT
+				sock_obj = __sock_objects[ fd ]
+				if cond & condition and sock_obj in __sockets[ cond ] and \
+					   not __sockets[ cond ][ sock_obj ]( sock_obj ):
+					socket_remove( sock_obj, cond )
 
 		# handle external dispatchers
 		if external:

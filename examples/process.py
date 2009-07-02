@@ -30,6 +30,7 @@ import notifier.popen
 proc = None
 
 def stdout( pid, line ):
+	print 'OUTPUT'
 	if not type( line ) in ( list, tuple ):
 		line = [ line ]
 	for l in line:
@@ -42,11 +43,11 @@ def stderr( pid, line ):
 		print "(%d>2): %s" % ( pid, l )
 
 def died( pid, status ):
-	print ">>> process %d died" % pid
+	print ">>> process %d died" % pid, status
 	# sys.exit( status )
 
 def tick():
-	print 'tick'
+	# print 'tick'
 	return True
 
 def runit():
