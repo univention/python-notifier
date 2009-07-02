@@ -70,9 +70,9 @@ def _get_fd( sock ):
 	return -1
 
 def socket_add( id, method, condition = IO_READ ):
-	"""The first argument specifies a socket, the second argument has to be a
-	function that is called whenever there is data ready in the socket.
-	The callback function gets the socket back as only argument."""
+	"""The first argument specifies a socket, the second argument has to
+	be a function that is invoked whenever there is data ready on the
+	socket. The socket/fiel objecct os passed to the callback method."""
 	global __sockets, __sock_objects, __poll
 
 	# ensure that already registered condition do not get lost
@@ -88,8 +88,8 @@ def socket_add( id, method, condition = IO_READ ):
 		raise AttributeError( 'could not get file description: %s' % id )
 
 def socket_remove( id, condition = IO_READ ):
-	"""Removes the given socket from scheduler. If no condition is specified the
-	default is IO_READ."""
+	"""Removes the given socket from scheduler. If no condition is
+	specified the default is IO_READ."""
 	global __sockets, __poll
 
 	if condition == IO_ALL:
@@ -114,13 +114,14 @@ def socket_remove( id, condition = IO_READ ):
 				break
 
 def timer_add( interval, method ):
-	"""The first argument specifies an interval in milliseconds, the second
-	argument a function. This is function is called after interval
-	seconds. If it returns true it's called again after interval
+	"""The first argument specifies an interval in milliseconds, the
+	second argument is a function that is called after interval
+	seconds. If it returns true it is called again after interval
 	seconds, otherwise it is removed from the scheduler. The third
-	(optional) argument is a parameter given to the called
-	function. This function returns an unique identifer which can be
-	used to remove this timer"""
+	(optional) argument is passwd to the invoked function.
+
+	The reutrn value is an unique identifer that can be used to remove
+	this timer"""
 	global __timer_id
 
 	try:
@@ -146,22 +147,18 @@ def dispatcher_remove( method ):
 	global __min_timer
 	__min_timer = dispatch.dispatcher_remove( method )
 
-__current_sockets = {}
-__current_sockets[ IO_READ ] = []
-__current_sockets[ IO_WRITE ] = []
-__current_sockets[ IO_EXCEPT ] = []
-
 ( INTERVAL, TIMESTAMP, CALLBACK ) = range( 3 )
 
 def step( sleep = True, external = True ):
-	"""Do one step forward in the main loop. First all timers are checked for
-	expiration and if necessary the accociated callback function is called.
-	After that the timer list is searched for the next timer that will expire.
-	This will define the maximum timeout for the following select statement
-	evaluating the registered sockets. Returning from the select statement the
-	callback functions from the sockets reported by the select system call are
-	invoked. As a final task in a notifier step all registered external
-	dispatcher functions are invoked."""
+	"""Do one step forward in the main loop. First all timers are
+	checked for expiration and if necessary the accociated callback
+	function is called.  After that the timer list is searched for the
+	next timer that will expire.  This will define the maximum timeout
+	for the following select statement evaluating the registered
+	sockets. Returning from the select statement the callback functions
+	from the sockets reported by the select system call are invoked. As
+	a final task in a notifier step all registered external dispatcher
+	functions are invoked."""
 
 	global __in_step, __step_depth, __step_depth_max, __min_timer
 
@@ -203,9 +200,9 @@ def step( sleep = True, external = True ):
 				continue
 			now = int( time() * 1000 )
 			if timestamp <= now:
-				# Update timestamp on timer before calling the callback to
-				# prevent infinite recursion in case the callback calls
-				# step().
+				# Update timestamp on timer before calling the callback
+				# to prevent infinite recursion in case the callback
+				# calls step().
 				timer[ TIMESTAMP ] = 0
 				if not timer[ CALLBACK ]():
 					if i in __timers:
@@ -226,14 +223,16 @@ def step( sleep = True, external = True ):
 			# check for closed pipes/sockets
 			if condition == select.POLLHUP:
 				socket_remove( sock_obj, IO_ALL )
-				break
+				continue
 			# check for errors
 			if condition in ( select.POLLERR, select.POLLNVAL ):
-				if sock_obj in __sockets[ IO_EXCEPT ] and not __sockets[ cond ][ sock_obj ]( sock_obj ):
+				if sock_obj in __sockets[ IO_EXCEPT ] and \
+					   not __sockets[ cond ][ sock_obj ]( sock_obj ):
 					socket_remove( sock_obj, cond )
-				break
+				continue
 			for cond in ( IO_READ, IO_WRITE ):
-				if cond & condition and sock_obj in __sockets[ cond ] and not __sockets[ cond ][ sock_obj ]( sock_obj ):
+				if cond & condition and sock_obj in __sockets[ cond ] and \
+					   not __sockets[ cond ][ sock_obj ]( sock_obj ):
 					socket_remove( sock_obj, cond )
 
 		# handle external dispatchers
