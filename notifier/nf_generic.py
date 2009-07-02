@@ -25,7 +25,6 @@
 """Simple mainloop that watches sockets and timers."""
 
 # python core packages
-from copy import copy
 from time import time
 
 import errno
@@ -42,6 +41,8 @@ IO_READ = select.POLLIN
 IO_WRITE = select.POLLOUT
 IO_EXCEPT = select.POLLERR
 IO_ALL = IO_READ | IO_WRITE | IO_EXCEPT
+
+( INTERVAL, TIMESTAMP, CALLBACK ) = range( 3 )
 
 __poll = select.poll()
 __sockets = {}
@@ -147,8 +148,6 @@ def dispatcher_remove( method ):
 	global __min_timer
 	__min_timer = dispatch.dispatcher_remove( method )
 
-( INTERVAL, TIMESTAMP, CALLBACK ) = range( 3 )
-
 def step( sleep = True, external = True ):
 	"""Do one step forward in the main loop. First all timers are
 	checked for expiration and if necessary the accociated callback
@@ -218,22 +217,23 @@ def step( sleep = True, external = True ):
 					timer[ TIMESTAMP ] = timestamp
 
 		# handle sockets
-		for fd, condition in fds:
-			sock_obj = __sock_objects[ fd ]
-			# check for closed pipes/sockets
-			if condition == select.POLLHUP:
-				socket_remove( sock_obj, IO_ALL )
-				continue
-			# check for errors
-			if condition in ( select.POLLERR, select.POLLNVAL ):
-				if sock_obj in __sockets[ IO_EXCEPT ] and \
-					   not __sockets[ cond ][ sock_obj ]( sock_obj ):
-					socket_remove( sock_obj, cond )
-				continue
-			for cond in ( IO_READ, IO_WRITE ):
-				if cond & condition and sock_obj in __sockets[ cond ] and \
-					   not __sockets[ cond ][ sock_obj ]( sock_obj ):
-					socket_remove( sock_obj, cond )
+		if fds:
+			for fd, condition in fds:
+				sock_obj = __sock_objects[ fd ]
+				# check for closed pipes/sockets
+				if condition == select.POLLHUP:
+					socket_remove( sock_obj, IO_ALL )
+					continue
+				# check for errors
+				if condition in ( select.POLLERR, select.POLLNVAL ):
+					if sock_obj in __sockets[ IO_EXCEPT ] and \
+						   not __sockets[ cond ][ sock_obj ]( sock_obj ):
+						socket_remove( sock_obj, cond )
+					continue
+				for cond in ( IO_READ, IO_WRITE ):
+					if cond & condition and sock_obj in __sockets[ cond ] and \
+						   not __sockets[ cond ][ sock_obj ]( sock_obj ):
+						socket_remove( sock_obj, cond )
 
 		# handle external dispatchers
 		if external:
