@@ -5,7 +5,7 @@
 #
 # en example demonstrating the process handler class
 #
-# Copyright (C) 2006
+# Copyright (C) 2006, 2009
 #		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -28,11 +28,9 @@ import notifier.threads as threads
 import time
 
 def my_thread( words ):
-	i = 50
-	while i:
-	print i, words
-	time.sleep( 0.1 )
-	i -= 1
+	for i in range( 50 ):
+		print i, words
+		time.sleep( 0.1 )
 	return words.reverse()
 
 def done_with_it( thread, result ):

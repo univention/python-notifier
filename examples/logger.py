@@ -5,7 +5,7 @@
 #
 # logger
 #
-# Copyright (C) 2005, 2006
+# Copyright (C) 2005, 2006, 2009
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify

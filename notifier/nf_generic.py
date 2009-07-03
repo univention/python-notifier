@@ -45,8 +45,8 @@ IO_ALL = IO_READ | IO_WRITE | IO_EXCEPT
 ( INTERVAL, TIMESTAMP, CALLBACK ) = range( 3 )
 
 __poll = select.poll()
-__sockets = {}
 __sock_objects = {}
+__sockets = {}
 __sockets[ IO_READ ] = {}
 __sockets[ IO_WRITE ] = {}
 __sockets[ IO_EXCEPT ] = {}
@@ -61,12 +61,11 @@ _options = {
 	'recursive_depth' : 2,
 }
 
-def _get_fd( sock ):
-	if isinstance( sock, int ):
-		return sock
-
-	if isinstance( sock, ( socket.socket, file, socket._socketobject ) ):
-		return sock.fileno()
+def _get_fd( obj ):
+	if isinstance( obj, int ):
+		return obj
+	if isinstance( obj, ( socket.socket, file, socket._socketobject ) ):
+		return obj.fileno()
 
 	return -1
 
@@ -80,11 +79,12 @@ def socket_add( id, method, condition = IO_READ ):
 	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
 		if id in __sockets[ cond ]:
 			condition |= cond
+
 	fd = _get_fd( id )
 	if fd>= 0:
 		__sock_objects[ fd ] = id
-		__sockets[ condition ][ id ] = method
-		__poll.register( id, condition )
+		__sockets[ condition ][ fd ] = method
+		__poll.register( fd, condition )
 	else:
 		raise AttributeError( 'could not get file description: %s' % id )
 
@@ -98,21 +98,19 @@ def socket_remove( id, condition = IO_READ ):
 			socket_remove( id, c )
 		return
 
+	fd = _get_fd( id )
 	remain = 0
 	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
-		if id in __sockets[ cond ] and condition != cond:
+		if fd in __sockets[ cond ] and condition != cond:
 			remain |= cond
 
 	if remain:
 		__poll.register( id, remain )
 	else:
-		if id in __sockets[ condition ]:
-			del __sockets[ condition ][ id ]
-			__poll.unregister( id )
-		for k, v in __sock_objects.items():
-			if v == id:
-				del __sock_objects[ k ]
-				break
+		if fd in __sockets[ condition ]:
+			del __sockets[ condition ][ fd ]
+			__poll.unregister( fd )
+			del __sock_objects[ fd ]
 
 def timer_add( interval, method ):
 	"""The first argument specifies an interval in milliseconds, the
@@ -121,7 +119,7 @@ def timer_add( interval, method ):
 	seconds, otherwise it is removed from the scheduler. The third
 	(optional) argument is passwd to the invoked function.
 
-	The reutrn value is an unique identifer that can be used to remove
+	The return value is an unique identifer that can be used to remove
 	this timer"""
 	global __timer_id
 
@@ -191,6 +189,7 @@ def step( sleep = True, external = True ):
 
 		# wait for event
 		fds = __poll.poll( timeout )
+
 		# handle timers
 		for i, timer in __timers.items():
 			timestamp = timer[ TIMESTAMP ]
@@ -226,13 +225,13 @@ def step( sleep = True, external = True ):
 					continue
 				# check for errors
 				if condition in ( select.POLLERR, select.POLLNVAL ):
-					if sock_obj in __sockets[ IO_EXCEPT ] and \
-						   not __sockets[ cond ][ sock_obj ]( sock_obj ):
+					if fd in __sockets[ IO_EXCEPT ] and \
+						   not __sockets[ cond ][ fd ]( sock_obj ):
 						socket_remove( sock_obj, cond )
 					continue
 				for cond in ( IO_READ, IO_WRITE ):
-					if cond & condition and sock_obj in __sockets[ cond ] and \
-						   not __sockets[ cond ][ sock_obj ]( sock_obj ):
+					if cond & condition and fd in __sockets[ cond ] and \
+						   not __sockets[ cond ][ fd ]( sock_obj ):
 						socket_remove( sock_obj, cond )
 
 		# handle external dispatchers
