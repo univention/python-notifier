@@ -424,8 +424,8 @@ class CountDown( object ):
 		return not self.timeout or ( now - self.start < self.timeout )
 
 class Child( object ):
-	'''Describesa child process and is used for return values of the
-	'run' method'''
+	'''Describes a child process and is used for return values of the
+	run method.'''
 	def __init__( self, stdout = None, stderr = None ):
 		self.pid = None
 		self.exitcode = None
@@ -433,6 +433,13 @@ class Child( object ):
 		self.stderr = stderr
 
 def run( command, timeout = 0, stdout = True, stderr = True, shell = True ):
+	'''Runs a a child process with the <command> and waits <timeout>
+	seconds for its termination. If <stdout> is True the standard output
+	is written to a temporary file. The same can be done for the stanard
+	error output with the argument <stderr>. If <shell> is True the
+	command is passed to a shell. The return value is a Child
+	object. The member variable <pid> is set if the process is still
+	running after <timeout> seconds otherwise <exitcode> is set.'''
 	# a dispatcher function required to activate the minimal timeout
 	def fake_dispatcher(): return True
 	notifier.dispatcher_add( fake_dispatcher )
@@ -472,6 +479,10 @@ def run( command, timeout = 0, stdout = True, stderr = True, shell = True ):
 	return ret
 
 def kill( pid, signal = 15, timeout = 0 ):
+	'''kills the process specified by pid that may be a process id or a
+	Child object. The process is killed with the provided signal (by
+	default 15). If the process is not dead after <timeout> seconds the
+	function exist anyway'''
 	# a dispatcher function required to activate the minimal timeout
 	def fake_dispatcher(): return True
 	notifier.dispatcher_add( fake_dispatcher )
