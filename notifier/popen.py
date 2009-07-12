@@ -30,6 +30,8 @@ import fcntl
 import glob
 import re
 import shlex
+import tempfile
+import time
 import types
 import subprocess
 
@@ -72,7 +74,11 @@ class Process( signals.Provider ):
 		if stdout: self.signal_new( 'stdout' );
 		self.signal_new( 'killed' );
 
-		self._cmd = self._normalize_cmd(cmd)
+		if not isinstance( cmd, ( list, tuple ) ):
+			self._cmd = shlex.split(cmd)
+		else:
+			self._cmd = cmd
+
 		self._shell = shell
 		if self._cmd:
 			self._name = self._cmd[ 0 ].split( '/' )[ -1 ]
@@ -89,25 +95,6 @@ class Process( signals.Provider ):
 		if not _processes:
 			notifier.dispatcher_add( _watcher )
 		_processes.append( self )
-
-	def _normalize_cmd( self, cmd ):
-		"""
-		Converts a command string into a list while honoring quoting or
-		removes empty strings if the cmd is a list.
-		"""
-		if cmd == None:
-			return []
-		elif type( cmd ) == list:
-			# Remove empty strings from argument list.
-			while '' in cmd:
-				cmd.remove( '' )
-			return cmd
-
-		assert( type( cmd ) in types.StringTypes )
-
-		cmdlist = shlex.split( str( cmd ) )
-
-		return cmdlist
 
 	def _read_stdout( self, line ):
 		"""emit signal 'stdout', announcing that there is another line
@@ -130,7 +117,11 @@ class Process( signals.Provider ):
 		if self.stopping:
 			raise SystemError, "process is currently dying."
 
-		cmd = self._cmd + self._normalize_cmd( args )
+		if not args:
+			cmd - self._cmd
+		else:
+			cmd = self._cmd + shlex.split( args )
+
 		self.__kill_timer = None
 		self.__dead = False
 		self.binary = cmd[ 0 ]
@@ -418,6 +409,95 @@ class RunIt( Process ):
 
 class Shell( RunIt ):
 	"""A simple interface for running shell commands as child processes"""
-	BINARY = '/bin/sh'
 	def __init__( self, command, stdout = True, stderr = False ):
 		RunIt.__init__( self, cmd, stdout = stdout, stderr = stderr, shell = True )
+
+class CountDown( object ):
+	'''This class provides a simple method to measure the expiration of
+	amount of time'''
+	def __init__( self, timeout ):
+		self.start = time.time() * 1000
+		self.timeout = timeout
+
+	def __call__( self ):
+		now = time.time() * 1000
+		return not self.timeout or ( now - self.start < self.timeout )
+
+class Child( object ):
+	'''Describesa child process and is used for return values of the
+	'run' method'''
+	def __init__( self, stdout = None, stderr = None ):
+		self.pid = None
+		self.exitcode = None
+		self.stdout = stdout
+		self.stderr = stderr
+
+def run( command, timeout = 0, stdout = True, stderr = True, shell = True ):
+	# a dispatcher function required to activate the minimal timeout
+	def fake_dispatcher(): return True
+	notifier.dispatcher_add( fake_dispatcher )
+
+	countdown = CountDown( timeout )
+	out = err = None
+	if stdout:
+		out = tempfile.NamedTemporaryFile()
+	if stderr:
+		err = tempfile.NamedTemporaryFile()
+
+	if isinstance( command, basestring ):
+		command = shlex.split( command )
+	child = subprocess.Popen( command, shell = shell, stdout = out, stderr = err )
+
+	while countdown():
+		exitcode = child.poll()
+		if exitcode != None:
+			break
+		notifier.step()
+
+	# remove dispatcher function
+	notifier.dispatcher_remove( fake_dispatcher )
+
+	# prepare return code
+	ret = Child( stdout = out, stderr = err )
+	if child.returncode == None:
+		ret.pid = child.pid
+	else:
+		# move to beginning of files
+		if out:
+			out.seek( 0 )
+		if err:
+			err.seek( 0 )
+		ret.exitcode = child.returncode
+
+	return ret
+
+def kill( pid, signal = 15, timeout = 0 ):
+	# a dispatcher function required to activate the minimal timeout
+	def fake_dispatcher(): return True
+	notifier.dispatcher_add( fake_dispatcher )
+
+	if isinstance( pid, Child ):
+		if pid.pid:
+			pid = pid.pid
+		else:
+			return pid.exitcode
+
+	os.kill( pid, signal )
+	countdown = CountDown( timeout )
+	while countdown():
+		dead_pid, sts = os.waitpid( pid, os.WNOHANG )
+		if dead_pid == pid:
+			break
+		notifier.step()
+	else:
+		# remove dspatcher function
+		notifier.dispatcher_remove( fake_dispatcher )
+		return None
+
+	# remove dspatcher function
+	notifier.dispatcher_remove( fake_dispatcher )
+
+	if os.WIFSIGNALED( sts ):
+		return -os.WTERMSIG( sts )
+
+	return os.WEXITSTATUS( sts )
