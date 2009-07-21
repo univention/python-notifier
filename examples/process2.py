@@ -46,7 +46,7 @@ if __name__ == '__main__':
 	# show we can still do things
 	notifier.timer_add( 500, tick )
 
-	cmd = u'/bin/sh -c "/bin/sleep 2 && /usr/bin/find /usr/bin"'
+	cmd = '/bin/sh -c "/bin/sleep 2 && /usr/bin/find /usr/bin"'
 #	cmd = '/usr/bin/find /var/log'
 	proc = notifier.popen.RunIt( cmd, stdout = True )
 	print 'started process', proc.start()

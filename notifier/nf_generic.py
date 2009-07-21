@@ -25,7 +25,7 @@
 """Simple mainloop that watches sockets and timers."""
 
 # python core packages
-from time import time
+from time import time, sleep as time_sleep
 
 import errno
 import os
@@ -188,13 +188,18 @@ def step( sleep = True, external = True ):
 				timeout = __min_timer
 
 		# wait for event
-		fds = __poll.poll( timeout )
+		if __sockets[ IO_READ ] or __sockets[ IO_WRITE ] or __sockets[ IO_EXCEPT ]:
+			fds = __poll.poll( timeout )
+		else:
+			fds = []
+			time_sleep( timeout / 1000.0 )
 
 		# handle timers
 		for i, timer in __timers.items():
 			timestamp = timer[ TIMESTAMP ]
-			if not timestamp:
-				# prevent recursion, ignore this timer
+			if not timestamp or i not in __timers:
+				# timer was unregistered by previous timer, or would
+				# recurse, ignore this timer
 				continue
 			now = int( time() * 1000 )
 			if timestamp <= now:
@@ -208,8 +213,8 @@ def step( sleep = True, external = True ):
 				else:
 					# Find a moment in the future. If interval is 0, we
 					# just reuse the old timestamp, doesn't matter.
-					now = int( time() * 1000 )
 					if timer[ INTERVAL ]:
+						now = int( time() * 1000 )
 						timestamp += timer[ INTERVAL ]
 						while timestamp <= now:
 							timestamp += timer[ INTERVAL ]
