@@ -33,6 +33,7 @@ def _wait_for_movement( optional = None ):
 
 def _emitting():
 	signals.emit( "clicked" )
+	# return True
 
 if __name__ == '__main__':
 	notifier.init( notifier.GENERIC )

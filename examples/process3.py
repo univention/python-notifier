@@ -41,7 +41,7 @@ def give_birth():
 	sleep = notifier.popen.run( 'sleep 5', timeout = 3, stderr = False, stdout = False, shell = False )
 	if sleep.pid:
 		print 'process still running', sleep.pid
-		ret = notifier.popen.kill()
+		ret = notifier.popen.kill( sleep )
 		print 'killed', ret
 
 	return False

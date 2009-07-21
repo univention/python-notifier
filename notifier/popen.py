@@ -117,7 +117,6 @@ class Process( signals.Provider ):
 		if self.stopping:
 			raise SystemError, "process is currently dying."
 
-		print self._cmd
 		if not args:
 			cmd = self._cmd
 		else:
@@ -137,7 +136,6 @@ class Process( signals.Provider ):
 				self.stderr = subprocess.PIPE
 
 			# line buffered, no shell
-			print cmd
 			self.child = subprocess.Popen( cmd, bufsize = 1, shell = self._shell,
 										   stdout = self.stdout, stderr = self.stderr )
 			self.pid = self.child.pid

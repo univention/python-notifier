@@ -35,7 +35,7 @@ def find_result( pid, status, result ):
 	print 'process %d died (%d)' % ( pid, status )
 	print 'output:',
 	if result:
-		print len( result )
+		print len( result ), 'lines'
 	else:
 		print result
 
@@ -47,9 +47,9 @@ if __name__ == '__main__':
 	notifier.timer_add( 500, tick )
 
 	cmd = '/bin/sh -c "/bin/sleep 2 && /usr/bin/find /usr/bin"'
-#	cmd = '/usr/bin/find /var/log'
+	# cmd = '/usr/bin/find /var/log'
 	proc = notifier.popen.RunIt( cmd, stdout = True )
-	print 'started process', proc.start()
 	proc.signal_connect( 'finished', find_result )
+	print 'started process', proc.start()
 
 	notifier.loop()

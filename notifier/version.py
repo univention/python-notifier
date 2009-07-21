@@ -23,7 +23,7 @@
 # 02110-1301 USA
 
 major_number    = 0
-minor_number    = 7
+minor_number    = 8
 revision_number = 0
 extension       = ''
 
