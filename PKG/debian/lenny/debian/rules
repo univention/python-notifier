@@ -3,6 +3,7 @@
 DEB_PYTHON_SYSTEM := pycentral
 #DEB_SRCDIR := src
 DEB_TAR_SRCDIR := pynotifier-0.8.0
+DEB_VERBOSE_ALL := yes
 
 include /usr/share/cdbs/1/rules/tarball.mk
 include /usr/share/cdbs/1/rules/debhelper.mk

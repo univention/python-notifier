@@ -1,3 +1,10 @@
+pynotifier (0.8.0-1) unstable; urgency=low
+
+  * new upstream version
+  * re-worked packaging; using the original tar archive directly
+
+ -- Andreas Büsching <crunchy@bitkipper.net>  Wed, 29 Jul 2009 19:25:15 +0200
+
 pynotifier (0.7.0-1) unstable; urgency=low
 
   * new upstream version
