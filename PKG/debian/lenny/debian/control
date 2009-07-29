@@ -1,0 +1,19 @@
+Source: pynotifier
+Priority: optional
+Maintainer: Andreas Büsching <crunchy@bitkipper.net>
+Build-Depends: debhelper (>= 5.0.0), python-dev, cdbs (>= 0.4.0), python-central
+Standards-Version: 3.7.2
+Section: python
+XS-Python-Version: all
+
+Package: python-notifier
+Architecture: all
+Replaces: pynotifier
+Depends: ${python:Depends}
+XB-Python-Version: ${python:Versions}
+Description: a generic event scheduler providing one own implementation and adaption code for GTK+, QT and Twisted
+ To be notified or to be threaded that is the question!
+ As the package name may suggest, pyNotifier is a notifier/event scheduler
+ abstraction written in python. It implements notification mechanisms for
+ socket events (read or write) and timers. Additionally external event
+ dispatchers may be called during an idle period.
