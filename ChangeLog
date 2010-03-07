@@ -1,4 +1,9 @@
-2009-07-21  Andreas Büsching  <buesching@univention.de>
+2010-03-07  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/popen.py (IO_Handler._handle_input): ensure that all
+	output is send to the calling instance; fixed line caching
+
+2009-07-21  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.8.0
 

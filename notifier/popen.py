@@ -158,6 +158,9 @@ class Process( signals.Provider ):
 
 	def dead( self, pid, status ):
 		self.__dead = True
+		# check io handlers if there is pending output
+		for output in ( self.stdout, self.stderr ):
+			output.flush_buffer()
 		self.signal_emit( 'killed', pid, status )
 
 	def _closed( self, name ):
@@ -335,29 +338,31 @@ class IO_Handler( signals.Provider ):
 			self.close()
 			return False
 
-		data  = data.replace('\r', '\n')
-		lines = data.split('\n')
+		data  = data.replace( '\r', '\n' )
+		partial_line = data[ -1 ] != '\n'
+		lines = data.split( '\n' )
+
+		# split creates an empty line of string ends with line break
+		if not lines[ -1 ]:
+			del lines[ -1 ]
+		# prepend saved data to first line
+		if self.saved:
+			lines[ 0 ] = self.saved + lines[ 0 ]
+			self.saved = ''
 		# Only one partial line?
-		if len(lines) == 1:
-			self.saved += data
-			return True
-
-		# Combine saved data and first line, send to app
-		self.callback( self.saved + lines[ 0 ] )
-		self.saved = ''
-
-		# There's one or more lines + possibly a partial line
-		if lines[ -1 ] != '':
-			# The last line is partial, save it for the next time
+		if partial_line:
 			self.saved = lines[ -1 ]
+			del lines[ -1 ]
 
-			# Send all lines except the last partial line to the app
-			self.callback( lines[ 1 : -1 ] )
-		else:
-			# Send all lines to the app
-			self.callback( lines[ 1 : ] )
+		# send lines
+		self.callback( lines )
 
 		return True
+	
+	def flush_buffer( self ):
+		if self.saved:
+			self.callback( self.saved.split( '\n' ) )
+			self.saved = ''
 
 class RunIt( Process ):
 	"""Is a more simple child process handler based on Process that
