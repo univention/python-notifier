@@ -46,9 +46,9 @@ Operating System :: Unix
 """
 
 doclines = __doc__.split( '\n' )
-setup( name	= 'pynotifier',
+setup( name	= 'python-notifier',
        version	= VERSION,
-       license  = 'GPLv2',
+       license  = 'LGPLv2',
        description = doclines[ 0 ],
        long_description = '\n'.join( doclines[ 2 : ] ),
        author	= 'Andreas Büsching',
