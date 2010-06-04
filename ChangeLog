@@ -1,3 +1,10 @@
+2010-06-04  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.8.2
+
+	* notifier/nf_generic.py (_get_fd): if socket is already closed
+	return -1
+
 2010-03-10  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.8.1

@@ -65,7 +65,10 @@ def _get_fd( obj ):
 	if isinstance( obj, int ):
 		return obj
 	if isinstance( obj, ( socket.socket, file, socket._socketobject ) ):
-		return obj.fileno()
+		try:
+			return obj.fileno()
+		except:
+			return -1
 
 	return -1
 
@@ -81,7 +84,7 @@ def socket_add( id, method, condition = IO_READ ):
 			condition |= cond
 
 	fd = _get_fd( id )
-	if fd>= 0:
+	if fd >= 0:
 		__sock_objects[ fd ] = id
 		__sockets[ condition ][ fd ] = method
 		__poll.register( fd, condition )
