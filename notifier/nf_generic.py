@@ -65,10 +65,7 @@ def _get_fd( obj ):
 	if isinstance( obj, int ):
 		return obj
 	if isinstance( obj, ( socket.socket, file, socket._socketobject ) ):
-		try:
-			return obj.fileno()
-		except:
-			return -1
+		return obj.fileno()
 
 	return -1
 
@@ -101,7 +98,18 @@ def socket_remove( id, condition = IO_READ ):
 			socket_remove( id, c )
 		return
 
-	fd = _get_fd( id )
+	try:
+		fd = _get_fd( id )
+	except:
+		fd = None
+		# file descriptor already closed
+		for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
+			for deskriptor, item in __sockets[ cond ].items():
+				if item == id:
+					fd = descriptor
+					break
+			if fd: break
+
 	remain = 0
 	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
 		if fd in __sockets[ cond ] and condition != cond:

@@ -2,8 +2,9 @@
 
 	* notifier/version.py: set version to 0.8.2
 
-	* notifier/nf_generic.py (_get_fd): if socket is already closed
-	return -1
+	* notifier/nf_generic.py (socket_remove): if file descriptor is
+	already closed try to find it in the list of watched sockets by
+	identifying the socket object
 
 2010-03-10  Andreas Büsching  <crunchy@bitkipper.net>
 
