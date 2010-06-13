@@ -415,7 +415,7 @@ class RunIt( Process ):
 class Shell( RunIt ):
 	"""A simple interface for running shell commands as child processes"""
 	def __init__( self, command, stdout = True, stderr = False ):
-		RunIt.__init__( self, cmd, stdout = stdout, stderr = stderr, shell = True )
+		RunIt.__init__( self, command, stdout = stdout, stderr = stderr, shell = True )
 
 class CountDown( object ):
 	'''This class provides a simple method to measure the expiration of

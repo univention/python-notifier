@@ -2,6 +2,8 @@
 
 	* notifier/version.py: set version to 0.8.2
 
+	* notifier/popen.py (Shell): fixed a typo
+
 	* notifier/nf_generic.py (socket_remove): if file descriptor is
 	already closed try to find it in the list of watched sockets by
 	identifying the socket object
