@@ -76,22 +76,23 @@ def socket_add( id, method, condition = IO_READ ):
 	global __sockets, __sock_objects, __poll
 
 	# ensure that already registered condition do not get lost
+	conditions = condition
 	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
 		if id in __sockets[ cond ]:
-			condition |= cond
+			conditions |= cond
 
 	fd = _get_fd( id )
 	if fd >= 0:
 		__sock_objects[ fd ] = id
 		__sockets[ condition ][ fd ] = method
-		__poll.register( fd, condition )
+		__poll.register( fd, conditions )
 	else:
 		raise AttributeError( 'could not get file description: %s' % id )
 
 def socket_remove( id, condition = IO_READ ):
 	"""Removes the given socket from scheduler. If no condition is
 	specified the default is IO_READ."""
-	global __sockets, __poll
+	global __sockets, __poll, __sock_objects
 
 	if condition == IO_ALL:
 		for c in ( IO_READ, IO_WRITE, IO_EXCEPT ):
@@ -104,7 +105,7 @@ def socket_remove( id, condition = IO_READ ):
 		fd = None
 		# file descriptor already closed
 		for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
-			for deskriptor, item in __sockets[ cond ].items():
+			for descriptor, item in __sock_objects.items():
 				if item == id:
 					fd = descriptor
 					break
@@ -244,7 +245,7 @@ def step( sleep = True, external = True ):
 				# check for errors
 				if condition == select.POLLERR:
 					if fd in __sockets[ IO_EXCEPT ] and not __sockets[ IO_EXCEPT ][ fd ]( sock_obj ):
-						socket_remove( sock_obj, cond )
+						socket_remove( sock_obj, IO_EXCEPT )
 					continue
 				for cond in ( IO_READ, IO_WRITE ):
 					if cond & condition and fd in __sockets[ cond ] and \

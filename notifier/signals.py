@@ -5,7 +5,7 @@
 #
 # a generic signal implementation for propagating asynchron events
 #
-# Copyright (C) 2005, 2006
+# Copyright (C) 2005, 2006, 2010
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify

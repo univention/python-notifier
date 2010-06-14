@@ -5,7 +5,7 @@
 #
 # a generic dispatcher implementation
 #
-# Copyright (C) 2006, 2007, 2009
+# Copyright (C) 2006, 2007, 2009, 2010
 #		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify

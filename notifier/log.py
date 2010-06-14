@@ -5,7 +5,7 @@
 #
 # log - a logging facility for the generic notifier module
 #
-# Copyright (C) 2005, 2006
+# Copyright (C) 2005, 2006, 2010
 #		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -26,7 +26,17 @@ import logging
 import sys
 
 instance = logging.getLogger( 'notifier' )
-instance.addHandler( logging.StreamHandler( sys.stderr ) )
+formatter = logging.Formatter( "%(asctime)s: %(name)s: %(levelname)-8s: %(message)s" )
+stream = logging.StreamHandler( sys.stderr )
+stream.setFormatter( formatter )
+try:
+	file = logging.FileHandler( '/var/log/python-notifier.log' )
+	file.setFormatter( formatter )
+except:
+	pass
+
+instance.addHandler( stream )
+instance.addHandler( file )
 
 debug = instance.debug
 info = instance.info
@@ -34,3 +44,5 @@ warn = instance.warn
 error = instance.error
 critical = instance.critical
 exception = instance.exception
+
+set_level = instance.setLevel
