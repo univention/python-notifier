@@ -3,7 +3,7 @@
 #
 # Author: Andreas Büsching <crunchy@bitkipper.net>
 #
-# Copyright (C) 2004, 2005, 2006
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -160,7 +160,7 @@ class Process( signals.Provider ):
 		self.__dead = True
 		# check io handlers if there is pending output
 		for output in ( self.stdout, self.stderr ):
-			output.flush_buffer()
+			if output: output.flush_buffer()
 		self.signal_emit( 'killed', pid, status )
 
 	def _closed( self, name ):

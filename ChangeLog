@@ -1,3 +1,12 @@
+2010-06-14  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.8.3
+
+	* notifier/popen.py (Process.dead): check if output object is not
+	None before flushing the buffer
+
+	* notifier/*.py: update copyright
+
 2010-06-04  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.8.2
