@@ -2,6 +2,9 @@
 
 	* notifier/version.py: set version to 0.8.3
 
+	* notifier/nf_generic.py (step): remove socket if poll returned
+	state POLLNVAL
+
 	* notifier/popen.py (Process.dead): check if output object is not
 	None before flushing the buffer
 

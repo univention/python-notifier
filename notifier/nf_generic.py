@@ -238,13 +238,12 @@ def step( sleep = True, external = True ):
 			for fd, condition in fds:
 				sock_obj = __sock_objects[ fd ]
 				# check for closed pipes/sockets
-				if condition == select.POLLHUP:
+				if condition in ( select.POLLHUP, select.POLLNVAL ):
 					socket_remove( sock_obj, IO_ALL )
 					continue
 				# check for errors
-				if condition in ( select.POLLERR, select.POLLNVAL ):
-					if fd in __sockets[ IO_EXCEPT ] and \
-						   not __sockets[ cond ][ fd ]( sock_obj ):
+				if condition == select.POLLERR:
+					if fd in __sockets[ IO_EXCEPT ] and not __sockets[ IO_EXCEPT ][ fd ]( sock_obj ):
 						socket_remove( sock_obj, cond )
 					continue
 				for cond in ( IO_READ, IO_WRITE ):
