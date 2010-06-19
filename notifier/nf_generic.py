@@ -5,7 +5,7 @@
 #
 # generic notifier implementation
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -101,8 +101,10 @@ def socket_remove( id, condition = IO_READ ):
 
 	try:
 		fd = _get_fd( id )
+		valid = True
 	except:
 		fd = None
+		valid = False
 		# file descriptor already closed
 		for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
 			for descriptor, item in __sock_objects.items():
@@ -111,18 +113,23 @@ def socket_remove( id, condition = IO_READ ):
 					break
 			if fd: break
 
-	remain = 0
-	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
-		if fd in __sockets[ cond ] and condition != cond:
-			remain |= cond
+	if valid:
+		# a valid file descriptor may still be registered for other conditions
+		remain = 0
+		for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
+			if fd in __sockets[ cond ] and condition != cond:
+				remain |= cond
 
-	if remain:
-		__poll.register( id, remain )
-	else:
-		if fd in __sockets[ condition ]:
-			del __sockets[ condition ][ fd ]
-			__poll.unregister( fd )
-			del __sock_objects[ fd ]
+		if remain:
+			__poll.register( id, remain )
+			return
+	# if the file descriptor is invalid (e.g. connection closed) or
+	# there are no remaining conditions it has to be removed completely
+	if fd in __sockets[ condition ]:
+		del __sockets[ condition ][ fd ]
+	if fd in __sock_objects:
+		__poll.unregister( fd )
+		del __sock_objects[ fd ]
 
 def timer_add( interval, method ):
 	"""The first argument specifies an interval in milliseconds, the

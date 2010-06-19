@@ -1,3 +1,10 @@
+2010-06-15  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.8.4
+
+	* notifier/nf_generic.py (socket_remove): do not try to
+	re-register an already closed socket
+
 2010-06-14  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.8.3

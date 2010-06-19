@@ -358,7 +358,7 @@ class IO_Handler( signals.Provider ):
 		self.callback( lines )
 
 		return True
-	
+
 	def flush_buffer( self ):
 		if self.saved:
 			self.callback( self.saved.split( '\n' ) )
@@ -413,13 +413,13 @@ class RunIt( Process ):
 			self.signal_emit( 'finished', pid, exit_code )
 
 class Shell( RunIt ):
-	"""A simple interface for running shell commands as child processes"""
+	'''A simple interface for running shell commands as child processes'''
 	def __init__( self, command, stdout = True, stderr = False ):
 		RunIt.__init__( self, command, stdout = stdout, stderr = stderr, shell = True )
 
 class CountDown( object ):
 	'''This class provides a simple method to measure the expiration of
-	amount of time'''
+	an amount of time'''
 	def __init__( self, timeout ):
 		self.start = time.time() * 1000
 		self.timeout = timeout
@@ -438,7 +438,7 @@ class Child( object ):
 		self.stderr = stderr
 
 def run( command, timeout = 0, stdout = True, stderr = True, shell = True ):
-	'''Runs a a child process with the <command> and waits <timeout>
+	'''Runs a child process with the <command> and waits <timeout>
 	seconds for its termination. If <stdout> is True the standard output
 	is written to a temporary file. The same can be done for the stanard
 	error output with the argument <stderr>. If <shell> is True the
