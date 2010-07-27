@@ -74,13 +74,13 @@ class Process( signals.Provider ):
 		if stdout: self.signal_new( 'stdout' );
 		self.signal_new( 'killed' );
 
-		if not isinstance( cmd, ( list, tuple ) ):
+		if not shell and not isinstance( cmd, ( list, tuple ) ):
 			self._cmd = shlex.split(cmd)
 		else:
 			self._cmd = cmd
 
 		self._shell = shell
-		if self._cmd:
+		if not shell and self._cmd:
 			self._name = self._cmd[ 0 ].split( '/' )[ -1 ]
 		else:
 			self._name = '<unknown>'
@@ -120,7 +120,11 @@ class Process( signals.Provider ):
 		if not args:
 			cmd = self._cmd
 		else:
-			cmd = self._cmd + shlex.split( args )
+			if not self._shell:
+				cmd = self._cmd + shlex.split( args )
+			else:
+				cmd = '%s %s' % ( self._cmd, args )
+
 
 		self.__kill_timer = None
 		self.__dead = False
