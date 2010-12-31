@@ -75,7 +75,7 @@ class Process( signals.Provider ):
 		self.signal_new( 'killed' );
 
 		if not shell and not isinstance( cmd, ( list, tuple ) ):
-			self._cmd = shlex.split(cmd)
+			self._cmd = shlex.split( str( cmd ) ) # shlex.split can not handle unicode strings
 		else:
 			self._cmd = cmd
 

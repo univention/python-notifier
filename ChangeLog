@@ -1,4 +1,12 @@
-2010-07-27  Andreas Büsching  <buesching@univention.de>
+2010-08-19  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.8.6
+
+	* notifier/popen.py: Process: before the command is split using
+	shlex.split it must be converted to a string because unicode strings
+	are not supported by this method
+
+2010-07-27  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.8.5
 
