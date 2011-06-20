@@ -5,7 +5,7 @@
 #
 # generic notifier implementation
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -56,6 +56,7 @@ __step_depth_max = 0
 
 _options = {
 	'recursive_depth' : 10,
+	'catch_select_errors' : True,
 }
 
 class NotifierException( Exception ):
@@ -182,7 +183,7 @@ def step( sleep = True, external = True ):
 	final task in a notifier step all registered external dispatcher
 	functions are invoked."""
 
-	global __in_step, __step_depth, __step_depth_max, __min_timer
+	global __in_step, __step_depth, __step_depth_max, __min_timer, _options
 
 	__in_step = True
 	__step_depth += 1
@@ -215,7 +216,12 @@ def step( sleep = True, external = True ):
 		# wait for event
 		fds = []
 		if __sockets[ IO_READ ] or __sockets[ IO_WRITE ] or __sockets[ IO_EXCEPT ]:
-			fds = __poll.poll( timeout )
+			try:
+				fds = __poll.poll( timeout )
+			except select.error, e:
+				log.error( 'error: poll system call interrupted: %s' % str( e ) )
+				if not _options[ 'catch_select_errors' ]:
+					raise
 		elif timeout:
 			time_sleep( timeout / 1000.0 )
 		elif timeout == None: # if there are no timers and no sockets, do not burn the CPU

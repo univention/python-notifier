@@ -2,14 +2,15 @@
 
 	* notifier/version.py: set version to 0.9.0
 
-	* notifier/nf_generic.py: increase maximum recursive depth to
-	10. If it is reached an NotifierException is raised.
-	The default log level is set to CRITICAL.
-	Made some minor fixes in the documentation
+	* notifier/nf_generic.py: increase maximum recursive depth to 10;
+	if it is reached an NotifierException is raised; the default log
+	level is set to CRITICAL; add new option'catch_select_errors. If
+	set to True errors during the system call poll will be catch,
+	logged and ignored; made some minor fixes in the documentation
 
 	* notifier/dispatch.py: add documentation
 
-	* notifier/nf_wx.py: removed it. Has been marked as deprecated in 0.8.x
+	* notifier/nf_wx.py: removed it; has been marked as deprecated in 0.8.x
 
 2010-08-19  Andreas Büsching  <crunchy@bitkipper.net>
 
