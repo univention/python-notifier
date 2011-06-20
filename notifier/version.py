@@ -5,7 +5,7 @@
 #
 # version information
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
 #		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -23,8 +23,8 @@
 # 02110-1301 USA
 
 major_number    = 0
-minor_number    = 8
-revision_number = 6
+minor_number    = 9
+revision_number = 0
 extension       = ''
 
 VERSION = "%d.%d.%d%s" % ( major_number, minor_number,

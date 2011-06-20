@@ -27,11 +27,8 @@
 # python core packages
 from time import time, sleep as time_sleep
 
-import errno
-import os
 import select
 import socket
-import sys
 
 # internal packages
 import log
@@ -58,10 +55,15 @@ __step_depth = 0
 __step_depth_max = 0
 
 _options = {
-	'recursive_depth' : 2,
+	'recursive_depth' : 10,
 }
 
+class NotifierException( Exception ):
+	pass
+
 def _get_fd( obj ):
+	"""Returns a file descriptor. obj can be a file descriptor or an
+	object of type socket.socket, file or socket._socketobject"""
 	if isinstance( obj, int ):
 		return obj
 	if isinstance( obj, ( socket.socket, file, socket._socketobject ) ):
@@ -140,7 +142,7 @@ def timer_add( interval, method ):
 
 	The return value is an unique identifer that can be used to remove
 	this timer"""
-	global __timer_id
+	global __timer_id, __timers
 
 	try:
 		__timer_id += 1
@@ -154,14 +156,18 @@ def timer_add( interval, method ):
 
 def timer_remove( id ):
 	"""Removes the timer identifed by the unique ID from the main loop."""
+	global __timers
 	if id in __timers:
 		del __timers[ id ]
 
 def dispatcher_add( method, min_timeout = True ):
+	"""Adds a dispatcher function. These methods are invoked by the
+	mainloop as the last action of a step."""
 	global __min_timer
 	__min_timer = dispatch.dispatcher_add( method, min_timeout )
 
 def dispatcher_remove( method ):
+	"""Removes a registered dispatcher function"""
 	global __min_timer
 	__min_timer = dispatch.dispatcher_remove( method )
 
@@ -170,10 +176,10 @@ def step( sleep = True, external = True ):
 	checked for expiration and if necessary the accociated callback
 	function is called.  After that the timer list is searched for the
 	next timer that will expire.  This will define the maximum timeout
-	for the following select statement evaluating the registered
-	sockets. Returning from the select statement the callback functions
-	from the sockets reported by the select system call are invoked. As
-	a final task in a notifier step all registered external dispatcher
+	for the following poll statement evaluating the registered
+	sockets. Returning from the pool statement the callback functions
+	from the sockets reported by the poll system call are invoked. As a
+	final task in a notifier step all registered external dispatcher
 	functions are invoked."""
 
 	global __in_step, __step_depth, __step_depth_max, __min_timer
@@ -184,7 +190,7 @@ def step( sleep = True, external = True ):
 	try:
 		if __step_depth > __step_depth_max:
 			log.exception( 'maximum recursion depth reached' )
-			return
+			raise NotifierException( 'error: maximum recursion depth reached' )
 
 		# get minInterval for max timeout
 		timeout = None
@@ -274,4 +280,5 @@ def loop():
 def _init():
 	global __step_depth_max
 
+	log.set_level( log.CRITICAL )
 	__step_depth_max = _options[ 'recursive_depth' ]

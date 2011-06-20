@@ -5,7 +5,7 @@
 #
 # log - a logging facility for the generic notifier module
 #
-# Copyright (C) 2005, 2006, 2010
+# Copyright (C) 2005, 2006, 2010, 2011
 #		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -22,15 +22,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-import logging
-import sys
+from logging import getLogger, Formatter, StreamHandler, FileHandler, CRITICAL, ERROR, WARN, INFO, DEBUG
+from sys import stderr
 
-instance = logging.getLogger( 'notifier' )
-formatter = logging.Formatter( "%(asctime)s: %(name)s: %(levelname)-8s: %(message)s" )
-stream = logging.StreamHandler( sys.stderr )
+instance = getLogger( 'notifier' )
+formatter = Formatter( "%(asctime)s: %(name)s: %(levelname)-8s: %(message)s" )
+stream = StreamHandler( stderr )
 stream.setFormatter( formatter )
 try:
-	file = logging.FileHandler( '/var/log/python-notifier.log' )
+	file = FileHandler( '/var/log/python-notifier.log' )
 	file.setFormatter( formatter )
 except:
 	pass

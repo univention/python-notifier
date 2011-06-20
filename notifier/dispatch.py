@@ -61,6 +61,7 @@ def dispatcher_remove( method ):
 		return None
 
 def dispatcher_run():
+	"""Invokes all registered dispatcher functions"""
 	global __dispatchers
 
 	for val in ( True, False ):
