@@ -48,7 +48,10 @@ class Simple( object ):
 		self._id = thread.start_new_thread( self._run, () )
 
 	def _run( self ):
-		tmp = self._function()
+		try:
+			tmp = self._function()
+		except BaseException, e:
+			tmp = e
 		self._lock.acquire()
 		self._result = tmp
 		self._finished = True

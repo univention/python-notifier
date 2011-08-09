@@ -28,13 +28,14 @@ import notifier.threads as threads
 import time
 
 def my_thread( words ):
-	for i in range( 50 ):
+	for i in range( 5 ):
 		print i, words
 		time.sleep( 0.1 )
-	return words.reverse()
+	return words
 
-def done_with_it( thread, result ):
+def done_with_it( thread, result, another ):
 	print "Thread '%s' is finished" % thread.name()
+	print "Argument:", another
 	print "Result:", result
 
 def doing_something_else():
@@ -44,10 +45,12 @@ def doing_something_else():
 if __name__ == '__main__':
 	notifier.init( notifier.GENERIC )
 
-#	  notifier.dispatcher_add( threads.results )
+	# task = threads.Simple( 'test',
+	# 					   notifier.Callback( my_thread, [ 'hello', 'world' ] ),
+	# 					   done_with_it )
 	task = threads.Simple( 'test',
-			   notifier.Callback( my_thread, [ 'hello', 'world' ] ),
-			   done_with_it )
+						   notifier.Callback( my_thread, [ 'hello', 'world' ] ),
+						   notifier.Callback( done_with_it, 'another argument' ) )
 	task.run()
 	notifier.timer_add( 1000, doing_something_else )
 	notifier.loop()
