@@ -31,6 +31,23 @@ __all__ = [ 'Simple' ]
 _threads = []
 
 class Simple( object ):
+	"""A simple class to start a thread and getting notified when the
+	thread is finished. Meaning this class helps to handle threads that
+	are meant for doing some calculations and returning the
+	result. Threads that need to communicate with the main thread can
+	not be handeld by this class.
+
+	If an exception is raised during the execution of the thread that is
+	based on BaseException it is catched and returned as the result of
+	the thread.
+
+	Arguments:
+	name: a name that might be used to identify the thread. It is not required to be unique.
+	function: the main function of the thread
+	callback: function that is invoked when the thread is dead. This function gets two arguments:
+	  thread: nme of the thread
+	  result: return value of the thread function.
+	"""
 	def __init__( self, name, function, callback ):
 		self._name = name
 		self._function = function
@@ -41,13 +58,17 @@ class Simple( object ):
 		self._lock = thread.allocate_lock()
 		global _threads
 		if not _threads:
-			notifier.dispatcher_add( _results )
+			notifier.dispatcher_add( _simple_threads_dispatcher )
 		_threads.append( self )
 
 	def run( self ):
+		"""Starts the thread"""
 		self._id = thread.start_new_thread( self._run, () )
 
 	def _run( self ):
+		"""Encapsulates the given thread function to handle the return
+		value in a thread-safe way and to catch exceptions raised from
+		within it."""
 		try:
 			tmp = self._function()
 		except BaseException, e:
@@ -57,27 +78,30 @@ class Simple( object ):
 		self._finished = True
 		self._lock.release()
 
+	@property
+	def name( self ):
+		return self._name
+
+	@property
+	def finished( self ):
+		return self._finished
+
 	def lock( self ):
 		self._lock.acquire()
 
 	def unlock( self ):
 		self._lock.release()
 
-	def name( self ):
-		return self._name
-
-	def finished( self ):
-		return self._finished
-
 	def announce( self ):
 		self._callback( self, self._result )
 
-def _results():
+def _simple_threads_dispatcher():
+	"""Dispatcher function checking for finished threads"""
 	finished = []
 	global _threads
 	for task in _threads:
 		task.lock()
-		if task.finished():
+		if task.finished:
 			task.announce()
 			finished.append( task )
 		task.unlock()
