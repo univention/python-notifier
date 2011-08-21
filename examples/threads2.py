@@ -41,8 +41,9 @@ def my_thread( words ):
 def done_with_it( thread, result, another ):
 	print "-> Thread '%s' is finished" % thread.name
 	print "  Argument:", another
-	if isinstance( result, BaseException ):
-		print "  Error occurred during thread processing:", type( result ), result
+	if isinstance( thread.result, BaseException ):
+		print "  Error occurred during thread processing:", type( thread.result ), thread.result
+		print "  Details:\n%s" % ''.join( thread.trace )
 	else:
 		print "  Counted from 0 to %d" % result
 

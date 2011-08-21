@@ -1,3 +1,13 @@
+2011-08-21  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.9.2
+
+	* notifier/threads.py: if an exception has occurred during thread
+	processing the traceback is saved additonally to the exception
+	object
+
+	* notifier/threads.py: add documentation
+
 2011-08-09  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.9.1

@@ -5,7 +5,7 @@
 #
 # simple interface to handle threads synchron to the notifier loop
 #
-# Copyright (C) 2006
+# Copyright (C) 2006, 2011
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -24,7 +24,9 @@
 
 import notifier
 
+import sys
 import thread
+import traceback
 
 __all__ = [ 'Simple' ]
 
@@ -45,7 +47,7 @@ class Simple( object ):
 	name: a name that might be used to identify the thread. It is not required to be unique.
 	function: the main function of the thread
 	callback: function that is invoked when the thread is dead. This function gets two arguments:
-	  thread: nme of the thread
+	  thread: this thread object
 	  result: return value of the thread function.
 	"""
 	def __init__( self, name, function, callback ):
@@ -71,12 +73,27 @@ class Simple( object ):
 		within it."""
 		try:
 			tmp = self._function()
+			trace = None
 		except BaseException, e:
+			trace = traceback.format_tb( sys.exc_info()[ 2 ] )
 			tmp = e
 		self._lock.acquire()
 		self._result = tmp
+		self._trace = trace
 		self._finished = True
 		self._lock.release()
+
+	@property
+	def result( self ):
+		"""Contains the result of the thread function or the exception
+		that occurred during thread processing"""
+		return self._result
+
+	@property
+	def trace( self ):
+		"""Contains a formatted traceback of the occured exception during
+		thread processing. If no exception has been raised the value is None"""
+		return self._trace
 
 	@property
 	def name( self ):
@@ -84,12 +101,16 @@ class Simple( object ):
 
 	@property
 	def finished( self ):
+		"""If the thread is finished the property continas the value
+		True else False."""
 		return self._finished
 
 	def lock( self ):
+		"""Locks a thread local lock object"""
 		self._lock.acquire()
 
 	def unlock( self ):
+		"""Unlocks a thread local lock object"""
 		self._lock.release()
 
 	def announce( self ):
