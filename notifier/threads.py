@@ -55,6 +55,8 @@ class Simple( object ):
 		self._function = function
 		self._callback = callback
 		self._result = None
+		self._trace = None
+		self._exc_info = None
 		self._finished = False
 		self._id = None
 		self._lock = thread.allocate_lock()
@@ -62,6 +64,10 @@ class Simple( object ):
 		if not _threads:
 			notifier.dispatcher_add( _simple_threads_dispatcher )
 		_threads.append( self )
+
+	def __del__( self ):
+		if self._exc_info is not None:
+			del self._exc_info
 
 	def run( self ):
 		"""Starts the thread"""
@@ -74,12 +80,15 @@ class Simple( object ):
 		try:
 			tmp = self._function()
 			trace = None
+			exc_info = None
 		except BaseException, e:
+			exc_info = sys.exc_info()
 			trace = traceback.format_tb( sys.exc_info()[ 2 ] )
 			tmp = e
 		self._lock.acquire()
 		self._result = tmp
 		self._trace = trace
+		self._exc_info = exc_info
 		self._finished = True
 		self._lock.release()
 
@@ -94,6 +103,14 @@ class Simple( object ):
 		"""Contains a formatted traceback of the occured exception during
 		thread processing. If no exception has been raised the value is None"""
 		return self._trace
+
+	@property
+	def exc_info( self ):
+		"""Contains information about the exception that es occured
+		during the execution of the thread. The value is the some as
+		returned by sys.exc_info(). If no exception has been raised the
+		value is None"""
+		return self._exc_info
 
 	@property
 	def name( self ):

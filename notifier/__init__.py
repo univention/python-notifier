@@ -43,7 +43,7 @@ loop = None
 step = None
 
 # notifier types
-( GENERIC, QT, GTK, WX, TWISTED ) = range( 5 )
+( GENERIC, QT, GTK, TWISTED ) = range( 4 )
 
 # socket conditions
 IO_READ = None
@@ -66,9 +66,6 @@ def init( model = GENERIC, **kwargs ):
 		import nf_qt as nf_impl
 	elif model == GTK:
 		import nf_gtk as nf_impl
-	elif model == WX:
-		import nf_wx as nf_impl
-		log.warn( 'the WX notifier is deprecated and is no longer maintained' )
 	elif model == TWISTED:
 		import nf_twisted as nf_impl
 	else:
@@ -95,18 +92,16 @@ def init( model = GENERIC, **kwargs ):
 		nf_impl._init()
 
 class Callback:
-	def __init__( self, function, *args ):
+	def __init__( self, function, *args, **kwargs ):
 		self._function = function
 		self._args = args
+		self._kwargs = kwargs
 
 	def __call__( self, *args ):
 		tmp = list( args )
 		if self._args:
 			tmp.extend( self._args )
-		if tmp:
-			return self._function( *tmp )
-		else:
-			return self._function()
+		return self._function( *tmp, **self._kwargs )
 
 	def __cmp__( self, rvalue ):
 		if not callable( rvalue ): return -1

@@ -1,3 +1,10 @@
+2011-10-23  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.9.3
+
+	* notifier/threads.py: add additional property exc_info to Simple
+	containing all data from sys.exc_info()
+
 2011-08-21  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.9.2

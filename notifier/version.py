@@ -24,7 +24,7 @@
 
 major_number    = 0
 minor_number    = 9
-revision_number = 2
+revision_number = 3
 extension       = ''
 
 VERSION = "%d.%d.%d%s" % ( major_number, minor_number,
