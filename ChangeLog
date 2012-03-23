@@ -1,5 +1,11 @@
 2012-03-23  Andreas Büsching  <crunchy@bitkipper.net>
 
+	* notifier/version.py: set version to 0.9.4
+
+	* notifier/threads.py: fixed typo in import
+
+2012-03-23  Andreas Büsching  <crunchy@bitkipper.net>
+
 	* notifier/threads.py (Enhanced): new thread cass supporting thread-safe signals
 	(threaded): a decorator that simplifies running a function as a thread
 
