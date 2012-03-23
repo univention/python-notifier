@@ -5,7 +5,7 @@
 #
 # simple interface to handle threads synchron to the notifier loop
 #
-# Copyright (C) 2006, 2011
+# Copyright (C) 2006, 2011, 2012
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -24,9 +24,12 @@
 
 import notifier
 
+import functools
 import sys
 import thread
 import traceback
+
+import .signals
 
 __all__ = [ 'Simple' ]
 
@@ -133,18 +136,43 @@ class Simple( object ):
 	def announce( self ):
 		self._callback( self, self._result )
 
+class Enhanced( Simple ):
+	def __init__( self, function, callback ):
+		Simple.__init__( self, '__enhanced__', function, callback )
+		self._signals = []
+
+	def signal_emit( self, signal, *args ):
+		self.lock()
+		self._signals.append( ( signal, args ) )
+		self.unlock()
+
 def _simple_threads_dispatcher():
 	"""Dispatcher function checking for finished threads"""
-	finished = []
 	global _threads
-	for task in _threads:
+
+	for task in _threads[ : ]:
 		task.lock()
 		if task.finished:
 			task.announce()
-			finished.append( task )
+			_threads.remove( task )
+		elif getattr( task, '_signals' ):
+			for signal, args in task._signals:
+				signals.emit( signal, *args )
+			task._signals = []
 		task.unlock()
 
-	for t in finished:
-		_threads.remove( t )
-
 	return ( len( _threads ) > 0 )
+
+def threaded( finished_func ):
+	"""A decorator function making it simple to start a thread. Just
+	add the decorator to the function that should be the main thread
+	function. The argument is the function that should be invoked when
+	the thread has finished"""
+
+	def inner_thread( func ):
+		def wrapped( *args, **kwargs ):
+			thread = Enhanced( notifier.Callback( func, *args, **kwargs ), finished_func )
+			thread.run()
+		return functools.wraps( func )( wrapped )
+	return inner_thread
+

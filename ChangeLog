@@ -1,3 +1,13 @@
+2012-03-23  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/threads.py (Enhanced): new thread cass supporting thread-safe signals
+	(threaded): a decorator that simplifies running a function as a thread
+
+	* notifier/nf_generic.py (step): if there are no timers and socket
+	events the loop sleeps for dispatch.MIN_TIMER that was passed to
+	time.sleep without dividing by 1000. That caused a sleep for 1
+	minute and 40 seconds instead of 100 milliseconds.
+
 2011-10-23  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.9.3

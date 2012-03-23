@@ -5,7 +5,7 @@
 #
 # generic notifier implementation
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -225,7 +225,7 @@ def step( sleep = True, external = True ):
 		elif timeout:
 			time_sleep( timeout / 1000.0 )
 		elif timeout == None: # if there are no timers and no sockets, do not burn the CPU
-			time_sleep( dispatch.MIN_TIMER )
+			time_sleep( dispatch.MIN_TIMER / 1000.0 )
 
 		# handle timers
 		for i, timer in __timers.items():
