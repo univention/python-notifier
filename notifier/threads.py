@@ -29,8 +29,6 @@ import sys
 import thread
 import traceback
 
-from signals import emit
-
 __all__ = [ 'Simple' ]
 
 _threads = []
@@ -155,9 +153,9 @@ def _simple_threads_dispatcher():
 		if task.finished:
 			task.announce()
 			_threads.remove( task )
-		elif getattr( task, '_signals' ):
+		elif hasattr( task, '_signals' ):
 			for signal, args in task._signals:
-				emit( signal, *args )
+				task.signal_emit( signal, *args )
 			task._signals = []
 		task.unlock()
 

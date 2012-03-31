@@ -25,13 +25,34 @@
 import os
 
 import logging
-import notifier.log
+import notifier.log as nflog
 
 if __name__ == '__main__':
-	for level in ( logging.CRITICAL, logging.DEBUG, logging.ERROR, logging.FATAL, logging.WARN, logging.INFO ):
-		notifier.log.set_level( level )
-		notifier.log.error( 'LEVEL: %d' % level )
-		notifier.log.error( 'error' )
-		notifier.log.warn( 'warn' )
-		notifier.log.info( 'info' )
-		notifier.log.debug( 'debug' )
+	# use default handlers
+	print '>>> default handlers'
+	# nflog.open() -> the default handlers are opened during import
+	for level in ( nflog.CRITICAL, nflog.ERROR, nflog.WARN, nflog.INFO, nflog.DEBUG ):
+		nflog.set_level( level )
+		print 'LEVEL: %d' % level
+		nflog.critical( 'critical' )
+		nflog.error( 'error' )
+		nflog.warn( 'warn' )
+		nflog.info( 'info' )
+		nflog.debug( 'debug' )
+
+	# use custom handlers
+	print '>>> custom handlers'
+	handler = logging.FileHandler( 'test.log' )
+	handler.setFormatter( nflog.formatter )
+	nflog.open( handler )
+	for level in ( nflog.CRITICAL, nflog.ERROR, nflog.WARN, nflog.INFO, nflog.DEBUG ):
+		nflog.set_level( level )
+		nflog.critical( 'LEVEL: %d' % level )
+		nflog.critical( 'critical' )
+		nflog.error( 'error' )
+		nflog.warn( 'warn' )
+		nflog.info( 'info' )
+		nflog.debug( 'debug' )
+	for line in open( 'test.log' ).readlines():
+		print line,
+	os.unlink( 'test.log' )

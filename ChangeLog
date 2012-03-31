@@ -1,3 +1,23 @@
+2012-03-31  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.9.5
+
+	* examples/test-qt-cli.py: add new test for the QT notifier without a GUI
+
+	* examples/test-qt.py: cleanup QT test
+
+	* examples/threads3.py: add new thread example demonstrating the decorator
+
+	* notifier/nf_qt.py (socket_add, socket_remove): add support for
+	write and exception notifications
+	(socket_add): ensure that sockets do not get registered more than
+	once for the same condition
+
+	* examples/log.py: extend/update example for logging API
+
+	* notifier/log.py (open): add function to (re)open the default
+	handlers for logging or optionally open custom handlers
+
 2012-03-23  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.9.4
