@@ -75,7 +75,7 @@ def _get_fd( obj ):
 def socket_add( id, method, condition = IO_READ ):
 	"""The first argument specifies a socket, the second argument has to
 	be a function that is invoked whenever there is data ready on the
-	socket. The socket/fiel objecct os passed to the callback method."""
+	socket. The socket/fiel object is passed to the callback method."""
 	global __sockets, __sock_objects, __poll
 
 	# ensure that already registered condition do not get lost
@@ -141,7 +141,7 @@ def timer_add( interval, method ):
 	seconds, otherwise it is removed from the scheduler. The third
 	(optional) argument is passwd to the invoked function.
 
-	The return value is an unique identifer that can be used to remove
+	The return value is an unique identifier that can be used to remove
 	this timer"""
 	global __timer_id, __timers
 
@@ -156,7 +156,7 @@ def timer_add( interval, method ):
 	return __timer_id
 
 def timer_remove( id ):
-	"""Removes the timer identifed by the unique ID from the main loop."""
+	"""Removes the timer identified by the unique ID from the main loop."""
 	global __timers
 	if id in __timers:
 		del __timers[ id ]
@@ -174,9 +174,9 @@ def dispatcher_remove( method ):
 
 def step( sleep = True, external = True ):
 	"""Do one step forward in the main loop. First all timers are
-	checked for expiration and if necessary the accociated callback
-	function is called.  After that the timer list is searched for the
-	next timer that will expire.  This will define the maximum timeout
+	checked for expiration and if necessary the associated callback
+	function is called. After that the timer list is searched for the
+	next timer that will expire. This will define the maximum timeout
 	for the following poll statement evaluating the registered
 	sockets. Returning from the pool statement the callback functions
 	from the sockets reported by the poll system call are invoked. As a
@@ -280,7 +280,7 @@ def step( sleep = True, external = True ):
 
 def loop():
 	"""Executes the 'main loop' forever by calling step in an endless loop"""
-	while 1:
+	while True:
 		step()
 
 def _init():

@@ -58,7 +58,7 @@ class MyThread( qt.QThread ):
 		# while True:
 		# 	print 'going to sleep'
 		# 	time.sleep( 1 )
-		# 	# in order to process events in this thread 
+		# 	# in order to process events in this thread
 		# 	qt.QCoreApplication.processEvents()
 		# 	print 'wake up'
 

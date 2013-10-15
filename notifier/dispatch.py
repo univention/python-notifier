@@ -34,7 +34,7 @@ __dispatchers[ False ] = []
 
 def dispatcher_add( method, min_timeout = True ):
 	"""The notifier supports external dispatcher functions that will be
-	called within each scheduler step. This functionality may be usful
+	called within each scheduler step. This functionality may be useful
 	for applications having an own event mechanism that needs to be
 	triggered as often as possible. This method registers a new
 	dispatcher function. To ensure that the notifier loop does not
@@ -65,7 +65,7 @@ def dispatcher_run():
 	global __dispatchers
 
 	for val in ( True, False ):
-		# there is no need to copz an empty dict
+		# there is no need to copy an empty dict
 		if not __dispatchers[ val ]:
 			continue
 		for disp in __dispatchers[ val ][ : ]:

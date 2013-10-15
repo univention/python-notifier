@@ -54,7 +54,6 @@ def doing_something_else():
 if __name__ == '__main__':
 	notifier.init( notifier.GENERIC )
 
-	
 	_stdout = os.fdopen( sys.stdout.fileno(), 'w', 0 )
 	_stdout.write( 'Starting threads ' )
 	for i in range( 100 ):

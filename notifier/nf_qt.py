@@ -107,7 +107,7 @@ def timer_add( interval, method ):
 	return Timer( interval, method )
 
 def timer_remove( id ):
-	"""Removes _all_ functioncalls to the method given as argument from the
+	"""Removes _all_ function calls to the method given as argument from the
 	scheduler."""
 	if isinstance( id, Timer ):
 		id.stop()
