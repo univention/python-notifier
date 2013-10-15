@@ -107,13 +107,13 @@ def step( sleep = True, external = True ):
 
 def loop():
 	"""Execute main loop forever."""
-	while 1:
+	while True:
 		step()
 
 def _init():
 	global _step, _mainloop
 
-	if _options[ 'x11' ] == True:
+	if _options[ 'x11' ]:
 		import gtk
 		_step = gtk.main_iteration_do
 	else:

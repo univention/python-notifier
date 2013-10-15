@@ -26,7 +26,7 @@
 This is a notifier implementation using Twisted - http://www.twistedmatrix.com/
 Twisted is an async framework that has much in common with pynotifier and kaa.
 
-Here are some links of interest to aid development and debuging:
+Here are some links of interest to aid development and debugging:
 
 The reactor base class, posixbase, and selectreactor:
 http://twistedmatrix.com/trac/browser/trunk/twisted/internet/base.py
@@ -69,7 +69,7 @@ __dispatch_timer = None
 
 class SocketReadCB:
     """
-    An object to implement Twisted's IReadDescriptor.  When there is data 
+    An object to implement Twisted's IReadDescriptor.  When there is data
     available on the socket doRead() will get called.
     """
     implements(IReadDescriptor)
@@ -95,14 +95,14 @@ class SocketReadCB:
     def logPrefix(self):
         return "notifier"
 
-    def connectionLost(self, reason): 
+    def connectionLost(self, reason):
         # Should we do more?
         log.error("connection lost on socket fd=%s" % self.fileno())
 
 
 class SocketWriteCB:
     """
-    An object to implement Twisted's IWriteDescriptor.  When there is data 
+    An object to implement Twisted's IWriteDescriptor.  When there is data
     available on the socket doWrite() will get called.
     """
     implements(IWriteDescriptor)
@@ -128,7 +128,7 @@ class SocketWriteCB:
     def logPrefix(self):
         return "notifier"
 
-    def connectionLost(self, reason): 
+    def connectionLost(self, reason):
         # Should we do more?
         log.error("connection lost on socket fd=%s" % self.fileno())
 
@@ -180,7 +180,7 @@ def timer_add(interval, method):
     seconds. If it returns true it's called again after interval
     seconds, otherwise it is removed from the scheduler. The third
     (optional) argument is a parameter given to the called
-    function. This function returns an unique identifer which can be
+    function. This function returns an unique identifier which can be
     used to remove this timer
     """
     global __timer_id
@@ -192,14 +192,14 @@ def timer_add(interval, method):
 
     t = task.LoopingCall(method)
     t.start(interval/1000.0, now=False)
-    __timers[__timer_id] = t 
+    __timers[__timer_id] = t
 
     return __timer_id
 
 
 def timer_remove(id):
     """
-    Removes the timer identifed by the unique ID from the main loop.
+    Removes the timer identified by the unique ID from the main loop.
     """
     t = __timers.get(id)
     if t != None:
@@ -232,12 +232,12 @@ def step(sleep = True, external = True):
 def loop():
     """
     Instead of calling reactor.run() here we must call step() so we get a
-    chance to call dispatch.dispatcher_run().  Otherwise the dispatchers 
+    chance to call dispatch.dispatcher_run().  Otherwise the dispatchers
     would have to be run in a timer, making something like the 'step' signal
     not getting called every iteration of the main loop like it was intended.
 
     We could also decide between reactor.run() and step() and if we use step()
-    just setup a Timer for the dispatchers at a reasonable rate.  ie:
+    just setup a Timer for the dispatchers at a reasonable rate, i.e.:
 
         global __dispatch_timer
         __dispatch_timer = task.LoopingCall(dispatch.dispatcher_run)

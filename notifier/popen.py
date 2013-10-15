@@ -59,12 +59,12 @@ class Process( signals.Provider ):
 
 		Signals:
 		'stderr' ( pid, line )
-			emmited when the IO_Handler reported another line of input
+			emitted when the IO_Handler reported another line of input
 			(from stdout).
 			pid			: PID of the process that produced the output
 			line		: line of output
 		'stdout' ( pid, line )
-			emmited when the IO_Handler reported another line of input
+			emitted when the IO_Handler reported another line of input
 			(from stderr).
 			pid			: PID of the process that produced the output
 			line		: line of output
@@ -75,7 +75,7 @@ class Process( signals.Provider ):
 		self.signal_new( 'killed' );
 
 		if not shell and not isinstance( cmd, ( list, tuple ) ):
-			self._cmd = shlex.split( str( cmd ) ) # shlex.split can not handle unicode strings
+			self._cmd = shlex.split( str( cmd ) ) # shlex.split can not handle Unicode strings
 		else:
 			self._cmd = cmd
 
@@ -302,7 +302,7 @@ class IO_Handler( signals.Provider ):
 
 	Signals:
 	'closed' ( name )
-		emmited when the file was closed.
+		emitted when the file was closed.
 		name			: name of the IO_Handler
 	"""
 	def __init__( self, name, fp, callback, logger = None ):
@@ -375,7 +375,7 @@ class RunIt( Process ):
 
 	Signals:
 	'finished' ( pid, status[, stdout[, stderr ] ] )
-		emmited when the child process is dead.
+		emitted when the child process is dead.
 		pid				: process ID
 		status			: exit code of the child process
 		stdout, stderr	: are only provided when stdout and/or stderr is
@@ -444,7 +444,7 @@ class Child( object ):
 def run( command, timeout = 0, stdout = True, stderr = True, shell = True ):
 	'''Runs a child process with the <command> and waits <timeout>
 	seconds for its termination. If <stdout> is True the standard output
-	is written to a temporary file. The same can be done for the stanard
+	is written to a temporary file. The same can be done for the standard
 	error output with the argument <stderr>. If <shell> is True the
 	command is passed to a shell. The return value is a Child
 	object. The member variable <pid> is set if the process is still
@@ -510,11 +510,11 @@ def kill( pid, signal = 15, timeout = 0 ):
 			break
 		notifier.step()
 	else:
-		# remove dspatcher function
+		# remove dispatcher function
 		notifier.dispatcher_remove( fake_dispatcher )
 		return None
 
-	# remove dspatcher function
+	# remove dispatcher function
 	notifier.dispatcher_remove( fake_dispatcher )
 
 	if os.WIFSIGNALED( sts ):
