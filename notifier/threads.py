@@ -159,7 +159,7 @@ def _simple_threads_dispatcher():
 			task._signals = []
 		task.unlock()
 
-	return ( len( _threads ) > 0 )
+	return len( _threads ) > 0
 
 def threaded( finished_func ):
 	"""A decorator function making it simple to start a thread. Just

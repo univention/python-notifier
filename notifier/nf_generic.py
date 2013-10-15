@@ -280,7 +280,7 @@ def step( sleep = True, external = True ):
 
 def loop():
 	"""Executes the 'main loop' forever by calling step in an endless loop"""
-	while 1:
+	while True:
 		step()
 
 def _init():
