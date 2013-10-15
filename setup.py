@@ -6,7 +6,7 @@
 # package's setup.py
 #
 # Copyright (C) 2004, 2005, 2006
-#      	Andreas Büsching <crunchy@bitkipper.net>
+#	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License version

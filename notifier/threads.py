@@ -38,10 +38,10 @@ class Simple( object ):
 	thread is finished. Meaning this class helps to handle threads that
 	are meant for doing some calculations and returning the
 	result. Threads that need to communicate with the main thread can
-	not be handeld by this class.
+	not be handled by this class.
 
 	If an exception is raised during the execution of the thread that is
-	based on BaseException it is catched and returned as the result of
+	based on BaseException it is caught and returned as the result of
 	the thread.
 
 	Arguments:
@@ -101,13 +101,13 @@ class Simple( object ):
 
 	@property
 	def trace( self ):
-		"""Contains a formatted traceback of the occured exception during
+		"""Contains a formatted traceback of the occurred exception during
 		thread processing. If no exception has been raised the value is None"""
 		return self._trace
 
 	@property
 	def exc_info( self ):
-		"""Contains information about the exception that es occured
+		"""Contains information about the exception that has occurred
 		during the execution of the thread. The value is the some as
 		returned by sys.exc_info(). If no exception has been raised the
 		value is None"""
@@ -119,7 +119,7 @@ class Simple( object ):
 
 	@property
 	def finished( self ):
-		"""If the thread is finished the property continas the value
+		"""If the thread is finished the property contains the value
 		True else False."""
 		return self._finished
 
