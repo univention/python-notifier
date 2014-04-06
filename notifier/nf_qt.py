@@ -100,8 +100,8 @@ def socket_remove( socket, condition = IO_READ ):
 
 def timer_add( interval, method ):
 	"""The first argument specifies an interval in milliseconds, the
-	second argument a function. This is function is called after
-	interval milliseconds. If it returns true it's called again after
+	second argument a function. This function is called after
+	interval milliseconds. If it returns True it's called again after
 	interval milliseconds, otherwise it is removed from the
 	scheduler."""
 	return Timer( interval, method )

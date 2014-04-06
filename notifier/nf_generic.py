@@ -75,7 +75,7 @@ def _get_fd( obj ):
 def socket_add( id, method, condition = IO_READ ):
 	"""The first argument specifies a socket, the second argument has to
 	be a function that is invoked whenever there is data ready on the
-	socket. The socket/fiel object is passed to the callback method."""
+	socket. The socket/file object is passed to the callback method."""
 	global __sockets, __sock_objects, __poll
 
 	# ensure that already registered condition do not get lost
@@ -97,7 +97,7 @@ def socket_remove( id, condition = IO_READ ):
 	specified the default is IO_READ."""
 	global __sockets, __poll, __sock_objects
 
-	if condition == IO_ALL:
+	if condition & IO_ALL == IO_ALL:
 		for c in ( IO_READ, IO_WRITE, IO_EXCEPT ):
 			socket_remove( id, c )
 		return
@@ -143,7 +143,7 @@ def timer_add( interval, method ):
 
 	The return value is an unique identifier that can be used to remove
 	this timer"""
-	global __timer_id, __timers
+	global __timer_id
 
 	try:
 		__timer_id += 1
@@ -157,7 +157,6 @@ def timer_add( interval, method ):
 
 def timer_remove( id ):
 	"""Removes the timer identified by the unique ID from the main loop."""
-	global __timers
 	if id in __timers:
 		del __timers[ id ]
 
@@ -204,7 +203,7 @@ def step( sleep = True, external = True ):
 					# timer is blocked (recursion), ignore it
 					continue
 				nextCall = timestamp - now
-				if timeout == None or nextCall < timeout:
+				if timeout is None or nextCall < timeout:
 					if nextCall > 0:
 						timeout = nextCall
 					else:
@@ -224,7 +223,7 @@ def step( sleep = True, external = True ):
 					raise
 		elif timeout:
 			time_sleep( timeout / 1000.0 )
-		elif timeout == None: # if there are no timers and no sockets, do not burn the CPU
+		elif timeout is None: # if there are no timers and no sockets, do not burn the CPU
 			time_sleep( dispatch.MIN_TIMER / 1000.0 )
 
 		# handle timers
