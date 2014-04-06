@@ -176,7 +176,7 @@ def socket_remove(id, condition=IO_READ):
 def timer_add(interval, method):
     """
     The first argument specifies an interval in milliseconds, the second
-    argument a function. This is function is called after interval
+    argument a function. This function is called after interval
     seconds. If it returns true it's called again after interval
     seconds, otherwise it is removed from the scheduler. The third
     (optional) argument is a parameter given to the called
@@ -190,7 +190,11 @@ def timer_add(interval, method):
     except OverflowError:
         __timer_id = 0
 
-    t = task.LoopingCall(method)
+    def _method(id_):
+        if not method():
+            timer_remove(id_)
+
+    t = task.LoopingCall(_method, __timer_id)
     t.start(interval/1000.0, now=False)
     __timers[__timer_id] = t
 
@@ -202,7 +206,7 @@ def timer_remove(id):
     Removes the timer identified by the unique ID from the main loop.
     """
     t = __timers.get(id)
-    if t != None:
+    if t is not None:
         t.stop()
         del __timers[id]
 
