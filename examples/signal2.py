@@ -25,29 +25,32 @@
 import notifier
 import notifier.signals as signals
 
+
 def _wait_for_click():
 	print "clicked"
 
-def _wait_for_movement( optional = None ):
+
+def _wait_for_movement(optional=None):
 	print "optional:", optional
 
+
 def _emitting():
-	signals.emit( "clicked" )
+	signals.emit("clicked")
 	# return True
 
 if __name__ == '__main__':
-	notifier.init( notifier.GENERIC )
+	notifier.init(notifier.GENERIC)
 
-	signals.new( "clicked" )
+	signals.new("clicked")
 	try:
-		signals.connect( "clicked2", _wait_for_click )
+		signals.connect("clicked2", _wait_for_click)
 	except signals.UnknownSignalError, e:
 		print 'Exception:', e
-	if not signals.exists( 'clicked3' ):
+	if not signals.exists('clicked3'):
 		print "signal 'clicked3' does not exist"
-	signals.connect( 'clicked', _wait_for_click )
-	signals.connect( 'clicked', notifier.Callback( _wait_for_movement,
-												 'optional something' ) )
-	notifier.timer_add( 3000, _emitting )
+	signals.connect('clicked', _wait_for_click)
+	signals.connect('clicked', notifier.Callback(_wait_for_movement,
+												 'optional something'))
+	notifier.timer_add(3000, _emitting)
 
 	notifier.loop()

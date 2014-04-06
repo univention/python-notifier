@@ -39,14 +39,14 @@ IO_WRITE = select.POLLOUT
 IO_EXCEPT = select.POLLERR
 IO_ALL = IO_READ | IO_WRITE | IO_EXCEPT
 
-( INTERVAL, TIMESTAMP, CALLBACK ) = range( 3 )
+(INTERVAL, TIMESTAMP, CALLBACK) = range(3)
 
 __poll = select.poll()
 __sock_objects = {}
 __sockets = {}
-__sockets[ IO_READ ] = {}
-__sockets[ IO_WRITE ] = {}
-__sockets[ IO_EXCEPT ] = {}
+__sockets[IO_READ] = {}
+__sockets[IO_WRITE] = {}
+__sockets[IO_EXCEPT] = {}
 __timers = {}
 __timer_id = 0
 __min_timer = None
@@ -55,24 +55,27 @@ __step_depth = 0
 __step_depth_max = 0
 
 _options = {
-	'recursive_depth' : 10,
-	'catch_select_errors' : True,
+		'recursive_depth': 10,
+		'catch_select_errors': True,
 }
 
-class NotifierException( Exception ):
+
+class NotifierException(Exception):
 	pass
 
-def _get_fd( obj ):
+
+def _get_fd(obj):
 	"""Returns a file descriptor. obj can be a file descriptor or an
 	object of type socket.socket, file or socket._socketobject"""
-	if isinstance( obj, int ):
+	if isinstance(obj, int):
 		return obj
-	if isinstance( obj, ( socket.socket, file, socket._socketobject ) ):
+	if isinstance(obj, (socket.socket, file, socket._socketobject)):
 		return obj.fileno()
 
 	return -1
 
-def socket_add( id, method, condition = IO_READ ):
+
+def socket_add(id, method, condition=IO_READ):
 	"""The first argument specifies a socket, the second argument has to
 	be a function that is invoked whenever there is data ready on the
 	socket. The socket/file object is passed to the callback method."""
@@ -80,61 +83,64 @@ def socket_add( id, method, condition = IO_READ ):
 
 	# ensure that already registered condition do not get lost
 	conditions = condition
-	for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
-		if id in __sockets[ cond ]:
+	for cond in (IO_READ, IO_WRITE, IO_EXCEPT):
+		if id in __sockets[cond]:
 			conditions |= cond
 
-	fd = _get_fd( id )
+	fd = _get_fd(id)
 	if fd >= 0:
-		__sock_objects[ fd ] = id
-		__sockets[ condition ][ fd ] = method
-		__poll.register( fd, conditions )
+		__sock_objects[fd] = id
+		__sockets[condition][fd] = method
+		__poll.register(fd, conditions)
 	else:
-		raise AttributeError( 'could not get file description: %s' % id )
+		raise AttributeError('could not get file description: %s' % id)
 
-def socket_remove( id, condition = IO_READ ):
+
+def socket_remove(id, condition=IO_READ):
 	"""Removes the given socket from scheduler. If no condition is
 	specified the default is IO_READ."""
 	global __sockets, __poll, __sock_objects
 
 	if condition & IO_ALL == IO_ALL:
-		for c in ( IO_READ, IO_WRITE, IO_EXCEPT ):
-			socket_remove( id, c )
+		for c in (IO_READ, IO_WRITE, IO_EXCEPT):
+			socket_remove(id, c)
 		return
 
 	try:
-		fd = _get_fd( id )
+		fd = _get_fd(id)
 		valid = True
 	except:
 		fd = None
 		valid = False
 		# file descriptor already closed
-		for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
+		for cond in (IO_READ, IO_WRITE, IO_EXCEPT):
 			for descriptor, item in __sock_objects.items():
 				if item == id:
 					fd = descriptor
 					break
-			if fd: break
+			if fd:
+				break
 
 	if valid:
 		# a valid file descriptor may still be registered for other conditions
 		remain = 0
-		for cond in ( IO_READ, IO_WRITE, IO_EXCEPT ):
-			if fd in __sockets[ cond ] and condition != cond:
+		for cond in (IO_READ, IO_WRITE, IO_EXCEPT):
+			if fd in __sockets[cond] and condition != cond:
 				remain |= cond
 
 		if remain:
-			__poll.register( id, remain )
+			__poll.register(id, remain)
 			return
 	# if the file descriptor is invalid (e.g. connection closed) or
 	# there are no remaining conditions it has to be removed completely
-	if fd in __sockets[ condition ]:
-		del __sockets[ condition ][ fd ]
+	if fd in __sockets[condition]:
+		del __sockets[condition][fd]
 	if fd in __sock_objects:
-		__poll.unregister( fd )
-		del __sock_objects[ fd ]
+		__poll.unregister(fd)
+		del __sock_objects[fd]
 
-def timer_add( interval, method ):
+
+def timer_add(interval, method):
 	"""The first argument specifies an interval in milliseconds, the
 	second argument is a function that is called after interval
 	seconds. If it returns true it is called again after interval
@@ -151,27 +157,31 @@ def timer_add( interval, method ):
 		__timer_id = 0
 
 	__timers[ __timer_id ] = \
-	[ interval, int( time() * 1000 ) + interval, method ]
+		[interval, int(time() * 1000) + interval, method]
 
 	return __timer_id
 
-def timer_remove( id ):
+
+def timer_remove(id):
 	"""Removes the timer identified by the unique ID from the main loop."""
 	if id in __timers:
-		del __timers[ id ]
+		del __timers[id]
 
-def dispatcher_add( method, min_timeout = True ):
+
+def dispatcher_add(method, min_timeout=True):
 	"""Adds a dispatcher function. These methods are invoked by the
 	mainloop as the last action of a step."""
 	global __min_timer
-	__min_timer = dispatch.dispatcher_add( method, min_timeout )
+	__min_timer = dispatch.dispatcher_add(method, min_timeout)
 
-def dispatcher_remove( method ):
+
+def dispatcher_remove(method):
 	"""Removes a registered dispatcher function"""
 	global __min_timer
-	__min_timer = dispatch.dispatcher_remove( method )
+	__min_timer = dispatch.dispatcher_remove(method)
 
-def step( sleep = True, external = True ):
+
+def step(sleep=True, external=True):
 	"""Do one step forward in the main loop. First all timers are
 	checked for expiration and if necessary the associated callback
 	function is called. After that the timer list is searched for the
@@ -189,15 +199,15 @@ def step( sleep = True, external = True ):
 
 	try:
 		if __step_depth > __step_depth_max:
-			log.exception( 'maximum recursion depth reached' )
-			raise NotifierException( 'error: maximum recursion depth reached' )
+			log.exception('maximum recursion depth reached')
+			raise NotifierException('error: maximum recursion depth reached')
 
 		# get minInterval for max timeout
 		timeout = None
 		if not sleep:
 			timeout = 0
 		else:
-			now = int( time() * 1000 )
+			now = int(time() * 1000)
 			for interval, timestamp, callback in __timers.values():
 				if not timestamp:
 					# timer is blocked (recursion), ignore it
@@ -209,66 +219,66 @@ def step( sleep = True, external = True ):
 					else:
 						timeout = 0
 						break
-			if __min_timer and ( __min_timer < timeout or timeout is None ):
+			if __min_timer and (__min_timer < timeout or timeout is None):
 				timeout = __min_timer
 
 		# wait for event
 		fds = []
-		if __sockets[ IO_READ ] or __sockets[ IO_WRITE ] or __sockets[ IO_EXCEPT ]:
+		if __sockets[IO_READ] or __sockets[IO_WRITE] or __sockets[IO_EXCEPT]:
 			try:
-				fds = __poll.poll( timeout )
+				fds = __poll.poll(timeout)
 			except select.error, e:
-				log.error( 'error: poll system call interrupted: %s' % str( e ) )
-				if not _options[ 'catch_select_errors' ]:
+				log.error('error: poll system call interrupted: %s' % str(e))
+				if not _options['catch_select_errors']:
 					raise
 		elif timeout:
-			time_sleep( timeout / 1000.0 )
-		elif timeout is None: # if there are no timers and no sockets, do not burn the CPU
-			time_sleep( dispatch.MIN_TIMER / 1000.0 )
+			time_sleep(timeout / 1000.0)
+		elif timeout is None:  # if there are no timers and no sockets, do not burn the CPU
+			time_sleep(dispatch.MIN_TIMER / 1000.0)
 
 		# handle timers
 		for i, timer in __timers.items():
-			timestamp = timer[ TIMESTAMP ]
+			timestamp = timer[TIMESTAMP]
 			if not timestamp or i not in __timers:
 				# timer was unregistered by previous timer, or would
 				# recurse, ignore this timer
 				continue
-			now = int( time() * 1000 )
+			now = int(time() * 1000)
 			if timestamp <= now:
 				# Update timestamp on timer before calling the callback
 				# to prevent infinite recursion in case the callback
 				# calls step().
-				timer[ TIMESTAMP ] = 0
-				if not timer[ CALLBACK ]():
+				timer[TIMESTAMP] = 0
+				if not timer[CALLBACK]():
 					if i in __timers:
-						del __timers[ i ]
+						del __timers[i]
 				else:
 					# Find a moment in the future. If interval is 0, we
 					# just reuse the old timestamp, doesn't matter.
-					if timer[ INTERVAL ]:
-						now = int( time() * 1000 )
-						timestamp += timer[ INTERVAL ]
+					if timer[INTERVAL]:
+						now = int(time() * 1000)
+						timestamp += timer[INTERVAL]
 						while timestamp <= now:
-							timestamp += timer[ INTERVAL ]
-					timer[ TIMESTAMP ] = timestamp
+							timestamp += timer[INTERVAL]
+					timer[TIMESTAMP] = timestamp
 
 		# handle sockets
 		if fds:
 			for fd, condition in fds:
-				sock_obj = __sock_objects[ fd ]
+				sock_obj = __sock_objects[fd]
 				# check for closed pipes/sockets
-				if condition in ( select.POLLHUP, select.POLLNVAL ):
-					socket_remove( sock_obj, IO_ALL )
+				if condition in (select.POLLHUP, select.POLLNVAL):
+					socket_remove(sock_obj, IO_ALL)
 					continue
 				# check for errors
 				if condition == select.POLLERR:
-					if fd in __sockets[ IO_EXCEPT ] and not __sockets[ IO_EXCEPT ][ fd ]( sock_obj ):
-						socket_remove( sock_obj, IO_EXCEPT )
+					if fd in __sockets[IO_EXCEPT] and not __sockets[IO_EXCEPT][fd](sock_obj):
+						socket_remove(sock_obj, IO_EXCEPT)
 					continue
-				for cond in ( IO_READ, IO_WRITE ):
+				for cond in (IO_READ, IO_WRITE):
 					if cond & condition and fd in __sockets[ cond ] and \
-						   not __sockets[ cond ][ fd ]( sock_obj ):
-						socket_remove( sock_obj, cond )
+							not __sockets[cond][fd](sock_obj):
+						socket_remove(sock_obj, cond)
 
 		# handle external dispatchers
 		if external:
@@ -277,13 +287,15 @@ def step( sleep = True, external = True ):
 		__step_depth -= 1
 		__in_step = False
 
+
 def loop():
 	"""Executes the 'main loop' forever by calling step in an endless loop"""
 	while True:
 		step()
 
+
 def _init():
 	global __step_depth_max
 
-	log.set_level( log.CRITICAL )
-	__step_depth_max = _options[ 'recursive_depth' ]
+	log.set_level(log.CRITICAL)
+	__step_depth_max = _options['recursive_depth']

@@ -29,11 +29,13 @@ import sys
 import thread
 import traceback
 
-__all__ = [ 'Simple' ]
+__all__ = ['Simple']
 
 _threads = []
 
-class Simple( object ):
+
+class Simple(object):
+
 	"""A simple class to start a thread and getting notified when the
 	thread is finished. Meaning this class helps to handle threads that
 	are meant for doing some calculations and returning the
@@ -51,7 +53,8 @@ class Simple( object ):
 	  thread: this thread object
 	  result: return value of the thread function.
 	"""
-	def __init__( self, name, function, callback ):
+
+	def __init__(self, name, function, callback):
 		self._name = name
 		self._function = function
 		self._callback = callback
@@ -63,18 +66,18 @@ class Simple( object ):
 		self._lock = thread.allocate_lock()
 		global _threads
 		if not _threads:
-			notifier.dispatcher_add( _simple_threads_dispatcher )
-		_threads.append( self )
+			notifier.dispatcher_add(_simple_threads_dispatcher)
+		_threads.append(self)
 
-	def __del__( self ):
+	def __del__(self):
 		if self._exc_info is not None:
 			del self._exc_info
 
-	def run( self ):
+	def run(self):
 		"""Starts the thread"""
-		self._id = thread.start_new_thread( self._run, () )
+		self._id = thread.start_new_thread(self._run, ())
 
-	def _run( self ):
+	def _run(self):
 		"""Encapsulates the given thread function to handle the return
 		value in a thread-safe way and to catch exceptions raised from
 		within it."""
@@ -84,7 +87,7 @@ class Simple( object ):
 			exc_info = None
 		except BaseException, e:
 			exc_info = sys.exc_info()
-			trace = traceback.format_tb( sys.exc_info()[ 2 ] )
+			trace = traceback.format_tb(sys.exc_info()[2])
 			tmp = e
 		self._lock.acquire()
 		self._result = tmp
@@ -94,19 +97,19 @@ class Simple( object ):
 		self._lock.release()
 
 	@property
-	def result( self ):
+	def result(self):
 		"""Contains the result of the thread function or the exception
 		that occurred during thread processing"""
 		return self._result
 
 	@property
-	def trace( self ):
+	def trace(self):
 		"""Contains a formatted traceback of the occurred exception during
 		thread processing. If no exception has been raised the value is None"""
 		return self._trace
 
 	@property
-	def exc_info( self ):
+	def exc_info(self):
 		"""Contains information about the exception that has occurred
 		during the execution of the thread. The value is the some as
 		returned by sys.exc_info(). If no exception has been raised the
@@ -114,63 +117,66 @@ class Simple( object ):
 		return self._exc_info
 
 	@property
-	def name( self ):
+	def name(self):
 		return self._name
 
 	@property
-	def finished( self ):
+	def finished(self):
 		"""If the thread is finished the property contains the value
 		True else False."""
 		return self._finished
 
-	def lock( self ):
+	def lock(self):
 		"""Locks a thread local lock object"""
 		self._lock.acquire()
 
-	def unlock( self ):
+	def unlock(self):
 		"""Unlocks a thread local lock object"""
 		self._lock.release()
 
-	def announce( self ):
-		self._callback( self, self._result )
+	def announce(self):
+		self._callback(self, self._result)
 
-class Enhanced( Simple ):
-	def __init__( self, function, callback ):
-		Simple.__init__( self, '__enhanced__', function, callback )
+
+class Enhanced(Simple):
+
+	def __init__(self, function, callback):
+		Simple.__init__(self, '__enhanced__', function, callback)
 		self._signals = []
 
-	def signal_emit( self, signal, *args ):
+	def signal_emit(self, signal, *args):
 		self.lock()
-		self._signals.append( ( signal, args ) )
+		self._signals.append((signal, args))
 		self.unlock()
+
 
 def _simple_threads_dispatcher():
 	"""Dispatcher function checking for finished threads"""
 	global _threads
 
-	for task in _threads[ : ]:
+	for task in _threads[:]:
 		task.lock()
 		if task.finished:
 			task.announce()
-			_threads.remove( task )
-		elif hasattr( task, '_signals' ):
+			_threads.remove(task)
+		elif hasattr(task, '_signals'):
 			for signal, args in task._signals:
-				task.signal_emit( signal, *args )
+				task.signal_emit(signal, *args)
 			task._signals = []
 		task.unlock()
 
-	return len( _threads ) > 0
+	return len(_threads) > 0
 
-def threaded( finished_func ):
+
+def threaded(finished_func):
 	"""A decorator function making it simple to start a thread. Just
 	add the decorator to the function that should be the main thread
 	function. The argument is the function that should be invoked when
 	the thread has finished"""
 
-	def inner_thread( func ):
-		def wrapped( *args, **kwargs ):
-			thread = Enhanced( notifier.Callback( func, *args, **kwargs ), finished_func )
+	def inner_thread(func):
+		def wrapped(*args, **kwargs):
+			thread = Enhanced(notifier.Callback(func, *args, **kwargs), finished_func)
 			thread.run()
-		return functools.wraps( func )( wrapped )
+		return functools.wraps(func)(wrapped)
 	return inner_thread
-
