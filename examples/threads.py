@@ -34,7 +34,7 @@ def my_thread( words ):
 	return words
 
 def done_with_it( thread, result, another ):
-	print "Thread '%s' is finished" % thread.name()
+	print "Thread '%s' is finished" % thread.name
 	print "Argument:", another
 	print "Result:", result
 
