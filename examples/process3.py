@@ -22,37 +22,40 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-import os, sys
+import os
+import sys
 
 import notifier
 import notifier.popen
+
 
 def tick():
 	print 'tick'
 	return True
 
+
 def give_birth():
-	ls = notifier.popen.run( '/bin/ls -ltr /etc', stderr = False, shell = False )
+	ls = notifier.popen.run('/bin/ls -ltr /etc', stderr=False, shell=False)
 	# process dead?
 	if ls.pid == None:
 		print ls.stdout.read()
 		ls.stdout.close()
 
-	sleep = notifier.popen.run( 'sleep 5', timeout = 3, stderr = False, stdout = False, shell = False )
+	sleep = notifier.popen.run('sleep 5', timeout=3, stderr=False, stdout=False, shell=False)
 	if sleep.pid:
 		print 'process still running', sleep.pid
-		ret = notifier.popen.kill( sleep )
+		ret = notifier.popen.kill(sleep)
 		print 'killed', ret
 
 	return False
 
 if __name__ == '__main__':
-	notifier.init( notifier.GENERIC )
+	notifier.init(notifier.GENERIC)
 
 	# run processes
-	notifier.timer_add( 1500, give_birth )
+	notifier.timer_add(1500, give_birth)
 
 	# show we can still do things
-	notifier.timer_add( 500, tick )
+	notifier.timer_add(500, tick)
 
 	notifier.loop()

@@ -27,47 +27,51 @@ import notifier
 
 import sys
 
-class QTestApp( qt.QCoreApplication ):
-	def __init__( self ):
-		qt.QCoreApplication.__init__( self, sys.argv )
 
-		self.timer_id = notifier.timer_add( 1000, self.timerTest )
+class QTestApp(qt.QCoreApplication):
+
+	def __init__(self):
+		qt.QCoreApplication.__init__(self, sys.argv)
+
+		self.timer_id = notifier.timer_add(1000, self.timerTest)
 		self.dispatch_it = 10
 
-	def recvQuit( self, mmsg, data = None ):
+	def recvQuit(self, mmsg, data=None):
 		if version == 4:
 			self.quit()
 		else:
 			self.exit_loop()
 
-	def timerTest( self ):
+	def timerTest(self):
 		print 'tick'
 		return True
 
-	def _dispatch( self ):
+	def _dispatch(self):
 		print 'dispatch'
 		self.dispatch_it -= 1
 		return self.dispatch_it > 0
 
-class MyThread( qt.QThread ):
-	def run( self ):
-		self._timer = notifier.timer_add( 2000, self.tick )
+
+class MyThread(qt.QThread):
+
+	def run(self):
+		self._timer = notifier.timer_add(2000, self.tick)
 
 		notifier.loop()
 		# import time
 		# while True:
 		# 	print 'going to sleep'
 		# 	time.sleep( 1 )
-		# 	# in order to process events in this thread
+		# in order to process events in this thread
 		# 	qt.QCoreApplication.processEvents()
 		# 	print 'wake up'
 
-	def tick( self ):
+	def tick(self):
 		print 'ticxk me'
 		return True
 
 if __name__ == '__main__':
-	notifier.init( notifier.QT )
+	notifier.init(notifier.QT)
 	app = QTestApp()
 
 	mt = MyThread()

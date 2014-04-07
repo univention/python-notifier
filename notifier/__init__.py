@@ -43,14 +43,15 @@ loop = None
 step = None
 
 # notifier types
-( GENERIC, QT, GTK, TWISTED ) = range( 4 )
+(GENERIC, QT, GTK, TWISTED) = range(4)
 
 # socket conditions
 IO_READ = None
 IO_WRITE = None
 IO_EXCEPT = None
 
-def init( model = GENERIC, **kwargs ):
+
+def init(model=GENERIC, **kwargs):
 	global timer_add
 	global socket_add
 	global dispatcher_add
@@ -69,7 +70,7 @@ def init( model = GENERIC, **kwargs ):
 	elif model == TWISTED:
 		import nf_twisted as nf_impl
 	else:
-		raise Exception( 'unknown notifier model' )
+		raise Exception('unknown notifier model')
 
 	socket_add = nf_impl.socket_add
 	socket_remove = nf_impl.socket_remove
@@ -83,38 +84,41 @@ def init( model = GENERIC, **kwargs ):
 	IO_WRITE = nf_impl.IO_WRITE
 	IO_EXCEPT = nf_impl.IO_EXCEPT
 
-	if hasattr( nf_impl, '_options' ) and type( nf_impl._options ) == dict:
+	if hasattr(nf_impl, '_options') and type(nf_impl._options) == dict:
 		for k, v in kwargs.items():
-			if nf_impl._options.has_key( k ):
-				nf_impl._options[ k ] = v
+			if nf_impl._options.has_key(k):
+				nf_impl._options[k] = v
 
-	if hasattr( nf_impl, '_init' ):
+	if hasattr(nf_impl, '_init'):
 		nf_impl._init()
 
+
 class Callback:
-	def __init__( self, function, *args, **kwargs ):
+
+	def __init__(self, function, *args, **kwargs):
 		self._function = function
 		self._args = args
 		self._kwargs = kwargs
 
-	def __call__( self, *args ):
-		tmp = list( args )
+	def __call__(self, *args):
+		tmp = list(args)
 		if self._args:
-			tmp.extend( self._args )
-		return self._function( *tmp, **self._kwargs )
+			tmp.extend(self._args)
+		return self._function(*tmp, **self._kwargs)
 
-	def __cmp__( self, rvalue ):
-		if not callable( rvalue ): return -1
+	def __cmp__(self, rvalue):
+		if not callable(rvalue):
+			return -1
 
-		if ( isinstance( rvalue, Callback ) and \
-			   self._function == rvalue._function ) or \
-			   self._function == rvalue:
+		if (isinstance(rvalue, Callback) and
+				self._function == rvalue._function ) or \
+				self._function == rvalue:
 			return 0
 
 		return -1
 
-	def __nonzero__( self ):
-		return bool( self._function )
+	def __nonzero__(self):
+		return bool(self._function)
 
-	def __hash__( self ):
+	def __hash__(self):
 		return self._function.__hash__()

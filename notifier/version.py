@@ -22,10 +22,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-major_number    = 0
-minor_number    = 9
+major_number = 0
+minor_number = 9
 revision_number = 5
-extension       = ''
+extension = ''
 
-VERSION = "%d.%d.%d%s" % ( major_number, minor_number,
-						   revision_number, extension )
+VERSION = "%d.%d.%d%s" % (major_number, minor_number,
+						  revision_number, extension)

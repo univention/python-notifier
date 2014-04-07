@@ -22,27 +22,30 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-import os, sys
+import os
+import sys
 
 import notifier
 import notifier.popen
 
+
 def tick():
 	print 'tick'
 	cmd = ['ps', 'h', '-eo', 'pcpu,vsize,rssize,pmem,user,pid,command', '--sort=-pcpu']
-	proc = notifier.popen.Process( cmd, stdout = True )
-	proc.signal_connect( 'stdout', find_result )
+	proc = notifier.popen.Process(cmd, stdout=True)
+	proc.signal_connect('stdout', find_result)
 	proc.start()
 
 	return True
 
-def find_result( pid, result ):
+
+def find_result(pid, result):
 	for line in result:
 		print line
 
 if __name__ == '__main__':
-	notifier.init( notifier.GENERIC )
+	notifier.init(notifier.GENERIC)
 
-	notifier.timer_add( 5000, tick )
+	notifier.timer_add(5000, tick)
 
 	notifier.loop()
