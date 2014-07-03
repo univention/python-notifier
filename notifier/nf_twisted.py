@@ -221,6 +221,8 @@ def step(sleep = True, external = True):
     if reactor.running:
         try:
             t = sleep and reactor.running and reactor.timeout()
+            if dispatch.dispatcher_count():
+		t = dispatch.MIN_TIMER / 1000.0
             reactor.doIteration(t)
             reactor.runUntilCurrent()
         except:

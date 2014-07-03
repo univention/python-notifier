@@ -24,7 +24,7 @@
 
 """Simple test program for the Twisted notifier."""
 
-import os, sys
+import os, sys, time
 
 #import twisted
 
@@ -32,17 +32,23 @@ import notifier
 
 notifier.init( notifier.TWISTED )
 
-def hello( *args ):
-	print 'Hello World'
+_stdout = os.fdopen( sys.stdout.fileno(), 'w', 0 )
 
 # notifier-timer testfunction
 def timer_test():
-	print "timer_test"
-#	 notifier.dispatcher_add( notifier.Callback( dispatcher_test, 1, 2, 3 ) )
+	print "\ntimer_test"
+	# notifier.dispatcher_add( notifier.Callback( dispatcher_test, 1, 2, 3 ) )
 	return True
 
+def timer_once():
+	print "\njust once"
+	return False
+
 def dispatcher_test( a, b, c ):
-	print 'dispatcher', a, b, c
+	global _stdout
+	_stdout.write( '.' )
+	time.sleep( 0.02 )
+	_stdout.write( '\033[1D*' )
 	return True
 
 def _stdin( fd ):
@@ -51,6 +57,7 @@ def _stdin( fd ):
 	return False
 
 notifier.socket_add( 0, _stdin )
+notifier.timer_add( 1400, notifier.Callback( timer_once ) )
 notifier.timer_add( 4000, notifier.Callback( timer_test ) )
 notifier.dispatcher_add( notifier.Callback( dispatcher_test, 1, 2, 3 ) )
 notifier.loop()

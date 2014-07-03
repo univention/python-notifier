@@ -1,5 +1,11 @@
 2014-07-03  Andreas Büsching  <crunchy@bitkipper.net>
 
+	* examples/test-twisted.py: demonstrate usage of dispatcher and
+	one-shot timer
+
+	* notifier/nf_twisted.py (step): if dispatcher are registered
+	minimum timer is set for timeout
+
 	* notifier/version.py: set version to 0.9.6
 
 	* apply patch from Jascha Geerds <geerds@univention.de>: Fix an
