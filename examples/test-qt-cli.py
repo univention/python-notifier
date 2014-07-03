@@ -63,7 +63,7 @@ class MyThread( qt.QThread ):
 		# 	print 'wake up'
 
 	def tick( self ):
-		print 'ticxk me'
+		print 'tick my thread'
 		return True
 
 if __name__ == '__main__':

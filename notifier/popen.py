@@ -164,7 +164,8 @@ class Process( signals.Provider ):
 		self.__dead = True
 		# check io handlers if there is pending output
 		for output in ( self.stdout, self.stderr ):
-			if output: output.flush_buffer()
+			if output:
+				output._handle_input(flush_partial_lines=True)
 		self.signal_emit( 'killed', pid, status )
 
 	def _closed( self, name ):
@@ -324,13 +325,13 @@ class IO_Handler( signals.Provider ):
 		self.fp.close()
 		self.signal_emit( 'closed', self.name )
 
-	def _handle_input( self, socket ):
+	def _handle_input( self, socket=None, flush_partial_lines=False ):
 		"""
 		Handle data input from socket.
 		"""
 		try:
 			self.fp.flush()
-			data = self.fp.read( 10000 )
+			data = self.fp.read( 65535 )
 		except IOError, (errno, msg):
 			if errno == 11:
 				# Resource temporarily unavailable; if we try to read on a
@@ -339,6 +340,11 @@ class IO_Handler( signals.Provider ):
 			data = None
 
 		if not data:
+			if self.saved:
+				# Although socket has no data anymore, we still have data left
+				# over in the buffer.
+				self.flush_buffer()
+				return True
 			self.close()
 			return False
 
@@ -354,7 +360,7 @@ class IO_Handler( signals.Provider ):
 			lines[ 0 ] = self.saved + lines[ 0 ]
 			self.saved = ''
 		# Only one partial line?
-		if partial_line:
+		if partial_line and not flush_partial_lines:
 			self.saved = lines[ -1 ]
 			del lines[ -1 ]
 

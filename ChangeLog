@@ -1,3 +1,20 @@
+2014-07-03  Andreas Büsching  <crunchy@bitkipper.net>
+
+	* notifier/version.py: set version to 0.9.6
+
+	* apply patch from Jascha Geerds <geerds@univention.de>: Fix an
+	erroneous handling with command output. In certain cases this
+	could lead to the loss of some output data.
+
+	* apply patches from Philipp Hahn <hahn@univention.de>: some
+	little cleanup which I collected while debugging a UMC-UVMM
+	problem
+
+	* apply patches from SpaceOne <space@wechall.net>: code cleanup;
+	remove unneeded globals; fix check for None (== None → is None)
+	fix stopping of loop when timer returns falsy value
+	fix typo in example script
+	
 2012-03-31  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.9.5

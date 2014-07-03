@@ -76,7 +76,9 @@ class Provider( object ):
 
 def _select_signals( signals ):
 	global __signals
-	return signals is None and __signals or signals
+	if signals is None:
+		return __signals
+	return signals
 
 def new( signal, signals = None ):
 	_signals = _select_signals( signals )

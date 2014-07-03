@@ -41,15 +41,14 @@ def timer_cb( a ):
 
 def signal_cb( signal, a, b ):
 	print 'signal arguments', signal, a, b
+	# disconnect global signal
 	signals.disconnect( 'test-signal', signal_cb )
 
 notifier.init( notifier.GENERIC )
 
 signals.new( 'test-signal' )
-signals.connect( 'test-signal', notifier.Callback( signal_cb, 1, 2,
-												   'global signal' ) )
-test.signal_connect( 'test-signal',notifier.Callback( signal_cb, 1, 2,
-											   'TestSignal signal' ) )
+signals.connect( 'test-signal', notifier.Callback( signal_cb, 1, 2, 'global signal' ) )
+test.signal_connect( 'test-signal',notifier.Callback( signal_cb, 1, 2, 'TestSignal signal' ) )
 notifier.timer_add( 2000, notifier.Callback( timer_cb, 7 ) )
 
 notifier.loop()

@@ -38,8 +38,6 @@ def stdout( pid, line ):
 	output.extend( line )
 	if not type( line ) in ( list, tuple ):
 		line = [ line ]
-#	for l in line:
-#		print "(%d>1): %s" % ( pid, l )
 
 def stderr( pid, line ):
 	if not type( line ) in ( list, tuple ):
@@ -50,7 +48,6 @@ def stderr( pid, line ):
 def died( pid, status ):
 	global output, lineno
 	print ">>> process %d died" % pid, status
-	# sys.exit( status )
 
 	if not output:
 		print ">>> process %d produced NO output" % pid, status
@@ -63,7 +60,6 @@ def died( pid, status ):
 	notifier.timer_add( 100, run_ls )
 
 def tick():
-	# print 'tick'
 	return True
 
 def runit():
