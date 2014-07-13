@@ -260,7 +260,7 @@ def loop():
         except:
             import traceback
             log.debug("exception: %s" % (traceback.format_exc(),))
-            break
+            raise
 
 
 def _init():
