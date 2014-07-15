@@ -222,7 +222,7 @@ def step(sleep = True, external = True):
         try:
             t = sleep and reactor.running and reactor.timeout()
             if dispatch.dispatcher_count():
-		t = dispatch.MIN_TIMER / 1000.0
+                 t = dispatch.MIN_TIMER / 1000.0
             reactor.doIteration(t)
             reactor.runUntilCurrent()
         except:
@@ -254,9 +254,13 @@ def loop():
     while True:
         try:
             step()
-        except:
+        except (SystemExit, KeyboardInterrupt):
             log.debug("exiting loop")
             break
+        except:
+            import traceback
+            log.debug("exception: %s" % (traceback.format_exc(),))
+            raise
 
 
 def _init():
