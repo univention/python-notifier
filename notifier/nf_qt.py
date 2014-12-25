@@ -5,7 +5,7 @@
 #
 # QT notifier wrapper
 #
-# Copyright (C) 2004, 2005, 2006, 2007
+# Copyright (C) 2004, 2005, 2006, 2007, 2014
 #	Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -43,6 +43,9 @@ _qt_socketIDs[ IO_EXCEPT ] = {}
 __min_timer = None
 __exit = None
 
+class NotifierErrorQtApplicationUnset(Exception):
+	pass
+
 def _get_fd( obj ):
 	"""Returns a file descriptor. obj can be a file descriptor or an
 	object of type socket.socket, file or socket._socketobject"""
@@ -69,7 +72,11 @@ class Socket( qt.QSocketNotifier ):
 
 class Timer( qt.QTimer ):
 	def __init__( self, ms, method ):
-		qt.QTimer.__init__( self )
+		if qt.QCoreApplication.instance() is None:
+			# create a new Qt Application instance before calling timer_add, e.g.
+			# app = qt.QCoreApplication([])
+			raise NotifierErrorQtApplicationUnset()
+		qt.QTimer.__init__(self, qt.QCoreApplication.instance())
 		self.method = method
 		self.timeout.connect( self.slotTick )
 		self.start( ms )
