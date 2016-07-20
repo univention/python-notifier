@@ -168,7 +168,7 @@ shown in the following code snippet.
 	# within the object
 	class Test2( object ):
 		def __init__( self, test ):
-			test.signals_connect( 'signal1', self._cb_signal )
+			test.signal_connect( 'signal1', self._cb_signal )
 
 		def _cb_signal( self, signal ):
 			pass
