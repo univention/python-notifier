@@ -26,7 +26,7 @@ import notifier
 
 import functools
 import sys
-import thread
+import threading
 import traceback
 
 __all__ = [ 'Simple' ]
@@ -59,8 +59,8 @@ class Simple( object ):
 		self._trace = None
 		self._exc_info = None
 		self._finished = False
-		self._id = None
-		self._lock = thread.allocate_lock()
+		self._thread = threading.Thread(target=self._run, name=self._name)
+		self._lock = threading.Lock()
 		global _threads
 		if not _threads:
 			notifier.dispatcher_add( _simple_threads_dispatcher )
@@ -72,26 +72,28 @@ class Simple( object ):
 
 	def run( self ):
 		"""Starts the thread"""
-		self._id = thread.start_new_thread( self._run, () )
+		self._thread.start()
 
 	def _run( self ):
 		"""Encapsulates the given thread function to handle the return
 		value in a thread-safe way and to catch exceptions raised from
 		within it."""
 		try:
-			tmp = self._function()
+			result = self._function()
 			trace = None
 			exc_info = None
-		except BaseException, e:
+		except BaseException as exc:
 			exc_info = sys.exc_info()
 			trace = traceback.format_tb( sys.exc_info()[ 2 ] )
-			tmp = e
-		self._lock.acquire()
-		self._result = tmp
-		self._trace = trace
-		self._exc_info = exc_info
-		self._finished = True
-		self._lock.release()
+			result = exc
+		self.lock()
+		try:
+			self._result = result
+			self._trace = trace
+			self._exc_info = exc_info
+			self._finished = True
+		finally:
+			self.unlock()
 
 	@property
 	def result( self ):
@@ -150,14 +152,16 @@ def _simple_threads_dispatcher():
 
 	for task in _threads[ : ]:
 		task.lock()
-		if task.finished:
-			task.announce()
-			_threads.remove( task )
-		elif hasattr( task, '_signals' ):
-			for signal, args in task._signals:
-				task.signal_emit( signal, *args )
-			task._signals = []
-		task.unlock()
+		try:
+			if task.finished:
+				task.announce()
+				_threads.remove( task )
+			elif hasattr( task, '_signals' ):
+				for signal, args in task._signals:
+					task.signal_emit( signal, *args )
+				task._signals = []
+		finally:
+			task.unlock()
 
 	return len( _threads ) > 0
 
