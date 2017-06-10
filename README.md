@@ -168,7 +168,7 @@ shown in the following code snippet.
 	# within the object
 	class Test2( object ):
 		def __init__( self, test ):
-			test.signals_connect( 'signal1', self._cb_signal )
+			test.signal_connect( 'signal1', self._cb_signal )
 
 		def _cb_signal( self, signal ):
 			pass
@@ -189,7 +189,7 @@ function as shown in the following snippet.
 	signals.emit( 'signal1', a, b )
 
 	# within an object
-	test.signals_emit( 'signal1', a, b, c )
+	test.signal_emit( 'signal1', a, b, c )
 
 The signature of the callback function for a signal depends on the
 specific signal provider, e.g. each signal may provide as many arguments
