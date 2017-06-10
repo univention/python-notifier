@@ -51,7 +51,7 @@ def _get_fd( obj ):
 	object of type socket.socket, file or socket._socketobject"""
 	if isinstance( obj, int ):
 		return obj
-	if isinstance( obj, ( socket.socket, file, socket._socketobject ) ):
+	if hasattr(obj, 'fileno'):
 		return obj.fileno()
 
 	return -1

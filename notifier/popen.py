@@ -208,7 +208,7 @@ class Process( signals.Provider ):
 		self.stopping = True
 
 		if self.is_alive() and not self.__kill_timer:
-			cb = Callback( self.__kill, 15 )
+			cb = notifier.Callback( self.__kill, 15 )
 			self.__kill_timer = notifier.timer_add( 0, cb )
 
 	def __kill( self, signal ):
@@ -226,9 +226,9 @@ class Process( signals.Provider ):
 			pass
 
 		if signal == 15:
-			cb = Callback( self.__kill, 9 )
+			cb = notifier.Callback( self.__kill, 9 )
 		else:
-			cb = Callback( self.__killall, 15 )
+			cb = notifier.Callback( self.__killall, 15 )
 
 		self.__kill_timer = notifier.timer_add( 3000, cb )
 		return False
@@ -270,7 +270,7 @@ class Process( signals.Provider ):
 
 		log.info( 'kill -%d %s' % ( signal, self.binary ) )
 		if signal == 15:
-			cb = Callback( self.__killall, 9 )
+			cb = notifier.Callback( self.__killall, 9 )
 			self.__kill_timer = notifier.timer_add( 2000, cb )
 		else:
 			log.critical( 'PANIC %s' % self.binary )
