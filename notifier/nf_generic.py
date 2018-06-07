@@ -53,6 +53,7 @@ __min_timer = None
 __in_step = False
 __step_depth = 0
 __step_depth_max = 0
+__uint32_max = 2**31 - 1
 
 _options = {
 	'recursive_depth' : 10,
@@ -204,7 +205,7 @@ def step( sleep = True, external = True ):
 					continue
 				nextCall = timestamp - now
 				if timeout is None or nextCall < timeout:
-					if nextCall > 0:
+					if nextCall > 0 and nextCall < __uint32_max:
 						timeout = nextCall
 					else:
 						timeout = 0
