@@ -66,10 +66,6 @@ class Simple( object ):
 			notifier.dispatcher_add( _simple_threads_dispatcher )
 		_threads.append( self )
 
-	def __del__( self ):
-		if self._exc_info is not None:
-			del self._exc_info
-
 	def run( self ):
 		"""Starts the thread"""
 		self._id = thread.start_new_thread( self._run, () )
