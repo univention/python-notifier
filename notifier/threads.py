@@ -79,8 +79,12 @@ class Simple( object ):
 			trace = None
 			exc_info = None
 		except BaseException as exc:
-			exc_info = sys.exc_info()
-			trace = traceback.format_tb( sys.exc_info()[ 2 ] )
+			try:
+				etype, value, tb = sys.exc_info()
+				trace = traceback.format_tb(tb)
+				exc_info = (etype, value, None)
+			finally:
+				etype = value = tb = None
 			result = exc
 		self.lock()
 		try:
