@@ -78,10 +78,14 @@ class Simple( object ):
 			tmp = self._function()
 			trace = None
 			exc_info = None
-		except BaseException, e:
-			exc_info = sys.exc_info()
-			trace = traceback.format_tb( sys.exc_info()[ 2 ] )
-			tmp = e
+		except BaseException as exc:
+			try:
+				etype, value, tb = sys.exc_info()
+				trace = traceback.format_tb(tb)
+				exc_info = (etype, value, None)
+				tmp = exc
+			finally:
+				etype = value = tb = None
 		self._lock.acquire()
 		self._result = tmp
 		self._trace = trace
