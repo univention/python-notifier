@@ -28,7 +28,7 @@ import os
 import sys
 import time
 
-#import twisted
+# import twisted
 
 import notifier
 
@@ -40,13 +40,13 @@ _stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 
 
 def timer_test():
-	print "\ntimer_test"
+	print("\ntimer_test")
 	# notifier.dispatcher_add( notifier.Callback( dispatcher_test, 1, 2, 3 ) )
 	return True
 
 
 def timer_once():
-	print "\njust once"
+	print("\njust once")
 	return False
 
 
@@ -59,7 +59,7 @@ def dispatcher_test(a, b, c):
 
 
 def _stdin(fd):
-	print 'read: ' + os.read(fd, 512)
+	print('read: %s' % os.read(fd, 512))
 	notifier.socket_remove(0)
 	return False
 

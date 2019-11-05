@@ -42,11 +42,11 @@ class QTestApp(qt.QCoreApplication):
 			self.exit_loop()
 
 	def timerTest(self):
-		print 'tick'
+		print('tick')
 		return True
 
 	def _dispatch(self):
-		print 'dispatch'
+		print('dispatch')
 		self.dispatch_it -= 1
 		return self.dispatch_it > 0
 
@@ -65,7 +65,7 @@ class MyThread(qt.QThread):
 		# 	print 'wake up'
 
 	def tick(self):
-		print 'tick my thread'
+		print('tick my thread')
 		return True
 
 
@@ -77,4 +77,4 @@ if __name__ == '__main__':
 	mt.start()
 
 	#notifier.dispatcher_add( app._dispatch )
-	print 'exit code: %d' % notifier.loop()
+	print('exit code: %d' % notifier.loop())

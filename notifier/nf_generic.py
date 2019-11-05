@@ -23,7 +23,7 @@
 # 02110-1301 USA
 
 """Simple mainloop that watches sockets and timers."""
-
+from __future__ import absolute_import
 # python core packages
 from time import time, sleep as time_sleep
 
@@ -31,8 +31,8 @@ import select
 import socket
 
 # internal packages
-import log
-import dispatch
+from . import log
+from . import dispatch
 
 IO_READ = select.POLLIN
 IO_WRITE = select.POLLOUT
@@ -158,7 +158,7 @@ def timer_add(interval, method):
 		__timer_id = 0
 
 	__timers[__timer_id] = \
-		[interval, int(time() * 1000) + interval, method]
+			[interval, int(time() * 1000) + interval, method]
 
 	return __timer_id
 
@@ -228,7 +228,7 @@ def step(sleep=True, external=True):
 		if __sockets[IO_READ] or __sockets[IO_WRITE] or __sockets[IO_EXCEPT]:
 			try:
 				fds = __poll.poll(timeout)
-			except select.error, e:
+			except select.error as e:
 				log.error('error: poll system call interrupted: %s' % str(e))
 				if not _options['catch_select_errors']:
 					raise
@@ -269,7 +269,8 @@ def step(sleep=True, external=True):
 				try:
 					sock_obj = __sock_objects[fd]
 				except KeyError:
-					continue  # ignore recently removed socket (by timer in this step() call)
+					# ignore recently removed socket (by timer in this step() call)
+					continue
 				# check for closed pipes/sockets
 				if condition in (select.POLLHUP, select.POLLNVAL):
 					socket_remove(sock_obj, IO_ALL)

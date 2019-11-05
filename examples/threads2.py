@@ -41,17 +41,17 @@ def my_thread(words):
 
 
 def done_with_it(thread, result, another):
-	print "-> Thread '%s' is finished" % thread.name
-	print "  Argument:", another
+	print("-> Thread '%s' is finished" % thread.name)
+	print("  Argument:", another)
 	if isinstance(thread.result, BaseException):
-		print "  Error occurred during thread processing:", type(thread.result), thread.result
-		print "  Details:\n%s" % ''.join(thread.trace)
+		print("  Error occurred during thread processing:", type(thread.result), thread.result)
+		print("  Details:\n%s" % ''.join(thread.trace))
 	else:
-		print "  Counted from 0 to %d" % result
+		print("  Counted from 0 to %d" % result)
 
 
 def doing_something_else():
-	print 'tick'
+	print('tick')
 	return True
 
 

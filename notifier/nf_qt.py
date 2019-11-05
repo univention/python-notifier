@@ -23,12 +23,11 @@
 # 02110-1301 USA
 
 """notifier wrapper for QT 4"""
-
+from __future__ import absolute_import
 import PyQt4.Qt as qt
-import socket
 
-import dispatch
-import log
+from . import dispatch
+from . import log
 
 _qt_socketIDs = {}  # map of sockets/condition/methods -> qt.QSocketNotifier
 
@@ -90,7 +89,7 @@ class Timer(qt.QTimer):
 			if not self.method():
 				self.stop()
 				del self
-		except BaseException, e:
+		except BaseException as e:
 			log.warn('TIMER FAILED: %s' % str(e))
 
 
@@ -155,8 +154,7 @@ def step(sleep=True, external=True):
 	if __min_timer and sleep:
 		time = qt.QTime()
 		time.start()
-		qt.QCoreApplication.processEvents(qt.QEventLoop.AllEvents | qt.QEventLoop.WaitForMoreEvents,
-										  __min_timer)
+		qt.QCoreApplication.processEvents(qt.QEventLoop.AllEvents | qt.QEventLoop.WaitForMoreEvents, __min_timer)
 		if time.elapsed() < __min_timer:
 			qt.QThread.usleep(__min_timer - time.elapsed())
 	else:
