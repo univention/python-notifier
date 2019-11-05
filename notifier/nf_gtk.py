@@ -23,10 +23,10 @@
 # 02110-1301 USA
 
 """Simple mainloop that watches sockets and timers."""
-
+from __future__ import absolute_import
 import gobject
 
-import log
+from . import log
 
 IO_READ = gobject.IO_IN
 IO_WRITE = gobject.IO_OUT

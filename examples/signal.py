@@ -36,15 +36,15 @@ test = TestSignal()
 
 
 def timer_cb(a):
-	print 'timer argument', a
+	print('timer argument:%s' % a)
 	signals.emit('test-signal')
 	test.signal_emit('test-signal')
-	print '-------------------------'
+	print('-------------------------')
 	return True
 
 
 def signal_cb(signal, a, b):
-	print 'signal arguments', signal, a, b
+	print('signal arguments:%s\t%s\t%s' % (signal, a, b))
 	# disconnect global signal
 	signals.disconnect('test-signal', signal_cb)
 

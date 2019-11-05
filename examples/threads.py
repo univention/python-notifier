@@ -30,19 +30,19 @@ import time
 
 def my_thread(words):
 	for i in range(5):
-		print i, words
+		print("%s\t%s" % (i, words))
 		time.sleep(0.1)
 	return words
 
 
 def done_with_it(thread, result, another):
-	print "Thread '%s' is finished" % thread.name
-	print "Argument:", another
-	print "Result:", result
+	print("Thread '%s' is finished" % thread.name)
+	print("Argument:%s" % another)
+	print("Result:%s" % (result))
 
 
 def doing_something_else():
-	print 'doing something else'
+	print('doing something else')
 	return True
 
 

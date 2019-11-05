@@ -37,8 +37,8 @@ import subprocess
 
 # notifier imports
 import notifier
-import signals
-import log
+from . import signals
+from . import log
 
 _processes = []
 
@@ -117,9 +117,9 @@ class Process(signals.Provider):
 		specified in the constructor.
 		"""
 		if not self.__dead:
-			raise SystemError, "process is already running."
+			raise SystemError("process is already running.")
 		if self.stopping:
-			raise SystemError, "process is currently dying."
+			raise SystemError("process is currently dying.")
 
 		if not args:
 			cmd = self._cmd
@@ -338,8 +338,8 @@ class IO_Handler(signals.Provider):
 		try:
 			self.fp.flush()
 			data = self.fp.read(65535)
-		except IOError, (errno, msg):
-			if errno == 11:
+		except IOError as exp:
+			if exp.errno == 11:
 				# Resource temporarily unavailable; if we try to read on a
 				# non-blocking descriptor we'll get this message.
 				return True

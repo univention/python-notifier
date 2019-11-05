@@ -23,12 +23,12 @@
 # 02110-1301 USA
 
 """Simple mainloop that watches sockets and timers."""
-
-from version import *
+from __future__ import absolute_import
+from .version import *
 
 from select import select
 
-import log
+from . import log
 
 socket_add = None
 socket_remove = None
@@ -62,13 +62,13 @@ def init(model=GENERIC, **kwargs):
 	global IO_READ, IO_WRITE, IO_EXCEPT
 
 	if model == GENERIC:
-		import nf_generic as nf_impl
+		from . import nf_generic as nf_impl
 	elif model == QT:
-		import nf_qt as nf_impl
+		from . import nf_qt as nf_impl
 	elif model == GTK:
-		import nf_gtk as nf_impl
+		from . import nf_gtk as nf_impl
 	elif model == TWISTED:
-		import nf_twisted as nf_impl
+		from . import nf_twisted as nf_impl
 	else:
 		raise Exception('unknown notifier model')
 
@@ -86,7 +86,7 @@ def init(model=GENERIC, **kwargs):
 
 	if hasattr(nf_impl, '_options') and type(nf_impl._options) == dict:
 		for k, v in kwargs.items():
-			if nf_impl._options.has_key(k):
+			if k in nf_impl._options:
 				nf_impl._options[k] = v
 
 	if hasattr(nf_impl, '_init'):
@@ -109,8 +109,8 @@ class Callback:
 		if not callable(rvalue):
 			return -1
 
-		if (isinstance(rvalue, Callback) and
-				self._function == rvalue._function ) or \
+		if (isinstance(rvalue, Callback)
+				and self._function == rvalue._function) or \
 				self._function == rvalue:
 			return 0
 

@@ -30,17 +30,16 @@ import notifier.popen
 
 
 def tick():
-	print 'tick'
+	print('tick')
 	return True
 
 
 def find_result(pid, status, result):
-	print 'process %d died (%d)' % (pid, status)
-	print 'output:',
+	print('process %d died (%d)' % (pid, status))
 	if result:
-		print len(result), 'lines'
+		print("output:%s lines" % len(result))
 	else:
-		print result
+		print("output:%s" % result)
 
 
 if __name__ == '__main__':

@@ -21,7 +21,17 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
+from __future__ import absolute_import
 
+import sys
+
+from . import log
+from . import dispatch
+from twisted.internet import task
+from twisted.internet import reactor
+from twisted.internet.interfaces import IReadDescriptor, IWriteDescriptor
+#from zope.interface import implements
+from zope.interface import implementer
 """
 This is a notifier implementation using Twisted - http://www.twistedmatrix.com/
 Twisted is an async framework that has much in common with pynotifier and kaa.
@@ -40,20 +50,21 @@ Twisted doc index:
 http://twistedmatrix.com/projects/core/documentation/howto/index.html
 """
 
+
 # Python imports
-from types import IntType
+if sys.version_info > (3,):
+    integer_type = int
+
+else:
+    from types import IntType
+    integer_type = IntType
+
 
 # Twisted uses zope.interface
-from zope.interface import implements
 
 # Twisted imports
-from twisted.internet.interfaces import IReadDescriptor, IWriteDescriptor
-from twisted.internet import reactor
-from twisted.internet import task
 
 # internal packages
-import dispatch
-import log
 
 IO_READ = 1
 IO_WRITE = 2
@@ -66,13 +77,13 @@ __timers = {}
 __timer_id = 0
 __dispatch_timer = None
 
-
+@implementer(IReadDescriptor)
 class SocketReadCB:
     """
     An object to implement Twisted's IReadDescriptor.  When there is data
     available on the socket doRead() will get called.
     """
-    implements(IReadDescriptor)
+    #implements(IReadDescriptor)
 
     def __init__(self, socket, method):
         self.socket = socket
@@ -87,7 +98,7 @@ class SocketReadCB:
             socket_remove(self.socket, IO_READ)
 
     def fileno(self):
-        if type(self.socket) is IntType:
+        if isinstance(self.socket, integer_type):
             return self.socket
         elif hasattr(self.socket, 'fileno'):
             return self.socket.fileno()
@@ -99,13 +110,13 @@ class SocketReadCB:
         # Should we do more?
         log.error("connection lost on socket fd=%s" % self.fileno())
 
-
+@implementer(IWriteDescriptor)
 class SocketWriteCB:
     """
     An object to implement Twisted's IWriteDescriptor.  When there is data
     available on the socket doWrite() will get called.
     """
-    implements(IWriteDescriptor)
+    #implements(IWriteDescriptor)
 
     def __init__(self, socket, method):
         self.socket = socket
@@ -120,7 +131,7 @@ class SocketWriteCB:
             socket_remove(self.socket, IO_WRITE)
 
     def fileno(self):
-        if type(self.socket) is IntType:
+        if isinstance(self.socket, integer_type):
             return self.socket
         elif hasattr(self.socket, 'fileno'):
             return self.socket.fileno()
@@ -246,11 +257,11 @@ def loop():
     We could also decide between reactor.run() and step() and if we use step()
     just setup a Timer for the dispatchers at a reasonable rate, i.e.:
 
-        global __dispatch_timer
-        __dispatch_timer = task.LoopingCall(dispatch.dispatcher_run)
-        __dispatch_timer.start(dispatch.MIN_TIMER/1000.0) # 10x / second
-        # or
-        # __dispatch_timer.start(1.0/30) # 30x / second
+            global __dispatch_timer
+            __dispatch_timer = task.LoopingCall(dispatch.dispatcher_run)
+            __dispatch_timer.start(dispatch.MIN_TIMER/1000.0) # 10x / second
+            # or
+            # __dispatch_timer.start(1.0/30) # 30x / second
     """
     while True:
         try:
