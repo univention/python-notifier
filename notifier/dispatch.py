@@ -29,10 +29,11 @@ several notifiers."""
 MIN_TIMER = 100
 
 __dispatchers = {}
-__dispatchers[ True ] = []
-__dispatchers[ False ] = []
+__dispatchers[True] = []
+__dispatchers[False] = []
 
-def dispatcher_add( method, min_timeout = True ):
+
+def dispatcher_add(method, min_timeout=True):
 	"""The notifier supports external dispatcher functions that will be
 	called within each scheduler step. This functionality may be useful
 	for applications having an own event mechanism that needs to be
@@ -42,41 +43,44 @@ def dispatcher_add( method, min_timeout = True ):
 	MIN_TIMER is set to guarantee that the dispatcher functions are
 	called at least every MIN_TIMER milliseconds."""
 	global __dispatchers, MIN_TIMER
-	__dispatchers[ min_timeout ].append( method )
-	if __dispatchers[ True ]:
+	__dispatchers[min_timeout].append(method)
+	if __dispatchers[True]:
 		return MIN_TIMER
 	else:
 		return None
 
-def dispatcher_remove( method ):
+
+def dispatcher_remove(method):
 	"""Removes an external dispatcher function from the list"""
 	global __dispatchers, MIN_TIMER
-	for val in ( True, False ):
-		if method in __dispatchers[ val ]:
-			__dispatchers[ val ].remove( method )
+	for val in (True, False):
+		if method in __dispatchers[val]:
+			__dispatchers[val].remove(method)
 			break
-	if __dispatchers[ True ]:
+	if __dispatchers[True]:
 		return MIN_TIMER
 	else:
 		return None
+
 
 def dispatcher_run():
 	"""Invokes all registered dispatcher functions"""
 	global __dispatchers
 
-	for val in ( True, False ):
+	for val in (True, False):
 		# there is no need to copy an empty dict
-		if not __dispatchers[ val ]:
+		if not __dispatchers[val]:
 			continue
-		for disp in __dispatchers[ val ][ : ]:
+		for disp in __dispatchers[val][:]:
 			if not disp():
-				dispatcher_remove( disp )
+				dispatcher_remove(disp)
 
-	if __dispatchers[ True ]:
+	if __dispatchers[True]:
 		return MIN_TIMER
 	else:
 		return None
 
+
 def dispatcher_count():
 	global __dispatchers
-	return len( __dispatchers )
+	return len(__dispatchers)

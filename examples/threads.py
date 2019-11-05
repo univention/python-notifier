@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Author: Andreas Büsching <crunchy@bitkipper.net>
 #
@@ -27,30 +27,34 @@ import notifier.threads as threads
 
 import time
 
-def my_thread( words ):
-	for i in range( 5 ):
+
+def my_thread(words):
+	for i in range(5):
 		print i, words
-		time.sleep( 0.1 )
+		time.sleep(0.1)
 	return words
 
-def done_with_it( thread, result, another ):
+
+def done_with_it(thread, result, another):
 	print "Thread '%s' is finished" % thread.name
 	print "Argument:", another
 	print "Result:", result
+
 
 def doing_something_else():
 	print 'doing something else'
 	return True
 
+
 if __name__ == '__main__':
-	notifier.init( notifier.GENERIC )
+	notifier.init(notifier.GENERIC)
 
 	# task = threads.Simple( 'test',
 	# 					   notifier.Callback( my_thread, [ 'hello', 'world' ] ),
 	# 					   done_with_it )
-	task = threads.Simple( 'test',
-						   notifier.Callback( my_thread, [ 'hello', 'world' ] ),
-						   notifier.Callback( done_with_it, 'another argument' ) )
+	task = threads.Simple('test',
+						  notifier.Callback(my_thread, ['hello', 'world']),
+						  notifier.Callback(done_with_it, 'another argument'))
 	task.run()
-	notifier.timer_add( 1000, doing_something_else )
+	notifier.timer_add(1000, doing_something_else)
 	notifier.loop()

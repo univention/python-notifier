@@ -133,7 +133,7 @@ class SocketWriteCB:
         log.error("connection lost on socket fd=%s" % self.fileno())
 
 
-def socket_add(id, method, condition = IO_READ):
+def socket_add(id, method, condition=IO_READ):
     """
     The first argument specifies a socket, the second argument has to be a
     function that is called whenever there is data ready in the socket.
@@ -195,7 +195,7 @@ def timer_add(interval, method):
             timer_remove(id_)
 
     t = task.LoopingCall(_method, __timer_id)
-    t.start(interval/1000.0, now=False)
+    t.start(interval / 1000.0, now=False)
     __timers[__timer_id] = t
 
     return __timer_id
@@ -214,15 +214,16 @@ def timer_remove(id):
 def dispatcher_add(method):
     dispatch.dispatcher_add(method)
 
+
 dispatcher_remove = dispatch.dispatcher_remove
 
 
-def step(sleep = True, external = True):
+def step(sleep=True, external=True):
     if reactor.running:
         try:
             t = sleep and reactor.running and reactor.timeout()
             if dispatch.dispatcher_count():
-                 t = dispatch.MIN_TIMER / 1000.0
+                t = dispatch.MIN_TIMER / 1000.0
             reactor.doIteration(t)
             reactor.runUntilCurrent()
         except:
@@ -265,4 +266,3 @@ def loop():
 
 def _init():
     reactor.startRunning(installSignalHandlers=True)
-

@@ -25,16 +25,18 @@
 import notifier
 
 
-notifier.init( notifier.GENERIC )
+notifier.init(notifier.GENERIC)
 
-def cb( bla, fasel, fasel2 ):
+
+def cb(bla, fasel, fasel2):
     print bla
     print fasel
     print fasel2
 
-b = notifier.Callback( cb )
-c = notifier.Callback( cb, 'addional user data', 'more additional user data' )
-c( 'mandatory arguments' )
+
+b = notifier.Callback(cb)
+c = notifier.Callback(cb, 'addional user data', 'more additional user data')
+c('mandatory arguments')
 
 print 'b == c', b == c
 print 'b == cb', b == cb
