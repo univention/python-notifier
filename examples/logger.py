@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Author: Andreas Büsching <crunchy@bitkipper.net>
 #
@@ -26,20 +26,23 @@ import os
 
 import notifier
 
-def tail_minus_f( logfile ):
-	new_size = os.stat( logfile.name )[ 6 ]
+
+def tail_minus_f(logfile):
+	new_size = os.stat(logfile.name)[6]
 	if new_size > logfile.tell():
-		buffer = logfile.read( 65536 )
-		if buffer: print buffer,
+		buffer = logfile.read(65536)
+		if buffer:
+			print buffer,
 
 	return True
+
 
 if __name__ == '__main__':
 	notifier.init()
 	filename = '/var/log/messages'
-	if not os.path.isfile( filename ):
+	if not os.path.isfile(filename):
 		filename = '/var/log/syslog'
-	log = open( filename, 'rb' )
-	log.seek( os.stat( filename )[ 6 ] )
-	notifier.timer_add( 100, notifier.Callback( tail_minus_f, log ) )
+	log = open(filename, 'rb')
+	log.seek(os.stat(filename)[6])
+	notifier.timer_add(100, notifier.Callback(tail_minus_f, log))
 	notifier.loop()

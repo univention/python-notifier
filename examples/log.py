@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Author: Andreas Büsching <crunchy@bitkipper.net>
 #
@@ -31,28 +31,28 @@ if __name__ == '__main__':
 	# use default handlers
 	print '>>> default handlers'
 	# nflog.open() -> the default handlers are opened during import
-	for level in ( nflog.CRITICAL, nflog.ERROR, nflog.WARN, nflog.INFO, nflog.DEBUG ):
-		nflog.set_level( level )
+	for level in (nflog.CRITICAL, nflog.ERROR, nflog.WARN, nflog.INFO, nflog.DEBUG):
+		nflog.set_level(level)
 		print 'LEVEL: %d' % level
-		nflog.critical( 'critical' )
-		nflog.error( 'error' )
-		nflog.warn( 'warn' )
-		nflog.info( 'info' )
-		nflog.debug( 'debug' )
+		nflog.critical('critical')
+		nflog.error('error')
+		nflog.warn('warn')
+		nflog.info('info')
+		nflog.debug('debug')
 
 	# use custom handlers
 	print '>>> custom handlers'
-	handler = logging.FileHandler( 'test.log' )
-	handler.setFormatter( nflog.formatter )
-	nflog.open( handler )
-	for level in ( nflog.CRITICAL, nflog.ERROR, nflog.WARN, nflog.INFO, nflog.DEBUG ):
-		nflog.set_level( level )
-		nflog.critical( 'LEVEL: %d' % level )
-		nflog.critical( 'critical' )
-		nflog.error( 'error' )
-		nflog.warn( 'warn' )
-		nflog.info( 'info' )
-		nflog.debug( 'debug' )
-	for line in open( 'test.log' ).readlines():
+	handler = logging.FileHandler('test.log')
+	handler.setFormatter(nflog.formatter)
+	nflog.open(handler)
+	for level in (nflog.CRITICAL, nflog.ERROR, nflog.WARN, nflog.INFO, nflog.DEBUG):
+		nflog.set_level(level)
+		nflog.critical('LEVEL: %d' % level)
+		nflog.critical('critical')
+		nflog.error('error')
+		nflog.warn('warn')
+		nflog.info('info')
+		nflog.debug('debug')
+	for line in open('test.log').readlines():
 		print line,
-	os.unlink( 'test.log' )
+	os.unlink('test.log')

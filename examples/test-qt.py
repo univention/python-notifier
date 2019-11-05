@@ -27,37 +27,39 @@ import notifier
 
 import sys
 
-class QTestApp( qt.QApplication ):
-	def __init__( self ):
-		qt.QApplication.__init__( self, sys.argv )
-		self.dialog = qt.QDialog()
-		self.setActiveWindow( self.dialog )
 
-		self.button = qt.QPushButton( 'Hello World', self.dialog )
+class QTestApp(qt.QApplication):
+	def __init__(self):
+		qt.QApplication.__init__(self, sys.argv)
+		self.dialog = qt.QDialog()
+		self.setActiveWindow(self.dialog)
+
+		self.button = qt.QPushButton('Hello World', self.dialog)
 		self.dialog.show()
-		qt.QObject.connect( self.button, qt.SIGNAL( 'clicked()' ), self.clickedButton )
-		self.timer_id = notifier.timer_add( 1000, self.timerTest )
+		qt.QObject.connect(self.button, qt.SIGNAL('clicked()'), self.clickedButton)
+		self.timer_id = notifier.timer_add(1000, self.timerTest)
 		self.dispatch_it = 10
 
-	def recvQuit( self, mmsg, data = None ):
+	def recvQuit(self, mmsg, data=None):
 		self.quit()
 
-	def clickedButton( self ):
+	def clickedButton(self):
 		print "bye"
-		self.quit( 1 )
+		self.quit(1)
 
-	def timerTest( self ):
+	def timerTest(self):
 		print 'tick'
 		return True
 
-	def _dispatch( self ):
+	def _dispatch(self):
 		print 'dispatch'
 		self.dispatch_it -= 1
 		return self.dispatch_it > 0
 
+
 if __name__ == '__main__':
-	notifier.init( notifier.QT )
+	notifier.init(notifier.QT)
 	app = QTestApp()
 
-	notifier.dispatcher_add( app._dispatch )
+	notifier.dispatcher_add(app._dispatch)
 	print 'exit code: %d' % notifier.loop()

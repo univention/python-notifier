@@ -26,8 +26,8 @@
 from logging import getLogger, Formatter, Handler, StreamHandler, FileHandler, CRITICAL, FATAL, ERROR, WARN, INFO, DEBUG
 from sys import stderr
 
-instance = getLogger( 'notifier' )
-formatter = Formatter( "%(asctime)s: %(name)s: %(levelname)-8s: %(message)s" )
+instance = getLogger('notifier')
+formatter = Formatter("%(asctime)s: %(name)s: %(levelname)-8s: %(message)s")
 
 debug = instance.debug
 info = instance.info
@@ -38,7 +38,8 @@ exception = instance.exception
 
 set_level = instance.setLevel
 
-def open( *arg ):
+
+def open(*arg):
 	'''Add the given list of handlers. If no handler is given two
 	default handlers will be installed that log to stderr and
 	/var/log/python-notifier.log'''
@@ -47,17 +48,18 @@ def open( *arg ):
 	instance.handlers = []
 	if not arg:
 		try:
-			file_handler = FileHandler( '/var/log/python-notifier.log' )
-			file_handler.setFormatter( formatter )
-			instance.addHandler( file_handler )
+			file_handler = FileHandler('/var/log/python-notifier.log')
+			file_handler.setFormatter(formatter)
+			instance.addHandler(file_handler)
 		except:
 			pass
 
-		stream_handler = StreamHandler( stderr )
-		stream_handler.setFormatter( formatter )
-		instance.addHandler( stream_handler )
+		stream_handler = StreamHandler(stderr)
+		stream_handler.setFormatter(formatter)
+		instance.addHandler(stream_handler)
 	else:
 		for hdl in arg:
-			instance.addHandler( hdl )
+			instance.addHandler(hdl)
+
 
 open()
