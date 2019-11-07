@@ -34,11 +34,17 @@ import tempfile
 import time
 import types
 import subprocess
+import sys
 
 # notifier imports
 import notifier
 from . import signals
 from . import log
+
+
+if sys.version_info >= (3,):
+	basestring = (str)
+
 
 _processes = []
 
@@ -319,7 +325,7 @@ class IO_Handler(signals.Provider):
 		self.fp = fp
 		fcntl.fcntl(self.fp.fileno(), fcntl.F_SETFL, os.O_NONBLOCK)
 		self.callback = callback
-		self.saved = ''
+		self.saved = b''
 		notifier.socket_add(fp, self._handle_input)
 		self.signal_new('closed')
 
@@ -354,9 +360,9 @@ class IO_Handler(signals.Provider):
 			self.close()
 			return False
 
-		data = data.replace('\r', '\n')
-		partial_line = data[-1] != '\n'
-		lines = data.split('\n')
+		data = data.replace(b'\r', b'\n')
+		partial_line = data[-1] != b'\n'
+		lines = data.split(b'\n')
 
 		# split creates an empty line of string ends with line break
 		if not lines[-1]:
@@ -364,7 +370,7 @@ class IO_Handler(signals.Provider):
 		# prepend saved data to first line
 		if self.saved:
 			lines[0] = self.saved + lines[0]
-			self.saved = ''
+			self.saved = b''
 		# Only one partial line?
 		if partial_line and not flush_partial_lines:
 			self.saved = lines[-1]
@@ -377,8 +383,8 @@ class IO_Handler(signals.Provider):
 
 	def flush_buffer(self):
 		if self.saved:
-			self.callback(self.saved.split('\n'))
-			self.saved = ''
+			self.callback(self.saved.split(b'\n'))
+			self.saved = b''
 
 
 class RunIt(Process):
