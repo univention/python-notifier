@@ -62,7 +62,7 @@ setup_args = {
 	'classifiers': filter(None, classifiers.split('\n')),
 	'packages': ['notifier', ],
 	'extras_require': {
-		'testing': ['zope', 'twisted', 'pytest'],
+		'testing': ['zope', 'twisted', 'pytest', 'pytest-cov'],
 	},
 }
 
