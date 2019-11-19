@@ -220,7 +220,7 @@ def step(sleep=True, external=True):
 					else:
 						timeout = 0
 						break
-			if __min_timer and (__min_timer < timeout or timeout is None):
+			if __min_timer and (timeout is None or __min_timer < timeout):
 				timeout = __min_timer
 
 		# wait for event
