@@ -28,8 +28,23 @@ import time
 import notifier
 
 
-def test_generic():
+def test_dispatch():
+	dispatch = mock.Mock()
+	# when no argument is given to init default is GENERIC
+	notifier.init(notifier.GENERIC, recursive_depth=5)
+	#notifier.timer_add( 0, notifier.Callback( zero, 'hello' ) )
+	notifier.dispatcher_add(notifier.Callback(dispatch, 'hello'))
+	#notifier.dispatcher_add( notifier.Callback( dispatch, 'hello' ), False )
 
+	notifier.step()
+	time.sleep(1)
+	notifier.step()
+
+	# test that func was called with the correct arguments
+	dispatch.assert_called_with('hello')
+
+
+def test_generic_with_timeout_and_dispatch():
 	timeout = mock.Mock()
 
 	dispatch = mock.Mock()
