@@ -56,7 +56,7 @@ def _socket_callback(source, condition, method):
 	to the socket objects that are used by pynotifier as an identifier
 	"""
 	global _gtk_socketIDs
-	if _gtk_socketIDs[condition].has_key(source):
+	if source in _gtk_socketIDs[condition]:
 		ret = method(source)
 		if not ret:
 			socket_remove(source, condition)
@@ -69,7 +69,7 @@ def _socket_callback(source, condition, method):
 def socket_remove(socket, condition=IO_READ):
 	"""Removes the given socket from scheduler."""
 	global _gtk_socketIDs
-	if _gtk_socketIDs[condition].has_key(socket):
+	if socket in _gtk_socketIDs[condition]:
 		gobject.source_remove(_gtk_socketIDs[condition][socket])
 		del _gtk_socketIDs[condition][socket]
 	else:
@@ -94,14 +94,14 @@ def timer_remove(id):
 def dispatcher_add(func):
 	global _gtk_idleIDs
 
-	if _gtk_idleIDs.has_key(func):
+	if func in _gtk_idleIDs:
 		_gtk_idleIDs[func] = gobject.idle_add(func)
 
 
 def dispatcher_remove(func):
 	global _gtk_idleIDs
 
-	if _gtk_idleIDs.has_key(func):
+	if func in _gtk_idleIDs:
 		gobject.source_remove(_gtk_idleIDs[func])
 
 
