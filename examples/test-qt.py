@@ -22,6 +22,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
 import PyQt4.Qt as qt
 import notifier
 
@@ -44,15 +45,15 @@ class QTestApp(qt.QApplication):
 		self.quit()
 
 	def clickedButton(self):
-		print "bye"
+		print("bye")
 		self.quit(1)
 
 	def timerTest(self):
-		print 'tick'
+		print('tick')
 		return True
 
 	def _dispatch(self):
-		print 'dispatch'
+		print('dispatch')
 		self.dispatch_it -= 1
 		return self.dispatch_it > 0
 
@@ -62,4 +63,4 @@ if __name__ == '__main__':
 	app = QTestApp()
 
 	notifier.dispatcher_add(app._dispatch)
-	print 'exit code: %d' % notifier.loop()
+	print('exit code: %d' % notifier.loop())

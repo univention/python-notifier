@@ -22,6 +22,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
 import os
 
 import notifier
@@ -32,7 +33,7 @@ def tail_minus_f(logfile):
 	if new_size > logfile.tell():
 		buffer = logfile.read(65536)
 		if buffer:
-			print buffer,
+			print(buffer, end=' ')
 
 	return True
 

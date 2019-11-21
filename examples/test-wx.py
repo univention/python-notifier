@@ -22,6 +22,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
 import notifier
 
 from wxPython.wx import wxPanel, wxBoxSizer, wxVERTICAL, wxButton, EVT_BUTTON, true, wxFrame
@@ -46,7 +47,7 @@ class MyPanel(wxPanel):
 		self.parent.Close()
 
 	def OnSend(self, event):
-		print 'Hello World!'
+		print('Hello World!')
 
 
 class MyFrame(wxFrame):

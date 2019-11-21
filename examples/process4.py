@@ -22,12 +22,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
 import notifier
 import notifier.popen
 
 
 def tick():
-	print 'tick'
+	print('tick')
 	cmd = ['ps', 'h', '-eo', 'pcpu,vsize,rssize,pmem,user,pid,command', '--sort=-pcpu']
 	proc = notifier.popen.Process(cmd, stdout=True)
 	proc.signal_connect('stdout', find_result)
@@ -38,7 +39,7 @@ def tick():
 
 def find_result(pid, result):
 	for line in result:
-		print line
+		print(line)
 
 
 if __name__ == '__main__':
