@@ -62,9 +62,7 @@ if __name__ == '__main__':
 	_stdout.write('Starting threads ')
 	for i in range(100):
 		_stdout.write('.')
-		task = threads.Simple('test%d' % i,
-							  notifier.Callback(my_thread, ['hello', 'world']),
-							  notifier.Callback(done_with_it, 'another argument'))
+		task = threads.Simple('test%d' % i, notifier.Callback(my_thread, ['hello', 'world']), notifier.Callback(done_with_it, 'another argument'))
 		task.run()
 		time.sleep(0.05)
 		_stdout.write('\033[1D*')

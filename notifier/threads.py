@@ -49,8 +49,8 @@ class Simple(object):
 	name: a name that might be used to identify the thread. It is not required to be unique.
 	function: the main function of the thread
 	callback: function that is invoked when the thread is dead. This function gets two arguments:
-	  thread: this thread object
-	  result: return value of the thread function.
+	thread: this thread object
+	result: return value of the thread function.
 	"""
 
 	def __init__(self, name, function, callback):
@@ -67,7 +67,6 @@ class Simple(object):
 		if not _threads:
 			notifier.dispatcher_add(_simple_threads_dispatcher)
 		_threads.append(self)
-
 
 	def run(self):
 		"""Starts the thread"""

@@ -50,8 +50,7 @@ if __name__ == '__main__':
 	if not signals.exists('clicked3'):
 		print "signal 'clicked3' does not exist"
 	signals.connect('clicked', _wait_for_click)
-	signals.connect('clicked', notifier.Callback(_wait_for_movement,
-												 'optional something'))
+	signals.connect('clicked', notifier.Callback(_wait_for_movement, 'optional something'))
 	notifier.timer_add(3000, _emitting)
 
 	notifier.loop()

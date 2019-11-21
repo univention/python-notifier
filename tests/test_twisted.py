@@ -25,9 +25,7 @@
 """Simple test program for the Twisted notifier."""
 import mock
 import os
-import sys
 import time
-import pytest
 
 import notifier
 import tempfile
@@ -38,8 +36,8 @@ _stdout = tempfile.TemporaryFile()
 
 # notifier-timer testfunction
 
-def test_twisted():
 
+def test_twisted():
 	notifier.init(notifier.TWISTED)
 
 	def _stdin(fd):

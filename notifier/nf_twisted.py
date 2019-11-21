@@ -77,6 +77,7 @@ __timers = {}
 __timer_id = 0
 __dispatch_timer = None
 
+
 @implementer(IReadDescriptor)
 class SocketReadCB:
     """
@@ -109,6 +110,7 @@ class SocketReadCB:
     def connectionLost(self, reason):
         # Should we do more?
         log.error("connection lost on socket fd=%s" % self.fileno())
+
 
 @implementer(IWriteDescriptor)
 class SocketWriteCB:

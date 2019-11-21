@@ -47,8 +47,7 @@ def socket_add(socket, method, condition=IO_READ):
 	"""The first argument specifies a socket, the second argument has to be a
 	function that is called whenever there is data ready in the socket."""
 	global _gtk_socketIDs
-	source = gobject.io_add_watch(socket, condition,
-								  _socket_callback, method)
+	source = gobject.io_add_watch(socket, condition, _socket_callback, method)
 	_gtk_socketIDs[condition][socket] = source
 
 
