@@ -22,9 +22,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-import os
-import sys
-
 import notifier
 import notifier.popen
 
@@ -37,7 +34,7 @@ def tick():
 def give_birth():
 	ls = notifier.popen.run('/bin/ls -ltr /etc', stderr=False, shell=False)
 	# process dead?
-	if ls.pid == None:
+	if ls.pid is None:
 		print ls.stdout.read()
 		ls.stdout.close()
 

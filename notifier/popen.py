@@ -22,8 +22,6 @@
 
 """child process control using notifier."""
 
-__all__ = ['Process', 'RunIt', 'Shell']
-
 # python imports
 import os
 import fcntl
@@ -32,7 +30,6 @@ import re
 import shlex
 import tempfile
 import time
-import types
 import subprocess
 import sys
 
@@ -40,6 +37,8 @@ import sys
 import notifier
 from . import signals
 from . import log
+
+__all__ = ['Process', 'RunIt', 'Shell']
 
 
 if sys.version_info >= (3,):
@@ -149,20 +148,17 @@ class Process(signals.Provider):
 				self.stderr = subprocess.PIPE
 
 			# line buffered, no shell
-			self.child = subprocess.Popen(cmd, bufsize=1, shell=self._shell,
-										  stdout=self.stdout, stderr=self.stderr)
+			self.child = subprocess.Popen(cmd, bufsize=1, shell=self._shell, stdout=self.stdout, stderr=self.stderr)
 			self.pid = self.child.pid
 
 			if self.stdout:
 				# IO_Handler for stdout
-				self.stdout = IO_Handler('stdout', self.child.stdout,
-										 self._read_stdout, self._name)
+				self.stdout = IO_Handler('stdout', self.child.stdout, self._read_stdout, self._name)
 				self.stdout.signal_connect('closed', self._closed)
 
 			if self.stderr:
 				# IO_Handler for stderr
-				self.stderr = IO_Handler('stderr', self.child.stderr,
-										 self._read_stderr, self._name)
+				self.stderr = IO_Handler('stderr', self.child.stderr, self._read_stderr, self._name)
 				self.stderr.signal_connect('closed', self._closed)
 
 		log.info('running %s (pid=%s)' % (self.binary, self.pid))
@@ -397,8 +393,7 @@ class RunIt(Process):
 			emitted when the child process is dead.
 			pid				: process ID
 			status			: exit code of the child process
-			stdout, stderr	: are only provided when stdout and/or stderr is
-											  monitored
+			stdout, stderr	: are only provided when stdout and/or stderr is monitored
 			"""
 
 	def __init__(self, command, stdout=True, stderr=False, shell=False):
@@ -477,7 +472,8 @@ def run(command, timeout=0, stdout=True, stderr=True, shell=True):
 	object. The member variable <pid> is set if the process is still
 	running after <timeout> seconds otherwise <exitcode> is set.'''
 	# a dispatcher function required to activate the minimal timeout
-	def fake_dispatcher(): return True
+	def fake_dispatcher():
+		return True
 	notifier.dispatcher_add(fake_dispatcher)
 
 	countdown = CountDown(timeout)
@@ -521,7 +517,8 @@ def kill(pid, signal=15, timeout=0):
 	default 15). If the process is not dead after <timeout> seconds the
 	function exist anyway'''
 	# a dispatcher function required to activate the minimal timeout
-	def fake_dispatcher(): return True
+	def fake_dispatcher():
+		return True
 	notifier.dispatcher_add(fake_dispatcher)
 
 	if isinstance(pid, Child):

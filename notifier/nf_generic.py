@@ -28,7 +28,6 @@ from __future__ import absolute_import
 from time import time, sleep as time_sleep
 
 import select
-import socket
 
 # internal packages
 from . import log
@@ -157,8 +156,7 @@ def timer_add(interval, method):
 	except OverflowError:
 		__timer_id = 0
 
-	__timers[__timer_id] = \
-			[interval, int(time() * 1000) + interval, method]
+	__timers[__timer_id] = [interval, int(time() * 1000) + interval, method]
 
 	return __timer_id
 
@@ -281,8 +279,7 @@ def step(sleep=True, external=True):
 						socket_remove(sock_obj, IO_EXCEPT)
 					continue
 				for cond in (IO_READ, IO_WRITE):
-					if cond & condition and fd in __sockets[cond] and \
-							not __sockets[cond][fd](sock_obj):
+					if cond & condition and fd in __sockets[cond] and not __sockets[cond][fd](sock_obj):
 						socket_remove(sock_obj, cond)
 
 		# handle external dispatchers

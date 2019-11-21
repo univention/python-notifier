@@ -23,7 +23,7 @@
 # 02110-1301 USA
 
 # CRITICAL is the same as FATAL
-from logging import getLogger, Formatter, Handler, StreamHandler, FileHandler, CRITICAL, FATAL, ERROR, WARN, INFO, DEBUG
+from logging import getLogger, Formatter, Handler, StreamHandler, FileHandler, CRITICAL, FATAL, ERROR, WARN, INFO, DEBUG  # noqa: F401
 from sys import stderr
 
 instance = getLogger('notifier')

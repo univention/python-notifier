@@ -24,7 +24,7 @@
 
 import notifier
 
-from wxPython.wx import *
+from wxPython.wx import wxPanel, wxBoxSizer, wxVERTICAL, wxButton, EVT_BUTTON, true, wxFrame
 
 
 class MyPanel(wxPanel):

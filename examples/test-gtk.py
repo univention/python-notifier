@@ -58,12 +58,12 @@ window.show()
 
 def timer_test():
 	print "timer_test"
-#	 notifier.dispatcher_add( notifier.Callback( dispatcher_test, 1, 2, 3 ) )
+	#notifier.dispatcher_add(notifier.Callback(dispatcher_test, 1, 2, 3))
 	return True
 
 
 def dispatcher_test(a, b, c):
-	#	 print 'dispatcher', a, b, c
+	# print 'dispatcher', a, b, c
 	return True
 
 

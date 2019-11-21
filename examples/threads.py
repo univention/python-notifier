@@ -49,12 +49,8 @@ def doing_something_else():
 if __name__ == '__main__':
 	notifier.init(notifier.GENERIC)
 
-	# task = threads.Simple( 'test',
-	# 					   notifier.Callback( my_thread, [ 'hello', 'world' ] ),
-	# 					   done_with_it )
-	task = threads.Simple('test',
-						  notifier.Callback(my_thread, ['hello', 'world']),
-						  notifier.Callback(done_with_it, 'another argument'))
+	# task = threads.Simple('test', notifier.Callback(my_thread, ['hello', 'world']), done_with_it)
+	task = threads.Simple('test', notifier.Callback(my_thread, ['hello', 'world']), notifier.Callback(done_with_it, 'another argument'))
 	task.run()
 	notifier.timer_add(1000, doing_something_else)
 	notifier.loop()

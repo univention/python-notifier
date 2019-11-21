@@ -30,43 +30,44 @@ import notifier
 
 
 class QTestApp(qt.QCoreApplication):
-		def __init__(self):
-				qt.QCoreApplication.__init__(self, sys.argv)
 
-				self.timer_id = notifier.timer_add(1000, self.timerTest)
-				self.dispatch_it = 10
+	def __init__(self):
+		qt.QCoreApplication.__init__(self, sys.argv)
 
-		def recvQuit(self, mmsg, data=None):
-				# Also coudl use exit_loop
-				# self.exit_loop()
-				self.quit()
+		self.timer_id = notifier.timer_add(1000, self.timerTest)
+		self.dispatch_it = 10
 
-		def timerTest(self):
-				print('tick')
-				return True
+	def recvQuit(self, mmsg, data=None):
+		# Also coudl use exit_loop
+		# self.exit_loop()
+		self.quit()
 
-		def _dispatch(self):
-				print('dispatch')
-				self.dispatch_it -= 1
-				return self.dispatch_it > 0
+	def timerTest(self):
+		print('tick')
+		return True
+
+	def _dispatch(self):
+		print('dispatch')
+		self.dispatch_it -= 1
+		return self.dispatch_it > 0
 
 
 class MyThread(qt.QThread):
-		def run(self):
-				self._timer = notifier.timer_add(2000, self.tick)
+	def run(self):
+		self._timer = notifier.timer_add(2000, self.tick)
 
-				notifier.loop()
-				# import time
-				# while True:
-				#       print 'going to sleep'
-				#       time.sleep( 1 )
-				#       # in order to process events in this thread
-				#       qt.QCoreApplication.processEvents()
-				#       print 'wake up'
+		notifier.loop()
+		# import time
+		# while True:
+		#       print 'going to sleep'
+		#       time.sleep( 1 )
+		#       # in order to process events in this thread
+		#       qt.QCoreApplication.processEvents()
+		#       print 'wake up'
 
-		def tick(self):
-				print('tick my thread')
-				return True
+	def tick(self):
+		print('tick my thread')
+		return True
 
 
 def test_generic():

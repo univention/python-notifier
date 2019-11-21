@@ -24,11 +24,9 @@
 
 """Simple mainloop that watches sockets and timers."""
 from __future__ import absolute_import
-from .version import *
 
-from select import select
-
-from . import log
+from .version import VERSION  # noqa: F401
+from . import log  # noqa: F401
 
 socket_add = None
 socket_remove = None
@@ -109,9 +107,7 @@ class Callback:
 		if not callable(rvalue):
 			return -1
 
-		if (isinstance(rvalue, Callback)
-				and self._function == rvalue._function) or \
-				self._function == rvalue:
+		if (isinstance(rvalue, Callback) and self._function == rvalue._function) or self._function == rvalue:
 			return 0
 
 		return -1
