@@ -22,6 +22,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
 import os
 
 import logging
@@ -29,11 +30,11 @@ import notifier.log as nflog
 
 if __name__ == '__main__':
 	# use default handlers
-	print '>>> default handlers'
+	print('>>> default handlers')
 	# nflog.open() -> the default handlers are opened during import
 	for level in (nflog.CRITICAL, nflog.ERROR, nflog.WARN, nflog.INFO, nflog.DEBUG):
 		nflog.set_level(level)
-		print 'LEVEL: %d' % level
+		print('LEVEL: %d' % level)
 		nflog.critical('critical')
 		nflog.error('error')
 		nflog.warn('warn')
@@ -41,7 +42,7 @@ if __name__ == '__main__':
 		nflog.debug('debug')
 
 	# use custom handlers
-	print '>>> custom handlers'
+	print('>>> custom handlers')
 	handler = logging.FileHandler('test.log')
 	handler.setFormatter(nflog.formatter)
 	nflog.open(handler)
@@ -54,5 +55,5 @@ if __name__ == '__main__':
 		nflog.info('info')
 		nflog.debug('debug')
 	for line in open('test.log').readlines():
-		print line,
+		print(line, end=' ')
 	os.unlink('test.log')

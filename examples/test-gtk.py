@@ -23,6 +23,7 @@
 # 02110-1301 USA
 
 """Simple test program for the GTK+ notifier."""
+from __future__ import print_function
 
 import sys
 
@@ -34,7 +35,7 @@ notifier.init(notifier.GTK)
 
 
 def hello(*args):
-	print 'Hello World'
+	print('Hello World')
 
 
 def destroy(*args):
@@ -57,7 +58,7 @@ window.show()
 
 
 def timer_test():
-	print "timer_test"
+	print("timer_test")
 	#notifier.dispatcher_add(notifier.Callback(dispatcher_test, 1, 2, 3))
 	return True
 

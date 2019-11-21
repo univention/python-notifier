@@ -22,12 +22,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
 import notifier
 import notifier.popen
 
 
 def tick():
-	print 'tick'
+	print('tick')
 	return True
 
 
@@ -35,14 +36,14 @@ def give_birth():
 	ls = notifier.popen.run('/bin/ls -ltr /etc', stderr=False, shell=False)
 	# process dead?
 	if ls.pid is None:
-		print ls.stdout.read()
+		print(ls.stdout.read())
 		ls.stdout.close()
 
 	sleep = notifier.popen.run('sleep 5', timeout=3, stderr=False, stdout=False, shell=False)
 	if sleep.pid:
-		print 'process still running', sleep.pid
+		print('process still running', sleep.pid)
 		ret = notifier.popen.kill(sleep)
-		print 'killed', ret
+		print('killed', ret)
 
 	return False
 

@@ -22,6 +22,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
 import notifier
 import notifier.popen
 
@@ -49,6 +50,6 @@ if __name__ == '__main__':
 	# cmd = '/usr/bin/find /var/log'
 	proc = notifier.popen.RunIt(cmd, stdout=True)
 	proc.signal_connect('finished', find_result)
-	print 'started process', proc.start()
+	print('started process', proc.start())
 
 	notifier.loop()

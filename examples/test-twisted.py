@@ -23,6 +23,7 @@
 # 02110-1301 USA
 
 """Simple test program for the Twisted notifier."""
+from __future__ import print_function
 
 import os
 import sys

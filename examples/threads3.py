@@ -22,6 +22,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
+
 import notifier
 import notifier.threads as nfthreads
 
@@ -35,7 +37,7 @@ def done_with_it(thread, result):
 	print("-> Thread '%s' is finished" % thread.name)
 	if isinstance(thread.result, BaseException):
 		print("  Error occurred during thread processing:", type(thread.result), thread.result)
-		# print "  Details:\n%s" % ''.join( thread.trace )
+		# print("  Details:\n%s" % ''.join(thread.trace))
 	else:
 		print("  Counted from 0 to %d" % result)
 

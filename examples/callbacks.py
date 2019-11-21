@@ -22,6 +22,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
 import notifier
 
 
@@ -29,14 +30,14 @@ notifier.init(notifier.GENERIC)
 
 
 def cb(bla, fasel, fasel2):
-    print bla
-    print fasel
-    print fasel2
+    print(bla)
+    print(fasel)
+    print(fasel2)
 
 
 b = notifier.Callback(cb)
 c = notifier.Callback(cb, 'addional user data', 'more additional user data')
 c('mandatory arguments')
 
-print 'b == c', b == c
-print 'b == cb', b == cb
+print('b == c', b == c)
+print('b == cb', b == cb)
