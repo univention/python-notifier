@@ -62,10 +62,10 @@ setup_args = {
 	'classifiers': filter(None, classifiers.split('\n')),
 	'packages': ['notifier', ],
 	'extras_require': {
-		'testing': ['zope', 'twisted', 'pytest', 'pytest-cov'],
+		'testing': ['zope', 'twisted', 'pytest', 'pytest-cov', 'mock', 'codecov'],
 	},
 }
 
 setup_args['tests_require'] = setup_args.get('install_requires', []).extend(
-	setup_args.get('tests_require', []))
+	setup_args.get('tests_require', ['zope', 'twisted', 'pytest', 'pytest-cov', 'PyQt4', 'mock', 'codecov']))
 setup(**setup_args)
