@@ -421,12 +421,12 @@ class RunIt(Process):
 
 	def _finished(self, pid, status):
 		exit_code = os.WEXITSTATUS(status)
-		if self.__stdout != None:
-			if self.__stderr == None:
+		if self.__stdout is not None:
+			if self.__stderr is None:
 				self.signal_emit('finished', pid, exit_code, self.__stdout)
 			else:
 				self.signal_emit('finished', pid, exit_code, self.__stdout, self.__stderr)
-		elif self.__stderr != None:
+		elif self.__stderr is not None:
 			self.signal_emit('finished', pid, exit_code, self.__stderr)
 		else:
 			self.signal_emit('finished', pid, exit_code)
@@ -489,7 +489,7 @@ def run(command, timeout=0, stdout=True, stderr=True, shell=True):
 
 	while countdown():
 		exitcode = child.poll()
-		if exitcode != None:
+		if exitcode is not None:
 			break
 		notifier.step()
 
@@ -498,7 +498,7 @@ def run(command, timeout=0, stdout=True, stderr=True, shell=True):
 
 	# prepare return code
 	ret = Child(stdout=out, stderr=err)
-	if child.returncode == None:
+	if child.returncode is None:
 		ret.pid = child.pid
 	else:
 		# move to beginning of files

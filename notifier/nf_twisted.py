@@ -95,7 +95,7 @@ class SocketReadCB:
         Call the callback method with the socket as the only argument.  If it
         returns False remove this socket from our notifier.
         """
-        if self.method(self.socket) == False:
+        if self.method(self.socket) is False:
             socket_remove(self.socket, IO_READ)
 
     def fileno(self):
@@ -129,7 +129,7 @@ class SocketWriteCB:
         Call the callback method with the socket as the only argument.  If it
         returns False remove this socket from our notifier.
         """
-        if self.method(self.socket) == False:
+        if self.method(self.socket) is False:
             socket_remove(self.socket, IO_WRITE)
 
     def fileno(self):
