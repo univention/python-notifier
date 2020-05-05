@@ -236,7 +236,7 @@ def step(sleep=True, external=True):
 			time_sleep(dispatch.MIN_TIMER / 1000.0)
 
 		# handle timers
-		for i, timer in __timers.items():
+		for i, timer in list(__timers.items()):
 			timestamp = timer[TIMESTAMP]
 			if not timestamp or i not in __timers:
 				# timer was unregistered by previous timer, or would
