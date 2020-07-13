@@ -29,7 +29,7 @@ import time
 import pytest
 
 
-class TestSignal(signals.Provider):
+class SignalTest(signals.Provider):
 	def __init__(self):
 		signals.Provider.__init__(self)
 		self.signal_new('test-signal')
@@ -37,7 +37,7 @@ class TestSignal(signals.Provider):
 
 @pytest.fixture(scope='module')
 def global_data():
-	return {'test': TestSignal()}
+	return {'test': SignalTest()}
 
 
 signals.new('test-signal')
@@ -60,7 +60,7 @@ def test_signals_obj(global_data):
 	signal_cb = mock.Mock()
 	notifier.init(notifier.GENERIC)
 	global_data['test'].signal_connect(
-		'test-signal', notifier.Callback(signal_cb, 1, 2, 'TestSignal signal'))
+		'test-signal', notifier.Callback(signal_cb, 1, 2, 'SignalTest signal'))
 	notifier.timer_add(2000, notifier.Callback(timer_cb, 7))
 	for i in range(3):
 		notifier.step()

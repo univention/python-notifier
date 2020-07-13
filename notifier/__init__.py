@@ -91,7 +91,8 @@ def init(model=GENERIC, **kwargs):
 		nf_impl._init()
 
 
-class Callback:
+class Callback(object):
+
 	def __init__(self, function, *args, **kwargs):
 		self._function = function
 		self._args = args
@@ -103,17 +104,27 @@ class Callback:
 			tmp.extend(self._args)
 		return self._function(*tmp, **self._kwargs)
 
-	def __cmp__(self, rvalue):
-		if not callable(rvalue):
-			return -1
+	def __lt__(self, other):
+		return self._function < (other._function if isinstance(other, Callback) else other) if callable(other) else NotImplemented
 
-		if (isinstance(rvalue, Callback) and self._function == rvalue._function) or self._function == rvalue:
-			return 0
+	def __le__(self, other):
+		return self._function <= (other._function if isinstance(other, Callback) else other) if callable(other) else NotImplemented
 
-		return -1
+	def __eq__(self, other):
+		return self._function == (other._function if isinstance(other, Callback) else other) if callable(other) else NotImplemented
 
-	def __nonzero__(self):
+	def __ne__(self, other):
+		return self._function != (other._function if isinstance(other, Callback) else other) if callable(other) else NotImplemented
+
+	def __ge__(self, other):
+		return self._function >= (other._function if isinstance(other, Callback) else other) if callable(other) else NotImplemented
+
+	def __gt__(self, other):
+		return self._function > (other._function if isinstance(other, Callback) else other) if callable(other) else NotImplemented
+
+	def __bool__(self):
 		return bool(self._function)
+	__nonzero__ = __bool__
 
 	def __hash__(self):
-		return self._function.__hash__()
+		return hash(self._function)
