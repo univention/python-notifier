@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/univention/python-notifier.svg)](https://travis-ci.org/univention/python-notifier)
+[![codecov](https://codecov.io/gh/univention/python-notifier/branch/ucs-5.0-0/graph/badge.svg)](https://codecov.io/gh/univention/python-notifier)
+[![Quality](https://landscape.io/github/univention/python-notifier/ucs-5.0-0/landscape.png)](https://landscape.io/github/univention/python-notifier/ucs-5.0-0)
+[![Code Climate](https://codeclimate.com/github/univention/python-notifier/badges/gpa.svg)](https://codeclimate.com/github/univention/python-notifier)
+
 Introduction
 ============
 
