@@ -108,8 +108,10 @@ def socket_remove(id, condition=IO_READ):
 
 	try:
 		fd = _get_fd(id)
+		if fd < 0:
+			raise ValueError()
 		valid = True
-	except:
+	except Exception:
 		fd = None
 		valid = False
 		# file descriptor already closed
