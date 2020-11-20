@@ -40,13 +40,15 @@ class SignalExistsError(Exception):
 
 
 class Signal(object):
+
 	def __init__(self, name):
 		self.name = name
 		self.__callbacks = []
 
 	def emit(self, *args):
-		for cb in self.__callbacks:
-			cb(*args)
+		for cb in self.__callbacks[:]:
+			if cb(*args):
+				self.disconnect(cb)
 
 	def connect(self, callback):
 		self.__callbacks.append(callback)
@@ -54,7 +56,7 @@ class Signal(object):
 	def disconnect(self, callback):
 		try:
 			self.__callbacks.remove(callback)
-		except:
+		except ValueError:
 			pass
 
 	def __str__(self):
@@ -62,6 +64,7 @@ class Signal(object):
 
 
 class Provider(object):
+
 	def __init__(self):
 		self.__signals = {}
 
