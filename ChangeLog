@@ -1,3 +1,81 @@
+2020-11-20  Florian Best <packages@univention.de>
+
+	* notifier/version.py: set version to 0.9.9
+	* Add CI badges
+	* Update maintainers
+	* Enhance formatting of README
+	* Remove obsolete contact information
+	* Add Travis configuration
+
+2020-08-07  Jürn Brodersen <brodersen@univention.de>
+
+	* Bug #51781: unregister closed sockets
+
+2020-07-13  Florian Best <best@univention.de>
+
+	* Bug #51282: disconnect callback if signal function wants it
+
+2020-07-13  Florian Best <best@univention.de>
+
+	* Bug #51282: fix notifier.Callback comparability
+
+2020-05-05  Florian Best <best@univention.de>
+
+	* Fix iteration in python3
+
+2019-11-21  Florian Best <best@univention.de>
+
+	* Bug #50461: futurize -wn examples/*.py
+	* Bug #50461: autopep8 -i --select W601 ./notifier/nf_gtk.py
+	* Bug #50461: fix more PEP8 issues
+
+2019-11-19  Owen Synge <synge@univention.de>
+
+	* Bug #50461: add pytest-cov to testing dependencies
+	* Bug #50461: Fix ordering of comparision to None
+	* Bug #50461: Add test with no timeout
+	* Bug #50461: use byte-string in popen command output
+	* Bug #50461: add basic unit tests
+	* Bug #50461: Add tox support
+	* Bug #50461: Migrate to Python 3 compatible code
+	* Bug #50461: Reformat with autopep8 but use tab indentation
+
+2018-06-07  Jannik Ahlers <ahlers@univention.de>
+
+	* Bug #44222: Fix overflowerror when system time changes
+
+2018-07-04  Philipp Hahn <hahn@univention.de>
+
+	* Bug #47114: Fix memory leak - traceback
+
+2018-07-04  Philipp Hahn <hahn@univention.de>
+
+	* Bug #47114: Fix memory leak - __del__
+
+2017-01-20  Florian Best <best@univention.de>
+
+	* Use python's threading; prevent hanging in futex
+
+2016-07-20  JuergenBS <JuergenBS@users.noreply.github.com>
+
+	* Fixed typo in signal example
+
+2016-01-27  Florian Best <best@univention.de>
+
+	* Fix KeyError if socket is removed in timer
+
+2015-01-06  Florian Best <best@univention.de>
+
+	* fix references to notifier.Callback(). calling e.g. process.stop() fails
+
+2014-11-13  Florian Best <best@univention.de>
+
+	* fixed broken timer handling in nf_qt
+
+2014-07-17  Florian Best <best@univention.de>
+
+	* fix python2.7 compatibility (e.g. for SSL sockets like OpenSSL.SSL.Connection)
+
 2014-12-25  Andreas Büsching  <crunchy@bitkipper.net>
 
 	* notifier/version.py: set version to 0.9.7
