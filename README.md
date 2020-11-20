@@ -293,20 +293,3 @@ pyNotifier in the examples sub-directory.
 		notifier.socket_add( sys.stdin, standard_in )
 
 		notifier.loop()
-
-Download
-========
-
-You can find the current development source at
-
-	git clone https://github.com/crunchy-github/python-notifier.git
-
-The latest release can be found at ["Downloads/pynotifier"]
-
-
-Contact
-=======
-
-Any comments or questions can be send to
-
-crunchy@bitkipper.net
