@@ -23,97 +23,107 @@
 # 02110-1301 USA
 
 """Simple mainloop that watches sockets and timers."""
-
+from __future__ import absolute_import
 import gobject
 
-import log
+from . import log
 
 IO_READ = gobject.IO_IN
 IO_WRITE = gobject.IO_OUT
 IO_EXCEPT = gobject.IO_ERR
 
 _options = {
-	'x11' : True,
+	'x11': True,
 }
 
 # map of Sockets/Methods -> GTK source IDs
 _gtk_socketIDs = {}
-_gtk_socketIDs[ IO_READ ] = {}
-_gtk_socketIDs[ IO_WRITE ] = {}
+_gtk_socketIDs[IO_READ] = {}
+_gtk_socketIDs[IO_WRITE] = {}
 _gtk_idleIDs = {}
 
-def socket_add( socket, method, condition = IO_READ ):
+
+def socket_add(socket, method, condition=IO_READ):
 	"""The first argument specifies a socket, the second argument has to be a
 	function that is called whenever there is data ready in the socket."""
 	global _gtk_socketIDs
-	source = gobject.io_add_watch( socket, condition,
-								   _socket_callback, method )
-	_gtk_socketIDs[ condition ][ socket ] = source
+	source = gobject.io_add_watch(socket, condition, _socket_callback, method)
+	_gtk_socketIDs[condition][socket] = source
 
-def _socket_callback( source, condition, method ):
+
+def _socket_callback(source, condition, method):
 	"""This is an internal callback function, that maps the GTK source IDs
 	to the socket objects that are used by pynotifier as an identifier
 	"""
 	global _gtk_socketIDs
-	if _gtk_socketIDs[ condition ].has_key( source ):
-		ret = method( source )
+	if source in _gtk_socketIDs[condition]:
+		ret = method(source)
 		if not ret:
-			socket_remove( source, condition )
+			socket_remove(source, condition)
 	return ret
 
-	log.info( "socket '%s' not found" % source )
+	log.info("socket '%s' not found" % source)
 	return False
 
-def socket_remove( socket, condition = IO_READ ):
+
+def socket_remove(socket, condition=IO_READ):
 	"""Removes the given socket from scheduler."""
 	global _gtk_socketIDs
-	if _gtk_socketIDs[ condition ].has_key( socket ):
-		gobject.source_remove( _gtk_socketIDs[ condition ][ socket ] )
-		del _gtk_socketIDs[ condition ][ socket ]
+	if socket in _gtk_socketIDs[condition]:
+		gobject.source_remove(_gtk_socketIDs[condition][socket])
+		del _gtk_socketIDs[condition][socket]
 	else:
-		log.info( "socket '%s' not found" % socket )
+		log.info("socket '%s' not found" % socket)
 
-def timer_add( interval, method ):
+
+def timer_add(interval, method):
 	"""The first argument specifies an interval in milliseconds, the
 	second argument a function. This is function is called after
 	interval seconds. If it returns true it's called again after
 	interval seconds, otherwise it is removed from the scheduler. The
 	third (optional) argument is a parameter given to the called
 	function."""
-	return gobject.timeout_add( interval, method )
+	return gobject.timeout_add(interval, method)
 
-def timer_remove( id ):
+
+def timer_remove(id):
 	"""Removes the timer specified by id from the scheduler."""
-	gobject.source_remove( id )
+	gobject.source_remove(id)
 
-def dispatcher_add( func ):
+
+def dispatcher_add(func):
 	global _gtk_idleIDs
 
-	if _gtk_idleIDs.has_key( func ):
-		_gtk_idleIDs[ func ] = gobject.idle_add( func )
+	if func in _gtk_idleIDs:
+		_gtk_idleIDs[func] = gobject.idle_add(func)
 
-def dispatcher_remove( func ):
+
+def dispatcher_remove(func):
 	global _gtk_idleIDs
 
-	if _gtk_idleIDs.has_key( func ):
-		gobject.source_remove( _gtk_idleIDs[ func ] )
+	if func in _gtk_idleIDs:
+		gobject.source_remove(_gtk_idleIDs[func])
+
 
 _mainloop = None
 _step = None
 
-def step( sleep = True, external = True ):
+
+def step(sleep=True, external=True):
 	global _step
-	_step( sleep )
+	_step(sleep)
+
 
 def loop():
 	"""Execute main loop forever."""
 	while True:
 		step()
 
+
 def _init():
 	global _step, _mainloop
 
-	if _options[ 'x11' ]:
+	if _options['x11']:
 		import gtk
 		_step = gtk.main_iteration_do
 	else:

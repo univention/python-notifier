@@ -22,36 +22,39 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
 import PyQt4.Qt as qt
 import notifier
 
 import sys
 
-class QTestApp( qt.QCoreApplication ):
-	def __init__( self ):
-		qt.QCoreApplication.__init__( self, sys.argv )
 
-		self.timer_id = notifier.timer_add( 1000, self.timerTest )
+class QTestApp(qt.QCoreApplication):
+	def __init__(self):
+		qt.QCoreApplication.__init__(self, sys.argv)
+
+		self.timer_id = notifier.timer_add(1000, self.timerTest)
 		self.dispatch_it = 10
 
-	def recvQuit( self, mmsg, data = None ):
+	def recvQuit(self, mmsg, data=None):
 		if version == 4:
 			self.quit()
 		else:
 			self.exit_loop()
 
-	def timerTest( self ):
-		print 'tick'
+	def timerTest(self):
+		print('tick')
 		return True
 
-	def _dispatch( self ):
-		print 'dispatch'
+	def _dispatch(self):
+		print('dispatch')
 		self.dispatch_it -= 1
 		return self.dispatch_it > 0
 
-class MyThread( qt.QThread ):
-	def run( self ):
-		self._timer = notifier.timer_add( 2000, self.tick )
+
+class MyThread(qt.QThread):
+	def run(self):
+		self._timer = notifier.timer_add(2000, self.tick)
 
 		notifier.loop()
 		# import time
@@ -62,16 +65,17 @@ class MyThread( qt.QThread ):
 		# 	qt.QCoreApplication.processEvents()
 		# 	print 'wake up'
 
-	def tick( self ):
-		print 'tick my thread'
+	def tick(self):
+		print('tick my thread')
 		return True
 
+
 if __name__ == '__main__':
-	notifier.init( notifier.QT )
+	notifier.init(notifier.QT)
 	app = QTestApp()
 
 	mt = MyThread()
 	mt.start()
 
 	#notifier.dispatcher_add( app._dispatch )
-	print 'exit code: %d' % notifier.loop()
+	print('exit code: %d' % notifier.loop())

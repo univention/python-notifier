@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Author: Andreas Büsching <crunchy@bitkipper.net>
+# Author: Andreas Büsching  <crunchy@bitkipper.net>
 #
-# test programm for the QT3 and QT4 notifier
+# test programm for generic notifier implementation
 #
 # Copyright (C) 2004, 2005, 2006, 2007
-#	Andreas Büsching <crunchy@bitkipper.net>
+#		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License version
@@ -14,7 +14,7 @@
 #
 # This library is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
@@ -22,31 +22,25 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-from __future__ import print_function
+import sys
+import time
 import PyQt4.Qt as qt
+
 import notifier
 
-import sys
 
+class QTestApp(qt.QCoreApplication):
 
-class QTestApp(qt.QApplication):
 	def __init__(self):
-		qt.QApplication.__init__(self, sys.argv)
-		self.dialog = qt.QDialog()
-		self.setActiveWindow(self.dialog)
+		qt.QCoreApplication.__init__(self, sys.argv)
 
-		self.button = qt.QPushButton('Hello World', self.dialog)
-		self.dialog.show()
-		qt.QObject.connect(self.button, qt.SIGNAL('clicked()'), self.clickedButton)
 		self.timer_id = notifier.timer_add(1000, self.timerTest)
 		self.dispatch_it = 10
 
 	def recvQuit(self, mmsg, data=None):
+		# Also coudl use exit_loop
+		# self.exit_loop()
 		self.quit()
-
-	def clickedButton(self):
-		print("bye")
-		self.quit(1)
 
 	def timerTest(self):
 		print('tick')
@@ -58,9 +52,33 @@ class QTestApp(qt.QApplication):
 		return self.dispatch_it > 0
 
 
-if __name__ == '__main__':
+class MyThread(qt.QThread):
+	def run(self):
+		self._timer = notifier.timer_add(2000, self.tick)
+
+		notifier.loop()
+		# import time
+		# while True:
+		#       print 'going to sleep'
+		#       time.sleep( 1 )
+		#       # in order to process events in this thread
+		#       qt.QCoreApplication.processEvents()
+		#       print 'wake up'
+
+	def tick(self):
+		print('tick my thread')
+		return True
+
+
+def test_generic():
+
 	notifier.init(notifier.QT)
 	app = QTestApp()
 
+	mt = MyThread()
+	mt.start()
+
 	notifier.dispatcher_add(app._dispatch)
-	print('exit code: %d' % notifier.loop())
+	for i in range(3):
+		notifier.step()
+		time.sleep(1)

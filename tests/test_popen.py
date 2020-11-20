@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Author: Andreas Büsching <crunchy@bitkipper.net>
+# Author: Andreas Büsching  <crunchy@bitkipper.net>
 #
-# an example demonstrating the process handler class RunIt
+# test programm for generic notifier implementation
 #
-# Copyright (C) 2006
+# Copyright (C) 2004, 2005, 2006, 2007
 #		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 #
 # This library is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
@@ -22,34 +22,32 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-from __future__ import print_function
+import time
+
 import notifier
 import notifier.popen
 
 
-def tick():
-	print('tick')
-	return True
+def test_generic():
+	cb_results = {}
 
+	def find_result(pid, status, result):
+		cb_results['pid'] = pid
+		cb_results['status'] = status
+		cb_results['result'] = result
 
-def find_result(pid, status, result):
-	print('process %d died (%d)' % (pid, status))
-	if result:
-		print("output:%s lines" % len(result))
-	else:
-		print("output:%s" % result)
-
-
-if __name__ == '__main__':
 	notifier.init(notifier.GENERIC)
-
-	# show we can still do things
-	notifier.timer_add(500, tick)
+	# find_result = mock.Mock()
 
 	cmd = '/bin/sh -c "/bin/sleep 2 && /usr/bin/find /usr/bin"'
 	# cmd = '/usr/bin/find /var/log'
 	proc = notifier.popen.RunIt(cmd, stdout=True)
 	proc.signal_connect('finished', find_result)
-	print('started process', proc.start())
-
-	notifier.loop()
+	pid = proc.start()
+	assert(pid > 0)
+	for _i in range(3):
+		notifier.step()
+		time.sleep(1)
+	assert(cb_results['pid'] == pid)
+	assert(cb_results['status'] == 0)
+	assert(len(cb_results['result']) >= 10)

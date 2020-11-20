@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Author: Andreas Büsching <crunchy@bitkipper.net>
 #
@@ -22,35 +22,37 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+from __future__ import print_function
+
 import notifier
 import notifier.threads as threads
 
 import time
 
-def my_thread( words ):
-	for i in range( 5 ):
-		print i, words
-		time.sleep( 0.1 )
+
+def my_thread(words):
+	for i in range(5):
+		print("%s\t%s" % (i, words))
+		time.sleep(0.1)
 	return words
 
-def done_with_it( thread, result, another ):
-	print "Thread '%s' is finished" % thread.name
-	print "Argument:", another
-	print "Result:", result
+
+def done_with_it(thread, result, another):
+	print("Thread '%s' is finished" % thread.name)
+	print("Argument:%s" % another)
+	print("Result:%s" % (result))
+
 
 def doing_something_else():
-	print 'doing something else'
+	print('doing something else')
 	return True
 
-if __name__ == '__main__':
-	notifier.init( notifier.GENERIC )
 
-	# task = threads.Simple( 'test',
-	# 					   notifier.Callback( my_thread, [ 'hello', 'world' ] ),
-	# 					   done_with_it )
-	task = threads.Simple( 'test',
-						   notifier.Callback( my_thread, [ 'hello', 'world' ] ),
-						   notifier.Callback( done_with_it, 'another argument' ) )
+if __name__ == '__main__':
+	notifier.init(notifier.GENERIC)
+
+	# task = threads.Simple('test', notifier.Callback(my_thread, ['hello', 'world']), done_with_it)
+	task = threads.Simple('test', notifier.Callback(my_thread, ['hello', 'world']), notifier.Callback(done_with_it, 'another argument'))
 	task.run()
-	notifier.timer_add( 1000, doing_something_else )
+	notifier.timer_add(1000, doing_something_else)
 	notifier.loop()

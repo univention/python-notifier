@@ -3,9 +3,9 @@
 #
 # Author: Andreas Büsching  <crunchy@bitkipper.net>
 #
-# callbacks test
+# test programm for generic notifier implementation
 #
-# Copyright (C) 2005, 2006
+# Copyright (C) 2004, 2005, 2006, 2007
 #		Andreas Büsching <crunchy@bitkipper.net>
 #
 # This library is free software; you can redistribute it and/or modify
@@ -22,22 +22,21 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-from __future__ import print_function
+import mock
 import notifier
+import notifier.threads as threads
 
 
-notifier.init(notifier.GENERIC)
+def test_threads():
 
+	my_thread = mock.Mock()
+	done_with_it = mock.Mock()
+	doing_something_else = mock.Mock()
 
-def cb(bla, fasel, fasel2):
-    print(bla)
-    print(fasel)
-    print(fasel2)
+	notifier.init(notifier.GENERIC)
 
-
-b = notifier.Callback(cb)
-c = notifier.Callback(cb, 'addional user data', 'more additional user data')
-c('mandatory arguments')
-
-print('b == c', b == c)
-print('b == cb', b == cb)
+	# task = threads.Simple('test', notifier.Callback(my_thread, ['hello', 'world']), done_with_it)
+	task = threads.Simple('test', notifier.Callback(my_thread, ['hello', 'world']), notifier.Callback(done_with_it, 'another argument'))
+	task.run()
+	notifier.timer_add(1000, doing_something_else)
+	notifier.step()
