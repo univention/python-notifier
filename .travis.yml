@@ -4,6 +4,12 @@ python:
   - 3.5
   - 3.7
 
+before_install:
+  pip install codecov
+
 install: pip install -U tox-travis
 
 script: tox
+
+after_success:
+  - codecov
