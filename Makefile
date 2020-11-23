@@ -32,24 +32,16 @@
 
 .PHONY: build
 
-GIT_PARAMS=--git-dir python-notifier/.git
-
 build: usr/share/pyshared/notifier usr/share/doc/python-notifier
 
 usr/share/pyshared/notifier:
 	mkdir -p usr/share/pyshared/
-	cp -r python-notifier/notifier usr/share/pyshared/
+	cp -r notifier usr/share/pyshared/
 
 usr/share/doc/python-notifier:
 	mkdir -p usr/share/doc/python-notifier
-	gzip -c python-notifier/ChangeLog > usr/share/doc/python-notifier/changelog.gz
+	gzip -c ChangeLog > usr/share/doc/python-notifier/changelog.gz
 
-repack:
-	git $(GIT_PARAMS) repack -d
-
-update:
-	git $(GIT_PARAMS) pull --rebase
-	git $(GIT_PARAMS) repack -d
 
 .PHONY: clean
 clean:
