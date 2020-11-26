@@ -24,6 +24,7 @@
 
 import mock
 import time
+import socket
 import pytest
 
 import notifier
@@ -43,6 +44,8 @@ def test_dispatch():
 
 	# test that func was called with the correct arguments
 	dispatch.assert_called_with('hello')
+
+	notifier.dispatcher_remove(dispatch)
 
 
 def test_generic_with_timeout_and_dispatch():
@@ -88,3 +91,27 @@ def test_timer(timeout):
 	start = points.pop(0)
 	points = [round(int(p - start) / 1000.0, 2) for p in points]
 	assert points == result
+
+
+def test_adding_closed_socket():
+	notifier.init(notifier.GENERIC, recursive_depth=5)
+	s = socket.socket()
+	s.close()
+	with pytest.raises(AttributeError) as exc:
+		notifier.socket_add(s, lambda x: None)
+	assert 'could not get file description' in str(exc.value)
+
+
+def test_adding_broken_socket():
+	notifier.init(notifier.GENERIC, recursive_depth=5)
+	with pytest.raises(AttributeError) as exc:
+		notifier.socket_add(None, lambda x: None)
+	assert 'could not get file description' in str(exc.value)
+
+
+def test_removing_closed_socket():
+	notifier.init(notifier.GENERIC, recursive_depth=5)
+	s = socket.socket()
+	notifier.socket_add(s.fileno(), lambda x: None)
+	s.close()
+	notifier.socket_remove(s)
