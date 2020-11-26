@@ -22,9 +22,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+import sys
 import mock
 import time
 import socket
+import subprocess
 import pytest
 
 import notifier
@@ -115,3 +117,20 @@ def test_removing_closed_socket():
 	notifier.socket_add(s.fileno(), lambda x: None)
 	s.close()
 	notifier.socket_remove(s)
+
+
+def test_socket_remove_in_timer():
+	notifier.init()
+
+	fd = None
+
+	def on_timer():
+		notifier.socket_remove(fd)
+		return False
+
+	p = subprocess.Popen([sys.executable, '-c', 'import sys; sys.stdin.read()'], stdin=subprocess.PIPE)
+	fd = p.stdin.fileno()
+	notifier.socket_add(fd, lambda sock: True)
+	notifier.timer_add(0, on_timer)
+	p.communicate(b'A')
+	notifier.step()
