@@ -26,6 +26,10 @@
 from __future__ import absolute_import
 # python core packages
 from time import time, sleep as time_sleep
+try:
+	from time import monotonic
+except ImportError:
+	monotonic = None
 
 import select
 
@@ -62,6 +66,12 @@ _options = {
 
 class NotifierException(Exception):
 	pass
+
+
+def _current_time():
+	if monotonic:
+		return int(monotonic() * 1000)
+	return int(time() * 1000)
 
 
 def _get_fd(obj):
@@ -158,7 +168,7 @@ def timer_add(interval, method):
 	except OverflowError:
 		__timer_id = 0
 
-	__timers[__timer_id] = [interval, int(time() * 1000) + interval, method]
+	__timers[__timer_id] = [interval, _current_time() + interval, method]
 
 	return __timer_id
 
@@ -208,7 +218,7 @@ def step(sleep=True, external=True):
 		if not sleep:
 			timeout = 0
 		else:
-			now = int(time() * 1000)
+			now = _current_time()
 			for interval, timestamp, callback in __timers.values():
 				if not timestamp:
 					# timer is blocked (recursion), ignore it
@@ -244,7 +254,7 @@ def step(sleep=True, external=True):
 				# timer was unregistered by previous timer, or would
 				# recurse, ignore this timer
 				continue
-			now = int(time() * 1000)
+			now = _current_time()
 			if timestamp <= now:
 				# Update timestamp on timer before calling the callback
 				# to prevent infinite recursion in case the callback
@@ -257,7 +267,7 @@ def step(sleep=True, external=True):
 					# Find a moment in the future. If interval is 0, we
 					# just reuse the old timestamp, doesn't matter.
 					if timer[INTERVAL]:
-						now = int(time() * 1000)
+						now = _current_time()
 						timestamp += timer[INTERVAL]
 						while timestamp <= now:
 							timestamp += timer[INTERVAL]

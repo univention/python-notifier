@@ -1,3 +1,9 @@
+python-notifier (0.9.8-2) unstable; urgency=medium
+
+  * Bug #52273: use monotonic time for notifier timers
+
+ -- Florian Best <best@univention.de>  Thu, 26 Nov 2020 21:22:57 +0100
+
 python-notifier (0.9.8-1) unstable; urgency=medium
 
   * Bug #51282: update to upstream version change
