@@ -24,6 +24,7 @@
 
 import mock
 import time
+import pytest
 
 import notifier
 
@@ -62,3 +63,28 @@ def test_generic_with_timeout_and_dispatch():
 	# test that func was called with the correct arguments
 	timeout.assert_called_with('hello')
 	dispatch.assert_called_with('hello')
+
+
+class Stop(Exception):
+	pass
+
+
+@pytest.mark.parametrize('timeout', [1000, 500, 100])
+def test_timer(timeout):
+	result = [(timeout * i) / 1000.0 for i in range(1, 6)]
+	points = []
+
+	def timer():
+		points.append(time.time() * 1000)
+		if len(points) > 5:
+			raise Stop()
+		return True
+
+	notifier.init(notifier.GENERIC)
+	t = notifier.timer_add(timeout, timer)
+	with pytest.raises(Stop):
+		notifier.loop()
+	notifier.timer_remove(t)
+	start = points.pop(0)
+	points = [round(int(p - start) / 1000.0, 2) for p in points]
+	assert points == result
