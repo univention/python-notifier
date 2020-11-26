@@ -1,3 +1,9 @@
+python-notifier (0.9.8-3) unstable; urgency=medium
+
+  * Bug #51781: move exception handling into _get_fd()
+
+ -- Florian Best <best@univention.de>  Thu, 26 Nov 2020 23:13:59 +0100
+
 python-notifier (0.9.8-2) unstable; urgency=medium
 
   * Bug #52273: use monotonic time for notifier timers

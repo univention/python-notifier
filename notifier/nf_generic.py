@@ -80,7 +80,10 @@ def _get_fd(obj):
 	if isinstance(obj, int):
 		return obj
 	if hasattr(obj, 'fileno'):
-		return obj.fileno()
+		try:
+			return obj.fileno()
+		except EnvironmentError:
+			return -1
 
 	return -1
 
@@ -116,12 +119,9 @@ def socket_remove(id, condition=IO_READ):
 			socket_remove(id, c)
 		return
 
-	try:
-		fd = _get_fd(id)
-		if fd < 0:
-			raise ValueError()
-		valid = True
-	except Exception:
+	fd = _get_fd(id)
+	valid = True
+	if fd < 0:
 		fd = None
 		valid = False
 		# file descriptor already closed
