@@ -25,11 +25,11 @@
 """Simple mainloop that watches sockets and timers."""
 from __future__ import absolute_import
 # python core packages
-from time import time, sleep as time_sleep
+from time import sleep as time_sleep
 try:
 	from time import monotonic
-except ImportError:
-	monotonic = None
+except ImportError:  # Python 2
+	from monotonic import monotonic
 
 import select
 
@@ -69,9 +69,7 @@ class NotifierException(Exception):
 
 
 def _current_time():
-	if monotonic:
-		return int(monotonic() * 1000)
-	return int(time() * 1000)
+	return int(monotonic() * 1000)
 
 
 def _get_fd(obj):

@@ -14,6 +14,7 @@ Package: python-notifier
 Architecture: all
 Depends:
  python,
+ python-monotonic,
  ${misc:Depends},
  ${python:Depends},
 Replaces:

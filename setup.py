@@ -61,6 +61,7 @@ setup_args = {
 	'platforms': ['any', ],
 	'classifiers': filter(None, classifiers.split('\n')),
 	'packages': ['notifier', ],
+	'install_requires': ['monotonic'],
 	'extras_require': {
 		'testing': ['zope', 'twisted', 'pytest', 'pytest-cov', 'mock', 'codecov'],
 	},

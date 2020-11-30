@@ -1,3 +1,9 @@
+python-notifier (0.9.8-4) unstable; urgency=medium
+
+  * Bug #52273: also use monotonic time in Python 2
+
+ -- Florian Best <best@univention.de>  Mon, 30 Nov 2020 19:26:36 +0100
+
 python-notifier (0.9.8-3) unstable; urgency=medium
 
   * Bug #51781: move exception handling into _get_fd()
