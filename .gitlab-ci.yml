@@ -1,0 +1,41 @@
+image: docker-registry.knut.univention.de/python:3.7-slim-buster
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -V  # Print out python version for debugging
+  - pip install virtualenv
+  - virtualenv venv
+  - . venv/bin/activate
+  - pip install tox flake8  # you can also use tox
+
+test:
+  script:
+    - tox
+
+wheel:
+  script:
+    - python setup.py bdist_wheel
+  artifacts:
+    paths:
+      - dist/*.whl
+
+deb:
+  image: docker-registry.knut.univention.de/debian:buster-slim
+  before_script:
+    - apt-get -qq update
+    - apt-get -q build-dep --assume-yes .
+  script:
+    - dpkg-buildpackage -nc
+    - rm -rf public
+    - mkdir public
+    - mv -t public/ ../python*-notifier_*
+  artifacts:
+    paths:
+      - public
