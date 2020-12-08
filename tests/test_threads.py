@@ -23,12 +23,12 @@
 # 02110-1301 USA
 
 import mock
+
 import notifier
 import notifier.threads as threads
 
 
 def test_threads():
-
 	my_thread = mock.Mock()
 	done_with_it = mock.Mock()
 	doing_something_else = mock.Mock()

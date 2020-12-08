@@ -21,15 +21,17 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-
 """Simple test program for the Twisted notifier."""
-import mock
+
 import os
+import tempfile
 import time
 
+import mock
+import pytest
+pytest.importorskip("twisted")
+
 import notifier
-import tempfile
-#import twisted
 
 
 _stdout = tempfile.TemporaryFile()
