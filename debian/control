@@ -6,7 +6,6 @@ Standards-Version: 3.9.8
 Build-Depends:
  debhelper,
  dh-python,
- gzip,
  python-all,
  python-setuptools,
  python3-all,
@@ -15,14 +14,12 @@ Build-Depends:
 Package: python-notifier
 Architecture: all
 Depends:
- python,
  python-monotonic,
  ${misc:Depends},
  ${python:Depends},
 Replaces:
  pynotifier,
 Provides:
- python2.6-notifier,
  python2.7-notifier,
  ${python:Provides},
 Section: python
@@ -37,11 +34,8 @@ Description: a generic event scheduler providing one own implementation and adap
 Package: python3-notifier
 Architecture: all
 Depends:
- python3,
  ${misc:Depends},
  ${python3:Depends},
-Provides:
- ${python3:Provides},
 Section: python
 Priority: optional
 Description: a generic event scheduler providing one own implementation and adaption code for GTK+, QT and Twisted
