@@ -1,0 +1,8 @@
+.coverage
+coverage.xml
+htmlcov/
+junit-*.xml
+*.pyc
+python_notifier.egg-info/
+.tox/
+venv/
