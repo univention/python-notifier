@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2004, 2005, 2006 Andreas Büsching <crunchy@bitkipper.net>
-# COpyright (C) 2020 Univentio GmbH <packages@univention.de>
+# Copyright (C) 2020 Univention GmbH <packages@univention.de>
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License version
