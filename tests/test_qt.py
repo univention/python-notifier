@@ -24,7 +24,9 @@
 
 import sys
 import time
-import PyQt4.Qt as qt
+
+import pytest
+qt = pytest.importorskip("PyQt4.Qt")
 
 import notifier
 

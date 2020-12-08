@@ -22,11 +22,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+import time
+
+import pytest
 import mock
+
 import notifier
 import notifier.signals as signals
-import time
-import pytest
 
 
 class TestSignal(signals.Provider):
