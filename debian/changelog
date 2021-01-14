@@ -1,3 +1,9 @@
+python-notifier (0.9.8-5) unstable; urgency=low
+
+  * Bug #52518: Remove __killall() function killing wrong processes
+
+ -- Philipp Hahn <hahn@univention.de>  Thu, 14 Jan 2021 17:30:06 +0100
+
 python-notifier (0.9.8-4) unstable; urgency=medium
 
   * Bug #52273: also use monotonic time in Python 2

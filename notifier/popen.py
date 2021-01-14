@@ -232,53 +232,7 @@ class Process(signals.Provider):
 
 		if signal == 15:
 			cb = notifier.Callback(self.__kill, 9)
-		else:
-			cb = notifier.Callback(self.__killall, 15)
-
-		self.__kill_timer = notifier.timer_add(3000, cb)
-		return False
-
-	def __killall(self, signal):
-		"""
-		Internal killall helper function
-		"""
-		if not self.is_alive():
-			self.__dead = True
-			self.stopping = False
-			return False
-		# child needs some assistance with dying ...
-		try:
-			# kill all applications with the string <appname> in their
-			# commandline. This implementation uses the /proc filesystem,
-			# it is Linux-dependent.
-			unify_name = re.compile('[^A-Za-z0-9]').sub
-			appname = unify_name('', self.binary)
-
-			cmdline_filenames = glob.glob('/proc/[0-9]*/cmdline')
-
-			for cmdline_filename in cmdline_filenames:
-				try:
-					fd = open(cmdline_filename)
-					cmdline = fd.read()
-					fd.close()
-				except IOError:
-					continue
-				if unify_name('', cmdline).find(appname) != -1:
-					# Found one, kill it
-					pid = int(cmdline_filename.split('/')[2])
-					try:
-						os.kill(pid, signal)
-					except:
-						pass
-		except OSError:
-			pass
-
-		log.info('kill -%d %s' % (signal, self.binary))
-		if signal == 15:
-			cb = notifier.Callback(self.__killall, 9)
-			self.__kill_timer = notifier.timer_add(2000, cb)
-		else:
-			log.critical('PANIC %s' % self.binary)
+			self.__kill_timer = notifier.timer_add(3000, cb)
 
 		return False
 
