@@ -1,3 +1,10 @@
+python-notifier (0.9.8-6) unstable; urgency=medium
+
+  * Bug #53249: fix "RuntimeError: dictionary changed size during
+    iteration" in timeout selection
+
+ -- Florian Best <best@univention.de>  Wed, 12 May 2021 12:35:56 +0200
+
 python-notifier (0.9.8-5) unstable; urgency=low
 
   * Bug #52518: Remove __killall() function killing wrong processes

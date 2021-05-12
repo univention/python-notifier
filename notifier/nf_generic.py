@@ -217,7 +217,7 @@ def step(sleep=True, external=True):
 			timeout = 0
 		else:
 			now = _current_time()
-			for interval, timestamp, callback in __timers.values():
+			for interval, timestamp, callback in list(__timers.values()):
 				if not timestamp:
 					# timer is blocked (recursion), ignore it
 					continue
