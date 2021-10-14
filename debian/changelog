@@ -1,3 +1,9 @@
+python-notifier (0.9.9-1~) unstable; urgency=medium
+
+  * Add notifier.TORNADO implementation
+
+ -- Florian Best <best@univention.de>  Thu, 14 Oct 2021 14:40:46 +0200
+
 python-notifier (0.9.8-6) unstable; urgency=medium
 
   * Bug #53249: fix "RuntimeError: dictionary changed size during
