@@ -41,7 +41,7 @@ loop = None
 step = None
 
 # notifier types
-(GENERIC, QT, GTK, TWISTED) = range(4)
+(GENERIC, QT, GTK, TWISTED, TORNADO) = range(5)
 
 # socket conditions
 IO_READ = None
@@ -67,6 +67,8 @@ def init(model=GENERIC, **kwargs):
 		from . import nf_gtk as nf_impl
 	elif model == TWISTED:
 		from . import nf_twisted as nf_impl
+	elif model == TORNADO:
+		from . import nf_tornado as nf_impl
 	else:
 		raise Exception('unknown notifier model')
 
